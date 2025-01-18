@@ -12,6 +12,7 @@ import { BuilderLayout } from "../pages/builder/layout";
 import { builderLoader, BuilderPage } from "../pages/builder/page";
 import { DashboardLayout } from "../pages/dashboard/layout";
 import { ResumesPage } from "../pages/dashboard/resumes/page";
+import { JobTrackerPage } from "../pages/dashboard/job-tracker/page";
 import { SettingsPage } from "../pages/dashboard/settings/page";
 import { HomeLayout } from "../pages/home/layout";
 import { HomePage } from "../pages/home/page";
@@ -20,6 +21,10 @@ import { Providers } from "../providers";
 import { AuthGuard } from "./guards/auth";
 import { GuestGuard } from "./guards/guest";
 import { authLoader } from "./loaders/auth";
+import { DashboardPage } from "../pages/dashboard/dashboard/page";
+import { InterviewPrepPage } from "../pages/dashboard/interview-prep/page";
+import { JobsPage } from "../pages/dashboard/jobs/page";
+import { MockTestsPage } from "../pages/dashboard/mock-tests/page";
 
 export const routes = createRoutesFromElements(
   // eslint-disable-next-line lingui/no-unlocalized-strings
@@ -62,7 +67,12 @@ export const routes = createRoutesFromElements(
     <Route path="dashboard">
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
           <Route path="resumes" element={<ResumesPage />} />
+          <Route path="jobs" element={<JobsPage />} />
+          <Route path="job-tracker" element={<JobTrackerPage />} />
+          <Route path="mock-tests" element={<MockTestsPage />} />
+          <Route path="interview-prep" element={<InterviewPrepPage />} />
           <Route path="settings" element={<SettingsPage />} />
 
           <Route index element={<Navigate replace to="/dashboard/resumes" />} />

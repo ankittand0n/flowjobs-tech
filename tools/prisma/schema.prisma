@@ -33,6 +33,7 @@ model User {
   provider         Provider
   secrets          Secrets?
   resumes          Resume[]
+  applications JobApplication[]
 }
 
 model Secrets {
@@ -62,6 +63,7 @@ model Resume {
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  applications JobApplication[]
 
   @@unique([userId, id])
   @@unique([userId, slug])
@@ -79,3 +81,42 @@ model Statistics {
 
   @@unique([resumeId, id])
 }
+
+model Job {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  company     String
+  location    String?
+  type        String?
+  salary      String?
+  url         String?  @unique
+  description String?
+  atsKeywords Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  applications JobApplication[]
+
+  @@index([userId])
+  @@unique([userId, url])
+}
+
+model JobApplication {
+  id        String   @id @default(cuid())
+  jobId     String
+  userId    String
+  resumeId  String?
+  status    String   @default("draft")
+  notes     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume    Resume?  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([jobId])
+  @@index([resumeId])
+}
+

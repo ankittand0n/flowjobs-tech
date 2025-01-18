@@ -1,5 +1,17 @@
 import { t } from "@lingui/macro";
-import { FadersHorizontal, ReadCvLogo } from "@phosphor-icons/react";
+import {
+  ChartLineUp,
+  FileText,
+  GearSix,
+  ListDashes,
+  SignOut,
+  FadersHorizontal,
+  User,
+  ReadCvLogo,
+  Briefcase,
+  Brain,
+} from "@phosphor-icons/react";
+
 import { Button, KeyboardShortcut, Separator } from "@reactive-resume/ui";
 import { cn } from "@reactive-resume/utils";
 import { motion } from "framer-motion";
@@ -80,19 +92,74 @@ export const Sidebar = ({ setOpen }: SidebarProps) => {
     setOpen?.(false);
   });
 
+  useKeyboardShortcut(["shift", "j"], () => {
+    navigate("/dashboard/jobs");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "t"], () => {
+    navigate("/dashboard/job-tracker");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "i"], () => {
+    navigate("/dashboard/interview-prep");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "d"], () => {
+    navigate("/dashboard");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "m"], () => {
+    navigate("/dashboard/mock-tests");
+    setOpen?.(false);
+  });
+
   const sidebarItems: SidebarItem[] = [
+    {
+      path: "/dashboard",
+      name: t`Dashboard`,
+      shortcut: "⇧D",
+      icon: <ReadCvLogo />,
+    },
+    {
+      path: "/dashboard/job-tracker",
+      name: t`Job Tracker`,
+      shortcut: "⇧T",
+      icon: <ChartLineUp />,
+    },
     {
       path: "/dashboard/resumes",
       name: t`Resumes`,
       shortcut: "⇧R",
-      icon: <ReadCvLogo />,
+      icon: <FileText />,
+    },
+    {
+      path: "/dashboard/jobs",
+      name: t`Jobs`,
+      shortcut: "⇧J",
+      icon: <Briefcase />,
+    },
+    {
+      path: "/dashboard/mock-tests",
+      name: t`Mock Tests`,
+      shortcut: "⇧M",
+      icon: <Brain />,
+    },
+    {
+      path: "/dashboard/interview-prep",
+      name: t`Interview Prep.`,
+      shortcut: "⇧I",
+      icon: <User />,
     },
     {
       path: "/dashboard/settings",
       name: t`Settings`,
       shortcut: "⇧S",
-      icon: <FadersHorizontal />,
-    },
+      icon: <GearSix />,
+    }
   ];
 
   return (

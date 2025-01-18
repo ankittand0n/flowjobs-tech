@@ -18,6 +18,8 @@ import { ResumeModule } from "./resume/resume.module";
 import { StorageModule } from "./storage/storage.module";
 import { TranslationModule } from "./translation/translation.module";
 import { UserModule } from "./user/user.module";
+import { JobModule } from "./job/job.module";
+import { JobApplicationModule } from "./job-application/job-application.module";
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { UserModule } from "./user/user.module";
     MailModule,
     RavenModule,
     HealthModule,
+    JobApplicationModule,
+    JobModule,
 
     // Feature Modules
     AuthModule.register(),
