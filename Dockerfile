@@ -29,7 +29,15 @@ RUN pnpm run build
 FROM base AS release
 ARG NX_CLOUD_ACCESS_TOKEN
 
-RUN apt update && apt install -y dumb-init --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# Install dumb-init and MinIO client
+RUN apt update && \
+    apt install -y dumb-init wget curl --no-install-recommends && \
+    wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
+    chmod +x mc && \
+    ./minio server /data && \
+    mv mc /usr/local/bin/ && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node --from=build /app/.npmrc /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
