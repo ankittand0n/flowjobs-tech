@@ -32,15 +32,12 @@ ARG NX_CLOUD_ACCESS_TOKEN
 # Install dependencies and MinIO
 RUN apt update && \
     apt install -y dumb-init wget curl --no-install-recommends && \
-    wget https://dl.min.io/server/minio/release/linux-amd64/minio && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget --no-check-certificate https://dl.min.io/server/minio/release/linux-amd64/minio && \
     chmod +x minio && \
     mv minio /usr/local/bin/ && \
-    wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
-    chmod +x mc && \
-    mv mc /usr/local/bin/ && \
-    mkdir -p /data && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    mkdir -p /data
 
 COPY --chown=node:node --from=build /app/.npmrc /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
