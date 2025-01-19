@@ -127,7 +127,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
               <Label>{t`Company`}</Label>
               <Input
                 required
-                placeholder={t`e.g. Acme Corp`}
+                placeholder={t`e.g. Google`}
                 value={jobData.company}
                 onChange={(e) => setJobData({ ...jobData, company: e.target.value })}
               />
@@ -261,7 +261,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
         <DialogHeader>
           <DialogTitle>{t`Track New Job`}</DialogTitle>
           <DialogDescription>
-            {t`Step ${currentStep} of ${steps.length}: ${steps[currentStep - 1].description}`}
+            {t`Step` + currentStep + t` of ` + steps.length + t`: ` + steps[currentStep - 1].description}
           </DialogDescription>
         </DialogHeader>
 

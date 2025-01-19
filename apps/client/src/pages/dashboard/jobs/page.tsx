@@ -63,7 +63,7 @@ export const JobsPage = () => {
 
         <div className="relative">
           <Input
-            placeholder={t`Search jobs...`}
+            placeholder={t`Search Jobs`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -86,7 +86,7 @@ export const JobsPage = () => {
               animate={{ opacity: 1 }}
               className="text-center text-muted-foreground py-8"
             >
-              {searchQuery ? t`No jobs found matching "${searchQuery}"` : t`No jobs found`}
+              {searchQuery ? t`No jobs found matching` + searchQuery : t`No jobs found`}
             </motion.div>
           ) : (
             filteredJobs.map((job: any, index: any) => (

@@ -194,6 +194,10 @@ msgstr "Awarder"
 #: apps/client/src/pages/auth/backup-otp/page.tsx:99
 #: apps/client/src/pages/auth/forgot-password/page.tsx:100
 #: apps/client/src/pages/dashboard/settings/_dialogs/two-factor.tsx:243
+
+msgid "Next"
+msgstr "Next"
+
 msgid "Back"
 msgstr "Back"
 
@@ -1924,6 +1928,9 @@ msgstr "View Resume"
 msgid "No jobs found"
 msgstr "No jobs found"
 
+msgid "No jobs found matching"
+msgstr "No jobs found matching"
+
 msgid "View"
 msgstr "View"
 
@@ -2061,3 +2068,60 @@ msgstr "Track New Job"
 
 msgid "Manage Columns"
 msgstr "Manage Columns"
+
+msgid "Search Jobs"
+msgstr "Search Jobs"
+
+msgid "Get personalized interview questions based on the job description and requirements."
+msgstr "Get personalized interview questions based on the job description and requirements."
+
+msgid "Basic Info"
+msgstr "Basic Info"
+
+msgid "Job Details"
+msgstr "Job Details"
+
+msgid "Application"
+msgstr "Application"
+
+msgid "Enter basic job information"
+msgstr "Enter basic job information"
+
+msgid "Add detailed job information"
+msgstr "Add detailed job information"
+
+msgid "Track your application"
+msgstr "Track your application"
+
+msgid "e.g. Frontend Developer"
+msgstr "e.g. Frontend Developer"
+
+msgid "e.g. Google"
+msgstr "e.g. Google"
+
+msgid "e.g. https://company.com/jobs/123"
+msgstr "e.g. https://company.com/jobs/123"
+
+msgid "Internship"
+msgstr "Internship"
+
+msgid "Freelance"
+msgstr "Freelance"
+
+msgid "Create Job"
+msgstr "Create Job"
+
+msgid "Creating job..."
+msgstr "Creating job..."
+
+msgid "Step"
+msgstr "Step"
+
+msgid " of "
+msgstr " of "
+
+msgid ": "
+msgstr ": "
+
+msgid "e.g. $100,000/year or $50-70/hour"
+msgstr "e.g. $100,000/year or $50-70/hour"
