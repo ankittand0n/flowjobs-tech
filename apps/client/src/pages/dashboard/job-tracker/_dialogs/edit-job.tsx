@@ -177,7 +177,7 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
                   type="url"
                   value={jobData.url}
                   onChange={(e) => setJobData({ ...jobData, url: e.target.value })}
-                  placeholder={t`https://example.com/job-posting`}
+                  placeholder={t`e.g. https://example.com/job-posting`}
                 />
               </div>
 

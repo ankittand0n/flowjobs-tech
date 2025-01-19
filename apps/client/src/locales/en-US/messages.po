@@ -1700,10 +1700,6 @@ msgstr "You can also integrate with Ollama simply by setting the API key to `sk-
 msgid "You can make use of the OpenAI API to help you generate content, or improve your writing while composing your resume."
 msgstr "You can make use of the OpenAI API to help you generate content, or improve your writing while composing your resume."
 
-#: apps/client/src/pages/builder/sidebars/right/sections/statistics.tsx:40
-msgid "You can track the number of views your resume has received, or how many people have downloaded the resume by enabling public sharing."
-msgstr "You can track the number of views your resume has received, or how many people have downloaded the resume by enabling public sharing."
-
 #: apps/client/src/pages/dashboard/settings/_sections/openai.tsx:87
 msgid "You have the option to <0>obtain your own OpenAI API key</0>. This key empowers you to leverage the API as you see fit. Alternatively, if you wish to disable the AI features in Reactive Resume altogether, you can simply remove the key from your settings."
 msgstr "You have the option to <0>obtain your own OpenAI API key</0>. This key empowers you to leverage the API as you see fit. Alternatively, if you wish to disable the AI features in Reactive Resume altogether, you can simply remove the key from your settings."
@@ -1744,3 +1740,324 @@ msgstr "Zoom In"
 #: apps/client/src/pages/builder/_components/toolbar.tsx:118
 msgid "Zoom Out"
 msgstr "Zoom Out"
+
+msgid "Draft"
+msgstr "Draft"
+
+msgid "Applied"
+msgstr "Applied"
+
+msgid "Interviewing"
+msgstr "Interviewing"
+
+msgid "Offer"
+msgstr "Offer"
+
+msgid "Edit Application"
+msgstr "Edit Application"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Save Changes"
+msgstr "Save Changes"
+
+msgid "Interview Prep"
+msgstr "Interview Prep"
+
+msgid "Interview Preparation"
+msgstr "Interview Preparation"
+
+msgid "Common Questions"
+msgstr "Common Questions"
+
+msgid "Technical Prep"
+msgstr "Technical Prep"
+
+msgid "Interview Tips"
+msgstr "Interview Tips"
+
+msgid "STAR Method"
+msgstr "STAR Method"
+
+msgid "Behavioral Questions"
+msgstr "Behavioral Questions"
+
+msgid "Resources"
+msgstr "Resources"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Job Tracker"
+msgstr "Job Tracker"
+
+msgid "Resumes"
+msgstr "Resumes"
+
+msgid "Jobs"
+msgstr "Jobs"
+
+msgid "Mock Tests"
+msgstr "Mock Tests"
+
+msgid "Interview Prep."
+msgstr "Interview Prep."
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Tell me about yourself"
+msgstr "Tell me about yourself"
+
+msgid "Why do you want this job?"
+msgstr "Why do you want this job?"
+
+msgid "What are your strengths and weaknesses?"
+msgstr "What are your strengths and weaknesses?"
+
+msgid "Data Structures & Algorithms"
+msgstr "Data Structures & Algorithms"
+
+msgid "System Design"
+msgstr "System Design"
+
+msgid "Coding Challenges"
+msgstr "Coding Challenges"
+
+msgid "Research the company"
+msgstr "Research the company"
+
+msgid "Prepare questions to ask"
+msgstr "Prepare questions to ask"
+
+msgid "Practice with mock interviews"
+msgstr "Practice with mock interviews"
+
+msgid "Set the context"
+msgstr "Set the context"
+
+msgid "Describe the challenge"
+msgstr "Describe the challenge"
+
+msgid "Explain your approach"
+msgstr "Explain your approach"
+
+msgid "Share the outcome"
+msgstr "Share the outcome"
+
+msgid "Interview Guides"
+msgstr "Interview Guides"
+
+msgid "Company Research Tools"
+msgstr "Company Research Tools"
+
+msgid "Practice Platforms"
+msgstr "Practice Platforms"
+
+msgid "Leadership experience example"
+msgstr "Leadership experience example"
+
+msgid "How do you handle conflicts?"
+msgstr "How do you handle conflicts?"
+
+msgid "Describe a challenging project"
+msgstr "Describe a challenging project"
+
+msgid "Update the details of your tracked job"
+msgstr "Update the details of your tracked job"
+
+msgid "Edit Job"
+msgstr "Edit Job"
+
+msgid "Job Title"
+msgstr "Job Title"
+
+msgid "Job Type"
+msgstr "Job Type"
+
+msgid "Select job type"
+msgstr "Select job type"
+
+msgid "Job Description"
+msgstr "Job Description"
+
+msgid "Salary Range"
+msgstr "Salary Range"
+
+msgid "Full-time"
+msgstr "Full-time"
+
+msgid "Part-time"
+msgstr "Part-time"
+
+msgid "Contract"
+msgstr "Contract"
+
+msgid "Remote"
+msgstr "Remote"
+
+msgid "Optional"
+msgstr "Optional"
+
+msgid "Job URL"
+msgstr "Job URL"
+
+msgid "e.g. https://example.com/job-posting"
+msgstr "e.g. https://example.com/job-posting"
+
+msgid "Resume Used"
+msgstr "Resume Used"
+
+msgid "View Resume"
+msgstr "View Resume"
+
+msgid "No jobs found"
+msgstr "No jobs found"
+
+msgid "View"
+msgstr "View"
+
+msgid "Apply to Job"
+msgstr "Apply to Job"
+
+msgid "Application Status"
+msgstr "Application Status"
+
+msgid "Select a resume"
+msgstr "Select a resume"
+
+msgid "Apply Now"
+msgstr "Apply Now"
+
+msgid "Skills"
+msgstr "Skills"
+
+msgid "Add Skills"
+msgstr "Add Skills"
+
+msgid "Requirements"
+msgstr "Requirements"
+
+msgid "Cover Letter"
+msgstr "Cover Letter"
+
+msgid "Upload Resume"
+msgstr "Upload Resume"
+
+msgid "Experience"
+msgstr "Experience"
+
+msgid "Education"
+msgstr "Education"
+
+msgid "Extract ATS Keywords"
+msgstr "Extract ATS Keywords"
+
+msgid "Analyze Job Description"
+msgstr "Analyze Job Description"
+
+msgid "Analyze Description"
+msgstr "Analyze Description"
+
+msgid "Job Details"
+msgstr "Job Details"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "View Job Posting"
+msgstr "View Job Posting"
+
+msgid "Salary"
+msgstr "Salary"
+
+msgid "Company"
+msgstr "Company"
+
+msgid "Years"
+msgstr "Years"
+
+msgid "Months"
+msgstr "Months"
+
+msgid "years"
+msgstr "years"
+
+msgid "months"
+msgstr "months"
+
+msgid "ATS Keywords Analysis"
+msgstr "ATS Keywords Analysis"
+
+msgid "View Details"
+msgstr "View Details"
+
+msgid "Track Application"
+msgstr "Track Application"
+
+msgid "Apply on Website"
+msgstr "Apply on Website"
+
+msgid "15 Minutes"
+msgstr "15 Minutes"
+
+msgid "30 Minutes"
+msgstr "30 Minutes"
+
+msgid "60 Minutes"
+msgstr "60 Minutes"
+
+msgid "Practice Interview Questions"
+msgstr "Practice Interview Questions"
+
+msgid "Start Test"
+msgstr "Start Test"
+
+msgid "Select Job"
+msgstr "Select Job"
+
+msgid "Generate Test"
+msgstr "Generate Test"
+
+msgid "Test Duration"
+msgstr "Test Duration"
+
+msgid "Select Duration"
+msgstr "Select Duration"
+
+msgid "Choose a job"
+msgstr "Choose a Job"
+
+msgid "Start Mock Test"
+msgstr "Start Mock Test"
+
+msgid "Total Resumes"
+msgstr "Total Resumes"
+
+msgid "Edit Job"
+msgstr "Edit Job"
+
+msgid "Application Status"
+msgstr "Application Status"
+
+msgid "Applications Status"
+msgstr "Applications Status"
+
+msgid "Recent Activity"
+msgstr "Recent Activity"
+
+msgid "Track New Job"
+msgstr "Track New Job"
+
+msgid "Manage Columns"
+msgstr "Manage Columns"
