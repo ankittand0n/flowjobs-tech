@@ -73,7 +73,7 @@ export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
         <DialogHeader>
           <DialogTitle>{t`Apply to Job`}</DialogTitle>
           <DialogDescription>
-            {t`Apply to ${job.title} at ${job.company}`}
+            {t`Apply to` + ` ${job.title}` + ` at ` + `${job.company}`}
           </DialogDescription>
         </DialogHeader>
 

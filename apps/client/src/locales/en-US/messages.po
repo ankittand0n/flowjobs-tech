@@ -2125,3 +2125,16 @@ msgstr ": "
 
 msgid "e.g. $100,000/year or $50-70/hour"
 msgstr "e.g. $100,000/year or $50-70/hour"
+
+msgid "Analyze job descriptions to extract key ATS keywords and requirements."
+msgstr "Analyze job descriptions to extract key ATS keywords and requirements."
+
+msgid "Apply to Job"
+msgstr "Apply to Job"
+
+msgid "Apply to"
+msgstr "Apply to"
+
+msgid " at "
+msgstr " at "
+
