@@ -2155,3 +2155,186 @@ msgstr "Select Job for ATS Keywords"
 
 msgid "Keywords found in resume"
 msgstr "Keywords found in resume"
+
+msgid "Select Keywords for Test Questions"
+msgstr "Select Keywords for Test Questions"
+
+msgid "Generating questions..."
+msgstr "Generating questions..."
+
+msgid "Generate Questions"
+msgstr "Generate Questions"
+
+msgid "Expected duration:"
+msgstr "Expected duration:"
+
+msgid "minutes"
+msgstr "minutes"
+
+msgid "Type your answer here..."
+msgstr "Type your answer here..."
+
+msgid "Select Keywords"
+msgstr "Select Keywords"
+
+msgid "Select Duration"
+msgstr "Select Duration"
+
+msgid "Your Answer:"
+msgstr "Your Answer:"
+
+msgid "Key Points:"
+msgstr "Key Points:"
+
+msgid "Score:"
+msgstr "Score:"
+
+msgid "Feedback:"
+msgstr "Feedback:"  
+
+msgid "Next Question"
+msgstr "Next Question"
+
+msgid "Previous Question"
+msgstr "Previous Question"  
+
+msgid "Submit"
+msgstr "Submit"
+
+msgid "Start Test"
+msgstr "Start Test"
+
+msgid "Cancel Test"
+msgstr "Cancel Test"
+
+msgid "Test Completed"
+msgstr "Test Completed"
+
+msgid "Submit Answer"
+msgstr "Submit Answer"
+
+msgid "Your Score"
+msgstr "Your Score"
+
+msgid "Your Feedback"
+msgstr "Your Feedback"
+
+msgid "Start Over"
+msgstr "Start Over"
+
+msgid "End Test"
+msgstr "End Test"
+
+msgid "Question"
+msgstr "Question"   
+
+msgid "of"
+msgstr "of"
+
+msgid "Back to Mock Tests"
+msgstr "Back to Mock Tests"
+
+msgid "No content in OpenAI response"
+msgstr "No content in OpenAI response"
+
+msgid "No evaluation returned from OpenAI"
+msgstr "No evaluation returned from OpenAI"
+
+msgid "Draft"
+msgstr "Draft"
+
+msgid "Applied"
+msgstr "Applied"
+
+msgid "Screening"
+msgstr "Screening"
+
+msgid "Interviewing"
+msgstr "Interviewing"
+
+msgid "Offer"
+msgstr "Offer"
+
+msgid "Accepted"
+msgstr "Accepted"
+
+msgid "Rejected"
+msgstr "Rejected"
+
+msgid "Ghosted"
+msgstr "Ghosted"
+
+msgid "Withdrawn"
+msgstr "Withdrawn"
+
+msgid "Archived"
+msgstr "Archived"
+
+msgid "Edit Application"
+msgstr "Edit Application"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Save Changes"
+msgstr "Save Changes"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "status.draft"
+msgstr "Draft"
+
+msgid "status.applied"
+msgstr "Applied"
+
+msgid "status.screening"
+msgstr "Screening"
+
+msgid "status.interviewing"
+msgstr "Interviewing"
+
+msgid "status.offer"
+msgstr "Offer"
+
+msgid "status.accepted"
+msgstr "Accepted"
+
+msgid "status.rejected"
+msgstr "Rejected"
+
+msgid "status.ghosted"
+msgstr "Ghosted"
+
+msgid "status.withdrawn"
+msgstr "Withdrawn"
+
+msgid "status.archived"
+msgstr "Archived"
+
+msgid "Delete Job"
+msgstr "Delete Job"
+
+msgid "Deleting..."
+msgstr "Deleting..."
+
+msgid "e.g. $80k - $100k"
+msgstr "e.g. $80k - $100k"
+
+msgid "Failed to create application"
+msgstr "Failed to create application"
+
+msgid "Applying..."
+msgstr "Applying..."

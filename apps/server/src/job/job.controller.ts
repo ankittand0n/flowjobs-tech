@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
@@ -60,11 +60,20 @@ export class JobController {
   }
 
   @Patch(":id")
+  @UseGuards(AuthGuard("jwt"))
   async updateJob(
     @GetUser() user: User,
     @Param("id") id: string,
     @Body() updateJobDto: UpdateJobDto,
   ) {
+    const job = await this.prisma.job.findUnique({
+      where: { id },
+    });
+
+    if (!job || job.createdBy !== user.id) {
+      throw new ForbiddenException('You cannot edit this job');
+    }
+
     return this.prisma.job.update({
       where: {
         id,
@@ -84,6 +93,14 @@ export class JobController {
 
   @Delete(":id")
   async deleteJob(@GetUser() user: User, @Param("id") id: string) {
+    const job = await this.prisma.job.findUnique({
+      where: { id },
+    });
+
+    if (!job || job.createdBy !== user.id) {
+      throw new ForbiddenException('You cannot delete this job');
+    }
+
     return this.prisma.job.delete({
       where: {
         id,

@@ -4,6 +4,7 @@ import { stripHtml } from "@/client/utils/string";
 import { axios } from "../../libs/axios";
 import { extractAtsKeywords } from "../openai/extract-ats";
 import { t } from "@lingui/macro";
+import { UpdateJobDto } from "@reactive-resume/dto";
 
 type CreateJobDto = {
   title: string;
@@ -39,17 +40,15 @@ type UpdateJobStatusDto = {
   status: string;
 };
 
-type UpdateJobDto = CreateJobDto & {
-  id: string;
-  notes?: string;
-};
-
 export const useJobs = () => {
   return useQuery({
     queryKey: ["jobs"],
     queryFn: async () => {
       const { data } = await axios.get("/jobs");
-      return data;
+      return data.map((job: any) => ({
+        ...job,
+        canEdit: job.userId === job.currentUserId
+      }));
     },
   });
 };
@@ -89,7 +88,7 @@ export const useUpdateJobStatus = () => {
 
   return useMutation({
     mutationFn: async ({ id, status }: UpdateJobStatusDto) => {
-      const { data } = await axios.patch(`/jobs/${id}/status`, { status });
+      const { data } = await axios.patch(`/job/${id}/status`, { status });
       return data;
     },
     onSuccess: () => {
@@ -102,9 +101,20 @@ export const useUpdateJob = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; [key: string]: any }) => {
+    mutationFn: async ({ id, ...data }: { id: string } & Omit<UpdateJobDto, "atsKeywords">) => {
       try {
-        const { data: updatedJob } = await axios.patch(`/jobs/${id}`, data);
+        const { data: updatedJob } = await axios.patch(`/jobs/${id}`, {
+          title: data.title,
+          company: data.company,
+          location: data.location,
+          type: data.type,
+          salary: data.salary,
+          url: data.url,
+          description: data.description,
+          notes: data.notes,
+          status: data.status,
+          resumeId: data.resumeId,
+        });
         return updatedJob;
       } catch (error) {
         console.error("Error in updateJob mutation:", error);
@@ -171,20 +181,15 @@ export const useExtractAtsKeywords = () => {
 export const useDeleteJob = () => {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (jobId: string) => {
-      const { data } = await axios.delete(`/jobs/${jobId}`);
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await axios.delete(`/jobs/${id}`);
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
     },
   });
-
-  return {
-    deleteJob: mutate,
-    loading: isPending
-  };
 };
 
 export const useSearchJobs = (url?: string) => {

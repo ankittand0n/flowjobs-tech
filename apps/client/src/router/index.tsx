@@ -25,6 +25,7 @@ import { DashboardPage } from "../pages/dashboard/dashboard/page";
 import { InterviewPrepPage } from "../pages/dashboard/interview-prep/page";
 import { JobsPage } from "../pages/dashboard/jobs/page";
 import { MockTestsPage } from "../pages/dashboard/mock-tests/page";
+import { MockTestPage } from "../pages/dashboard/mock-tests/test";
 
 export const routes = createRoutesFromElements(
   // eslint-disable-next-line lingui/no-unlocalized-strings
@@ -71,7 +72,10 @@ export const routes = createRoutesFromElements(
           <Route path="resumes" element={<ResumesPage />} />
           <Route path="jobs" element={<JobsPage />} />
           <Route path="job-tracker" element={<JobTrackerPage />} />
-          <Route path="mock-tests" element={<MockTestsPage />} />
+          <Route path="mock-tests">
+            <Route index element={<MockTestsPage />} />
+            <Route path="test" element={<MockTestPage />} />
+          </Route>
           <Route path="interview-prep" element={<InterviewPrepPage />} />
           <Route path="settings" element={<SettingsPage />} />
 

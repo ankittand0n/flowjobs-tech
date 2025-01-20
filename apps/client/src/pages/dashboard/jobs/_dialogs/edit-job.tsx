@@ -1,5 +1,5 @@
 import { t } from "@lingui/macro";
-import { ArrowSquareOut } from "@phosphor-icons/react";
+import { ArrowSquareOut, Trash } from "@phosphor-icons/react";
 import {
   Button,
   Dialog,
@@ -19,7 +19,7 @@ import {
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 
-import { useUpdateJob } from "@/client/services/jobs/job";
+import { useUpdateJob, useDeleteJob } from "@/client/services/jobs/job";
 
 type Job = {
   id: string;
@@ -45,7 +45,8 @@ type Props = {
 };
 
 export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
-  const { mutateAsync: updateJob, isPending: isLoading } = useUpdateJob();
+  const { mutateAsync: updateJob, isPending: isUpdating } = useUpdateJob();
+  const { mutateAsync: deleteJob, isPending: isDeleting } = useDeleteJob();
 
   const [jobData, setJobData] = useState({
     title: job.title,
@@ -102,6 +103,15 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteJob(job.id);
+      onClose();
+    } catch (error) {
+      console.error("Failed to delete job:", error);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[1200px]">
@@ -151,10 +161,12 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
                     <SelectValue placeholder={t`Select job type`} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full-time">{t`Full-time`}</SelectItem>
-                    <SelectItem value="part-time">{t`Part-time`}</SelectItem>
-                    <SelectItem value="contract">{t`Contract`}</SelectItem>
-                    <SelectItem value="remote">{t`Remote`}</SelectItem>
+                  <SelectItem value="full-time">{t`Full-time`}</SelectItem>
+                  <SelectItem value="part-time">{t`Part-time`}</SelectItem>
+                  <SelectItem value="contract">{t`Contract`}</SelectItem>
+                  <SelectItem value="internship">{t`Internship`}</SelectItem>
+                  <SelectItem value="freelance">{t`Freelance`}</SelectItem>
+                  <SelectItem value="remote">{t`Remote`}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -220,12 +232,24 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
           </div>
 
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
-              {t`Cancel`}
+            <Button 
+              type="button" 
+              variant="error"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="w-full sm:w-auto"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              {isDeleting ? t`Deleting...` : t`Delete Job`}
             </Button>
-            <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
-              {isLoading ? t`Saving...` : t`Save Changes`}
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
+                {t`Cancel`}
+              </Button>
+              <Button type="submit" className="w-full sm:w-auto" disabled={isUpdating}>
+                {isUpdating ? t`Saving...` : t`Save Changes`}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ConflictException, InternalServerErrorException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
@@ -19,43 +19,39 @@ export class JobApplicationController {
   @Post()
   async createJobApplication(
     @GetUser() user: User,
-    @Body() createDto: CreateJobApplicationDto
+    @Body() createJobApplicationDto: CreateJobApplicationDto
   ) {
-    // Check if job exists (no need to verify ownership since jobs are public)
-    const job = await this.prisma.job.findUnique({
-      where: {
-        id: createDto.jobId,
-      },
-    });
+    try {
+      // Check if application already exists
+      const existingApplication = await this.prisma.jobApplication.findFirst({
+        where: {
+          userId: user.id,
+          jobId: createJobApplicationDto.jobId,
+        },
+      });
 
-    if (!job) {
-      throw new Error("Job not found");
+      if (existingApplication) {
+        throw new ConflictException('You have already applied to this job');
+      }
+
+      return this.prisma.jobApplication.create({
+        data: {
+          jobId: createJobApplicationDto.jobId,
+          status: createJobApplicationDto.status,
+          userId: user.id,
+          notes: createJobApplicationDto.notes ?? "",
+          resumeId: createJobApplicationDto.resumeId,
+        },
+        include: {
+          job: true,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to create application');
     }
-
-    // Check if user already has an application for this job
-    const existingApplication = await this.prisma.jobApplication.findFirst({
-      where: {
-        jobId: createDto.jobId,
-        userId: user.id,
-      },
-    });
-
-    if (existingApplication) {
-      throw new Error("You have already applied to this job");
-    }
-
-    return this.prisma.jobApplication.create({
-      data: {
-        userId: user.id,
-        jobId: createDto.jobId,
-        status: createDto.status,
-        resumeId: createDto.resumeId,
-        notes: createDto.notes ?? "", // Using nullish coalescing operator
-      },
-      include: {
-        job: true,
-      },
-    });
   }
 
   @Get()

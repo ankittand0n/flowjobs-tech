@@ -33,6 +33,19 @@ export const EditApplicationDialog = ({ application, isOpen, onClose }: Props) =
     notes: application.notes || "",
   });
 
+  const statusOptions = [
+    { value: "draft", label: t`Draft` },
+    { value: "applied", label: t`Applied` },
+    { value: "screening", label: t`Screening` },
+    { value: "interviewing", label: t`Interviewing` },
+    { value: "offer", label: t`Offer` },
+    { value: "accepted", label: t`Accepted` },
+    { value: "rejected", label: t`Rejected` },
+    { value: "ghosted", label: t`Ghosted` },
+    { value: "withdrawn", label: t`Withdrawn` },
+    { value: "archived", label: t`Archived` },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -65,10 +78,11 @@ export const EditApplicationDialog = ({ application, isOpen, onClose }: Props) =
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">{t`Draft`}</SelectItem>
-                  <SelectItem value="applied">{t`Applied`}</SelectItem>
-                  <SelectItem value="interviewing">{t`Interviewing`}</SelectItem>
-                  <SelectItem value="offer">{t`Offer`}</SelectItem>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

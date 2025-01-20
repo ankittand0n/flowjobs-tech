@@ -18,6 +18,7 @@ import {
 import { useState } from "react";
 import { useResumes } from "@/client/services/resume";
 import { useCreateJobApplication } from "@/client/services/jobs/application";
+import { toast } from "sonner";
 
 type Props = {
   job: {
@@ -44,25 +45,21 @@ export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
 
     try {
       await createApplication({
-        job: {
-          id: job.id,
-          title: job.title,
-          company: job.company,
-        },
         jobId: job.id,
         status: applicationData.status,
         resumeId: applicationData.resumeId || undefined,
         notes: applicationData.notes || undefined,
+        job: {
+          id: job.id,
+          title: job.title,
+          company: job.company,
+        }
       });
 
-      setApplicationData({
-        status: "applied",
-        resumeId: "",
-        notes: "",
-      });
-
+      toast.success(t`Successfully applied to job`);
       onClose();
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : t`Failed to create application`);
       console.error("Failed to create application:", error);
     }
   };

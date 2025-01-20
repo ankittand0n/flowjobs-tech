@@ -4,8 +4,11 @@ import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectV
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router";
 
 import { useJobs } from "@/client/services/jobs/job";
+import { SelectKeywordsDialog } from "@/client/pages/dashboard/mock-tests/_dialogs/select-keywords";
+import { generateMockQuestions, MockQuestion } from "@/client/services/openai/generate-questions";
 
 type TestDuration = "15" | "30" | "60";
 
@@ -13,11 +16,50 @@ export const MockTestsPage = () => {
   const { data: jobs } = useJobs();
   const [selectedJob, setSelectedJob] = useState<string>("");
   const [duration, setDuration] = useState<TestDuration>("30");
+  const [isKeywordDialogOpen, setIsKeywordDialogOpen] = useState(false);
+  const [questions, setQuestions] = useState<MockQuestion[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const navigate = useNavigate();
+
+  const selectedJobData = jobs?.find((job: any) => job.id === selectedJob);
 
   const handleStartTest = () => {
-    if (!selectedJob) return;
-    // TODO: Implement test generation and navigation to test page
-    console.log(`Starting ${duration} minute test for job:`, selectedJob);
+    if (!selectedJob || !selectedJobData?.atsKeywords?.skills) return;
+    setIsKeywordDialogOpen(true);
+  };
+
+  const handleGenerateQuestions = async (keywords: string[]) => {
+    if (!selectedJobData) return;
+    
+    setIsGenerating(true);
+    try {
+      const questionsCount = {
+        "15": 10,
+        "30": 20,
+        "60": 40,
+      }[duration];
+
+      const generatedQuestions = await generateMockQuestions({
+        jobTitle: selectedJobData.title,
+        company: selectedJobData.company,
+        keywords,
+        count: questionsCount
+      });
+
+      setIsKeywordDialogOpen(false);
+
+      navigate("/dashboard/mock-tests/test", {
+        state: { 
+          questions: generatedQuestions,
+          duration: parseInt(duration)
+        },
+        replace: true
+      });
+    } catch (error) {
+      console.error("Failed to generate questions:", error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const durations: { value: TestDuration; label: string }[] = [
@@ -112,6 +154,14 @@ export const MockTestsPage = () => {
           </div>
         </Card>
       </div>
+
+      <SelectKeywordsDialog
+        isOpen={isKeywordDialogOpen}
+        onClose={() => !isGenerating && setIsKeywordDialogOpen(false)}
+        onSubmit={handleGenerateQuestions}
+        atsKeywords={selectedJobData?.atsKeywords?.skills}
+        isLoading={isGenerating}
+      />
     </>
   );
 };

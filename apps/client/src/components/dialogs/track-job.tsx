@@ -105,7 +105,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
           id: job.id,
           title: job.title,
           company: job.company,
-          location: job.location,
+          location: job.location || undefined,
         },
       });
 

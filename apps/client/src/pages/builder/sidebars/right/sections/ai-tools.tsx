@@ -22,7 +22,7 @@ export const AiToolsSection = () => {
     const resumeText = JSON.stringify(resume.data).toLowerCase();
     const matches = new Set<string>();
     
-    selectedJob.atsKeywords.skills?.forEach((skill) => {
+    selectedJob.atsKeywords.skills?.forEach((skill: any) => {
       if (resumeText.includes(skill.keyword.toLowerCase())) {
         matches.add(skill.keyword);
       }
@@ -84,7 +84,7 @@ export const AiToolsSection = () => {
               <div>
                 <h4 className="text-sm font-medium mb-2">{t`Skills`}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {selectedJob.atsKeywords.skills.map((skill) => (
+                  {selectedJob.atsKeywords.skills.map((skill: any) => (
                     <div
                       key={skill.keyword}
                       className={cn(

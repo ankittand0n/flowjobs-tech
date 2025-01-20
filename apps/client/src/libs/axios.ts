@@ -1,7 +1,7 @@
 import { t } from "@lingui/macro";
 import type { ErrorMessage } from "@reactive-resume/utils";
 import { deepSearchAndParseDates } from "@reactive-resume/utils";
-import _axios from "axios";
+import Axios from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import { redirect } from "react-router";
 
@@ -12,33 +12,31 @@ import { toast } from "../hooks/use-toast";
 import { translateError } from "../services/errors/translate-error";
 import { queryClient } from "./query-client";
 
-export const axios = _axios.create({ baseURL: "/api", withCredentials: true });
+export const axios = Axios.create({
+  baseURL: "/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-// Intercept responses to transform ISO dates to JS date objects
+// Add a response interceptor
 axios.interceptors.response.use(
-  (response) => {
-    const transformedResponse = deepSearchAndParseDates(response.data, ["createdAt", "updatedAt"]);
-    return { ...response, data: transformedResponse };
-  },
+  (response) => response,
   (error) => {
-    const message = error.response?.data.message as ErrorMessage;
-    const description = translateError(message);
+    const errorMessage = error.response?.data?.message || t`An unexpected error occurred`;
+    
+    toast({
+      variant: "error",
+      title: errorMessage
+    });
 
-    if (description) {
-      toast({
-        variant: "error",
-        title: t`Oops, the server returned an error.`,
-        description,
-      });
-    }
-
-    return Promise.reject(new Error(message));
-  },
+    return Promise.reject(new Error(errorMessage));
+  }
 );
 
 // Create another instance to handle failed refresh tokens
 // Reference: https://github.com/Flyrell/axios-auth-refresh/issues/191
-const axiosForRefresh = _axios.create({ baseURL: "/api", withCredentials: true });
+const axiosForRefresh = Axios.create({ baseURL: "/api", withCredentials: true });
 
 // Interceptor to handle expired access token errors
 const handleAuthError = () => refreshToken(axiosForRefresh);

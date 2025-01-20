@@ -4,27 +4,27 @@ import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectV
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useMemo } from "react";
 
-import { useJobs, useUpdateJobStatus } from "@/client/services/jobs/job";
-import { EditJobDialog } from "../../_dialogs/edit-job";
+import { useJobApplications, useUpdateJobApplication } from "@/client/services/jobs/application";
+import { EditApplicationDialog } from "../../_dialogs/edit-application";
 
 export const ListView = () => {
-  const { data: jobs, isLoading } = useJobs();
-  const { mutateAsync: updateJobStatus } = useUpdateJobStatus();
-  const [editingJob, setEditingJob] = useState<any>(null);
+  const { data: applications, isLoading } = useJobApplications();
+  const { mutateAsync: updateJobStatus } = useUpdateJobApplication();
+  const [editingApplication, setEditingApplication] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredJobs = useMemo(() => {
-    if (!jobs) return [];
+    if (!applications) return [];
 
-    return jobs.filter((job: any) => {
-      const searchString = `${job.title} ${job.company} ${job.location} ${job.status}`.toLowerCase();
+    return applications.filter((application: any) => {
+      const searchString = `${application.job.title} ${application.job.company} ${application.job.location} ${application.status}`.toLowerCase();
       return searchString.includes(searchQuery.toLowerCase());
     });
-  }, [jobs, searchQuery]);
+  }, [applications, searchQuery]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-muted text-muted-foreground",
+      draft: "bg-secondary/50 text-foreground border border-border",
       applied: "bg-blue-500/10 text-blue-500",
       screening: "bg-orange-500/10 text-orange-500",
       interviewing: "bg-purple-500/10 text-purple-500",
@@ -92,9 +92,9 @@ export const ListView = () => {
             {searchQuery ? t`No jobs found matching "${searchQuery}"` : t`No jobs found`}
           </motion.div>
         ) : (
-          filteredJobs.map((job: any, index: number) => (
+          filteredJobs.map((application: any, index: number) => (
             <motion.div
-              key={job.id}
+              key={application.id}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0, transition: { delay: index * 0.1 } }}
               exit={{ opacity: 0, y: -20 }}
@@ -103,57 +103,50 @@ export const ListView = () => {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{job.title}</h3>
-                      <Select
-                        value={job.status}
-                        onValueChange={(value) => handleStatusChange(job.id, value)}
-                      >
-                        <SelectTrigger className={`w-32 h-7 text-xs ${getStatusColor(job.status)}`}>
-                          <SelectValue>{job.status}</SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map((status) => (
-                            <SelectItem
-                              key={status}
-                              value={status}
-                              className="text-xs"
-                            >
-                              {status}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <h3 className="font-medium">{application.job.title}</h3>
+                      <div className={`px-3 py-1 rounded-md text-xs ${getStatusColor(application.status)}`}>
+                        {application.status === "draft" && t`Draft`}
+                        {application.status === "applied" && t`Applied`}
+                        {application.status === "screening" && t`Screening`}
+                        {application.status === "interviewing" && t`Interviewing`}
+                        {application.status === "offer" && t`Offer`}
+                        {application.status === "accepted" && t`Accepted`}
+                        {application.status === "rejected" && t`Rejected`}
+                        {application.status === "ghosted" && t`Ghosted`}
+                        {application.status === "withdrawn" && t`Withdrawn`}
+                        {application.status === "archived" && t`Archived`}
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Buildings className="h-4 w-4" />
-                        <span>{job.company}</span>
+                        <span>{application.job.company}</span>
                       </div>
 
-                      {job.location && (
+                      {application.job.location && (
                         <div className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
-                          <span>{job.location}</span>
+                          <span>{application.job.location}</span>
                         </div>
                       )}
 
-                      {job.salary && (
+                      {application.job.salary && (
                         <div className="flex items-center gap-1">
                           <Money className="h-4 w-4" />
-                          <span>{job.salary}</span>
+                          <span>{application.job.salary}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {job.url && (
+                    {application.job.url && (
                       <Button
                         size="sm"
                         variant="secondary"
                         className="h-8 px-3 bg-foreground text-background hover:bg-foreground/90"
-                        onClick={() => window.open(job.url, '_blank', 'noopener,noreferrer')}
+                        onClick={() => window.open(application.job.url, '_blank', 'noopener,noreferrer')}
                       >
                         <LinkIcon className="h-4 w-4 mr-2" />
                         {t`View`}
@@ -164,7 +157,7 @@ export const ListView = () => {
                       size="sm"
                       variant="ghost"
                       className="h-8 w-8 p-0"
-                      onClick={() => setEditingJob(job)}
+                      onClick={() => setEditingApplication(application)}
                     >
                       <PencilSimple className="h-4 w-4" />
                     </Button>
@@ -176,11 +169,11 @@ export const ListView = () => {
         )}
       </AnimatePresence>
 
-      {editingJob && (
-        <EditJobDialog
-          job={editingJob}
-          isOpen={!!editingJob}
-          onClose={() => setEditingJob(null)}
+      {editingApplication && (
+        <EditApplicationDialog
+          application={editingApplication}
+          isOpen={!!editingApplication}
+          onClose={() => setEditingApplication(null)}
         />
       )}
     </div>

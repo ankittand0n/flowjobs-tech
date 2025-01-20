@@ -35,3 +35,5 @@ export * from "./toggle";
 export * from "./toggle-group";
 export * from "./tooltip";
 export * from "./visually-hidden";
+export * from "./textarea";
+export * from "./spinner";

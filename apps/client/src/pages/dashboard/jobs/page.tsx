@@ -8,6 +8,7 @@ import {
   Brain,
   Eye,
   Link,
+  PencilSimple,
 } from "@phosphor-icons/react";
 import { Button, Card, Input } from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,6 +20,7 @@ import { useUser } from "@/client/services/user";
 import { ExtractAtsDialog } from "./_dialogs/extract-ats";
 import { JobDetailsDialog } from "./_dialogs/job-details";
 import { ApplyJobDialog } from "./_dialogs/apply-job";
+import { EditJobDialog } from "./_dialogs/edit-job";
 
 export const JobsPage = () => {
   const { user } = useUser();
@@ -27,6 +29,7 @@ export const JobsPage = () => {
   const [isExtractDialogOpen, setIsExtractDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+  const [editingJob, setEditingJob] = useState<any>(null);
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
@@ -155,6 +158,17 @@ export const JobsPage = () => {
                           {t`Apply on Website`}
                         </Button>
                       )}
+
+                      {job.canEdit && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          onClick={() => setEditingJob(job)}
+                        >
+                          <PencilSimple className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -185,6 +199,14 @@ export const JobsPage = () => {
             setIsApplyDialogOpen(false);
             setSelectedJob(null);
           }}
+        />
+      )}
+
+      {editingJob && (
+        <EditJobDialog
+          job={editingJob}
+          isOpen={!!editingJob}
+          onClose={() => setEditingJob(null)}
         />
       )}
     </>

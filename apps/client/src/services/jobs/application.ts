@@ -33,9 +33,33 @@ export const useCreateJobApplication = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (application: Omit<JobApplication, "id">) => {
-      const { data } = await axios.post("/job-applications", application);
-      return data;
+    mutationFn: async (data: {
+      jobId: string;
+      status: string;
+      resumeId?: string;
+      notes?: string;
+      job: {
+        id: string;
+        title: string;
+        company: string;
+        location?: string;
+      };
+    }) => {
+      try {
+        const response = await axios.post("/job-applications", {
+          jobId: data.jobId,
+          status: data.status,
+          resumeId: data.resumeId,
+          notes: data.notes,
+          job: data.job
+        });
+        return response.data;
+      } catch (error: any) {
+        if (error.response?.data?.message) {
+          throw new Error(error.response.data.message);
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["job-applications"] });
