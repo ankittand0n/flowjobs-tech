@@ -84,7 +84,6 @@ model Statistics {
 
 model Job {
   id          String   @id @default(cuid())
-  userId      String
   title       String
   company     String
   location    String?
@@ -95,10 +94,10 @@ model Job {
   atsKeywords Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  createdBy   String?  // Optional field to track who created the job
   applications JobApplication[]
 
-  @@index([userId])
-  @@unique([userId, url])
+  @@index([url])
 }
 
 model JobApplication {

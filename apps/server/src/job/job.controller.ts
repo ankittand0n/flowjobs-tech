@@ -1,10 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
-
 import { User as GetUser } from "../user/decorators/user.decorator";
-import { CreateJobDto , UpdateJobDto} from "@reactive-resume/dto";
+import { CreateJobDto, UpdateJobDto } from "@reactive-resume/dto";
 
 @Controller("jobs")
 @UseGuards(AuthGuard("jwt"))
@@ -14,8 +13,11 @@ export class JobController {
   @Get()
   async getJobs(@GetUser() user: User) {
     return this.prisma.job.findMany({
-      where: { userId: user.id },
-      include: { applications: true },
+      include: { 
+        applications: {
+          where: { userId: user.id }
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -26,11 +28,12 @@ export class JobController {
       if (createJobDto.url) {
         const existingJob = await this.prisma.job.findFirst({
           where: {
-            userId: user.id,
             url: createJobDto.url,
           },
           include: {
-            applications: true,
+            applications: {
+              where: { userId: user.id }
+            },
           },
         });
 
@@ -42,10 +45,12 @@ export class JobController {
       return await this.prisma.job.create({
         data: {
           ...createJobDto,
-          userId: user.id,
+          createdBy: user.id,
         },
         include: {
-          applications: true,
+          applications: {
+            where: { userId: user.id }
+          },
         },
       });
     } catch (error) {
@@ -63,14 +68,16 @@ export class JobController {
     return this.prisma.job.update({
       where: {
         id,
-        userId: user.id,
+        createdBy: user.id,
       },
       data: {
         ...updateJobDto,
         updatedAt: new Date(),
       },
       include: {
-        applications: true,
+        applications: {
+          where: { userId: user.id }
+        },
       },
     });
   }
@@ -80,7 +87,7 @@ export class JobController {
     return this.prisma.job.delete({
       where: {
         id,
-        userId: user.id,
+        createdBy: user.id,
       },
     });
   }
@@ -90,7 +97,7 @@ export class JobController {
     return this.prisma.job.findUnique({
       where: {
         id,
-        userId: user.id,
+        createdBy: user.id,
       },
       include: {
         applications: true,
@@ -114,7 +121,7 @@ export class JobController {
     return this.prisma.job.update({
       where: {
         id,
-        userId: user.id,
+        createdBy: user.id,
       },
       data: {
         atsKeywords: data.atsKeywords,

@@ -1,5 +1,14 @@
 import { t } from "@lingui/macro";
-import { Buildings, MapPin, Money, MagnifyingGlass, ArrowSquareOut, Brain, Eye, Link } from "@phosphor-icons/react";
+import {
+  Buildings,
+  MapPin,
+  Money,
+  MagnifyingGlass,
+  ArrowSquareOut,
+  Brain,
+  Eye,
+  Link,
+} from "@phosphor-icons/react";
 import { Button, Card, Input } from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useMemo } from "react";
@@ -33,6 +42,8 @@ export const JobsPage = () => {
     setIsApplyDialogOpen(true);
   };
 
+  const canManageJob = (job: any) => job.createdBy === user?.id;
+
   return (
     <>
       <Helmet>
@@ -41,7 +52,7 @@ export const JobsPage = () => {
         </title>
       </Helmet>
 
-      <div className="space-y-4 p-4 h-full overflow-y-auto">
+      <div className="h-full space-y-4 overflow-y-auto p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <motion.h1
             initial={{ opacity: 0, x: -50 }}
@@ -51,10 +62,7 @@ export const JobsPage = () => {
             {t`Jobs`}
           </motion.h1>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsExtractDialogOpen(true)}
-            >
+            <Button variant="outline" onClick={() => setIsExtractDialogOpen(true)}>
               <Brain className="mr-2 h-4 w-4" />
               {t`Extract ATS Keywords`}
             </Button>
@@ -68,13 +76,13 @@ export const JobsPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
-          <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <MagnifyingGlass className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
         </div>
 
         {isLoading && (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="p-4 animate-pulse bg-muted" />
+              <Card key={i} className="bg-muted animate-pulse p-4" />
             ))}
           </div>
         )}
@@ -84,7 +92,7 @@ export const JobsPage = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-muted-foreground py-8"
+              className="text-muted-foreground py-8 text-center"
             >
               {searchQuery ? t`No jobs found matching` + searchQuery : t`No jobs found`}
             </motion.div>
@@ -103,7 +111,7 @@ export const JobsPage = () => {
                         <h3 className="font-medium">{job.title}</h3>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                      <div className="text-muted-foreground flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           <Buildings className="h-4 w-4" />
                           <span>{job.company}</span>
@@ -122,25 +130,16 @@ export const JobsPage = () => {
                             <span>{job.salary}</span>
                           </div>
                         )}
-
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setSelectedJob(job)}
-                      >
+                      <Button size="sm" variant="secondary" onClick={() => setSelectedJob(job)}>
                         <Eye className="mr-2 h-4 w-4" />
                         {t`View Details`}
                       </Button>
 
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleApplyClick(job)}
-                      >
+                      <Button size="sm" variant="secondary" onClick={() => handleApplyClick(job)}>
                         <Brain className="mr-2 h-4 w-4" />
                         {t`Track Application`}
                       </Button>
@@ -149,10 +148,10 @@ export const JobsPage = () => {
                         <Button
                           size="sm"
                           variant="secondary"
-                          className="h-8 px-3 bg-foreground text-background hover:bg-foreground/90"
-                          onClick={() => window.open(job.url, '_blank', 'noopener,noreferrer')}
+                          className="h-8 bg-foreground px-3 text-background hover:bg-foreground/90"
+                          onClick={() => window.open(job.url, "_blank", "noopener,noreferrer")}
                         >
-                          <ArrowSquareOut className="h-4 w-4 mr-2" />
+                          <ArrowSquareOut className="mr-2 h-4 w-4" />
                           {t`Apply on Website`}
                         </Button>
                       )}
