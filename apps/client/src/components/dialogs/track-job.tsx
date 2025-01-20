@@ -1,4 +1,4 @@
-import { t } from "@lingui/macro";
+import { t, plural } from "@lingui/macro";
 import {
   Button,
   Dialog,
@@ -27,11 +27,31 @@ type Props = {
   onClose: () => void;
 };
 
-const steps = [
-  { id: 1, title: t`Basic Info`, description: t`Enter basic job information` },
-  { id: 2, title: t`Job Details`, description: t`Add detailed job information` },
-  { id: 3, title: t`Application`, description: t`Track your application` },
-];
+const StepDescription = ({ step }: { step: number }) => {
+  switch (step) {
+    case 1:
+      return <>{t`Enter basic job information`}</>;
+    case 2:
+      return <>{t`Add detailed job information`}</>;
+    case 3:
+      return <>{t`Track your application`}</>;
+    default:
+      return null;
+  }
+};
+
+const StepTitle = ({ step }: { step: number }) => {
+  switch (step) {
+    case 1:
+      return <>{t`Basic Info`}</>;
+    case 2:
+      return <>{t`Job Details`}</>;
+    case 3:
+      return <>{t`Application`}</>;
+    default:
+      return null;
+  }
+};
 
 export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -260,44 +280,43 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t`Track New Job`}</DialogTitle>
-          <DialogDescription>
-            {t`Step` + currentStep + t` of ` + steps.length + t`: ` + steps[currentStep - 1].description}
-          </DialogDescription>
         </DialogHeader>
 
         {/* Steps Indicator */}
         <div className="mb-8 flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex-1">
+          {[1, 2, 3].map((step, index) => (
+            <div key={step} className="flex-1">
               <div className="flex items-center">
                 <div
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full border-2",
-                    currentStep === step.id
+                    currentStep === step
                       ? "border-primary bg-primary text-primary-foreground"
-                      : currentStep > step.id
+                      : currentStep > step
                         ? "border-primary bg-primary/20 text-primary"
                         : "border-muted-foreground/50 text-muted-foreground/50",
                   )}
                 >
-                  {currentStep > step.id ? "✓" : step.id}
+                  {currentStep > step ? "✓" : step}
                 </div>
                 <div className="ml-3">
                   <p
                     className={cn(
                       "text-sm font-medium",
-                      currentStep === step.id ? "text-foreground" : "text-muted-foreground",
+                      currentStep === step ? "text-foreground" : "text-muted-foreground",
                     )}
                   >
-                    {step.title}
+                    <StepTitle step={step} />
                   </p>
-                  <p className="text-muted-foreground text-xs">{step.description}</p>
+                  <p className="text-muted-foreground text-xs">
+                    <StepDescription step={step} />
+                  </p>
                 </div>
-                {index < steps.length - 1 && (
+                {index < 2 && (
                   <div
                     className={cn(
                       "mx-4 h-[2px] flex-1",
-                      currentStep > step.id + 1 ? "bg-primary" : "bg-muted-foreground/20",
+                      currentStep > step + 1 ? "bg-primary" : "bg-muted-foreground/20",
                     )}
                   />
                 )}

@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { Copyright } from "@/client/components/copyright";
 import { ThemeSwitch } from "@/client/components/theme-switch";
 
+import { AiToolsSection } from "./sections/ai-tools";
 import { CssSection } from "./sections/css";
 import { ExportSection } from "./sections/export";
 import { InformationSection } from "./sections/information";
@@ -30,6 +31,8 @@ export const RightSidebar = () => {
     <div className="flex bg-secondary-accent/30">
       <ScrollArea orientation="vertical" className="h-screen flex-1 pb-16 lg:pb-0">
         <div ref={containterRef} className="grid gap-y-6 p-6 @container/right">
+          <AiToolsSection />
+          <Separator />
           <TemplateSection />
           <Separator />
           <LayoutSection />
@@ -60,6 +63,13 @@ export const RightSidebar = () => {
         <div />
 
         <div className="flex flex-col items-center justify-center gap-y-2">
+          <SectionIcon
+            id="ai-tools"
+            name={t`AI Tools`}
+            onClick={() => {
+              scrollIntoView("#ai-tools");
+            }}
+          />
           <SectionIcon
             id="template"
             name={t`Template`}

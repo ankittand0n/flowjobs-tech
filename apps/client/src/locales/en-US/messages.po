@@ -2075,24 +2075,6 @@ msgstr "Search Jobs"
 msgid "Get personalized interview questions based on the job description and requirements."
 msgstr "Get personalized interview questions based on the job description and requirements."
 
-msgid "Basic Info"
-msgstr "Basic Info"
-
-msgid "Job Details"
-msgstr "Job Details"
-
-msgid "Application"
-msgstr "Application"
-
-msgid "Enter basic job information"
-msgstr "Enter basic job information"
-
-msgid "Add detailed job information"
-msgstr "Add detailed job information"
-
-msgid "Track your application"
-msgstr "Track your application"
-
 msgid "e.g. Frontend Developer"
 msgstr "e.g. Frontend Developer"
 
@@ -2138,3 +2120,23 @@ msgstr "Apply to"
 msgid " at "
 msgstr " at "
 
+msgid "e.g. New York, NY or Remote"
+msgstr "e.g. New York, NY or Remote"
+
+msgid "Basic Info"
+msgstr "Basic Info"
+
+msgid "Job Details"
+msgstr "Job Details"
+
+msgid "Application"
+msgstr "Application"
+
+msgid "Enter basic job information"
+msgstr "Enter basic job information"
+
+msgid "Add detailed job information"
+msgstr "Add detailed job information"
+
+msgid "Track your application"
+msgstr "Track your application"
