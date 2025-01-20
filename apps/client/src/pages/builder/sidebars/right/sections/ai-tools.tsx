@@ -1,15 +1,45 @@
 import { t } from "@lingui/macro";
 import { Brain } from "@phosphor-icons/react";
 import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@reactive-resume/ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
+import { CreateJobDto } from "@reactive-resume/dto";
+import { cn } from "@reactive-resume/utils";
+import { useResumeStore } from "@/client/stores/resume";
 
 import { getSectionIcon } from "../shared/section-icon";
 
 export const AiToolsSection = () => {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [matchedKeywords, setMatchedKeywords] = useState<Set<string>>(new Set());
   const { data: jobs } = useJobs();
-  const selectedJob = jobs?.find(job => job.id === selectedJobId);
+  const selectedJob = jobs?.find((job: CreateJobDto & { id: string }) => job.id === selectedJobId);
+  const resume = useResumeStore((state) => state.resume);
+
+  useEffect(() => {
+    if (!selectedJob?.atsKeywords) return;
+
+    const resumeText = JSON.stringify(resume.data).toLowerCase();
+    const matches = new Set<string>();
+    
+    selectedJob.atsKeywords.skills?.forEach((skill) => {
+      if (resumeText.includes(skill.keyword.toLowerCase())) {
+        matches.add(skill.keyword);
+      }
+    });
+
+    setMatchedKeywords(matches);
+  }, [selectedJob, resume]);
+
+  const getKeywordStats = () => {
+    if (!selectedJob?.atsKeywords) return null;
+    
+    const totalKeywords = selectedJob.atsKeywords.skills?.length || 0;
+    const matchedCount = matchedKeywords.size;
+    const percentage = Math.round((matchedCount / totalKeywords) * 100);
+
+    return { matched: matchedCount, total: totalKeywords, percentage };
+  };
 
   return (
     <section id="ai-tools" className="grid gap-y-6">
@@ -28,7 +58,7 @@ export const AiToolsSection = () => {
               <SelectValue placeholder={t`Choose a job`} />
             </SelectTrigger>
             <SelectContent>
-              {jobs?.map((job) => (
+              {jobs?.map((job: CreateJobDto & { id: string }) => (
                 <SelectItem key={job.id} value={job.id}>
                   {job.title} - {job.company}
                 </SelectItem>
@@ -39,6 +69,17 @@ export const AiToolsSection = () => {
 
         {selectedJob?.atsKeywords && (
           <div className="space-y-4 border rounded-lg p-4">
+            {getKeywordStats() && (
+              <div className="mb-4 rounded-md bg-secondary/50 p-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span>{t`Keywords found in resume`}</span>
+                  <span className="font-medium">
+                    {getKeywordStats()?.matched}/{getKeywordStats()?.total} ({getKeywordStats()?.percentage}%)
+                  </span>
+                </div>
+              </div>
+            )}
+
             {selectedJob.atsKeywords.skills?.length > 0 && (
               <div>
                 <h4 className="text-sm font-medium mb-2">{t`Skills`}</h4>
@@ -46,26 +87,17 @@ export const AiToolsSection = () => {
                   {selectedJob.atsKeywords.skills.map((skill) => (
                     <div
                       key={skill.keyword}
-                      className="rounded-full bg-secondary px-3 py-1 text-xs"
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs transition-colors",
+                        matchedKeywords.has(skill.keyword)
+                          ? "bg-green-500/20 text-green-700 dark:text-green-400"
+                          : "bg-secondary"
+                      )}
                     >
                       {skill.keyword} ({Math.round(skill.relevance * 100)}%)
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {selectedJob.atsKeywords.requirements?.length > 0 && (
-              <div>
-                <h4 className="text-sm font-medium mb-2">{t`Requirements`}</h4>
-                <ul className="space-y-1">
-                  {selectedJob.atsKeywords.requirements.map((req) => (
-                    <li key={req.keyword} className="text-sm">
-                      {req.keyword}
-                      <span className="ml-2 text-xs text-muted-foreground">({req.type})</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
           </div>

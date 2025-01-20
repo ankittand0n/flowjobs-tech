@@ -28,7 +28,8 @@ type MetadataKey =
   | "statistics"
   | "export"
   | "notes"
-  | "information";
+  | "information"
+  | "ai-tools";
 
 const getSectionIcon = (id: MetadataKey, props: IconProps = {}) => {
   switch (id) {
