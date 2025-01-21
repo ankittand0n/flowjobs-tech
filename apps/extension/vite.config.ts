@@ -5,6 +5,11 @@ import fs from 'fs';
 import sharp from 'sharp';
 
 export default defineConfig({
+  server: {
+    host: true,  // Listen on all available network interfaces
+    port: 6174,  // Changed extension to 6174
+    strictPort: true,
+  },
   build: {
     outDir: 'dist/apps/extension',
     emptyOutDir: true,

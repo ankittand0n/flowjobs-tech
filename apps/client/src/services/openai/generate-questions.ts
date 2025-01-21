@@ -85,6 +85,14 @@ export type AnswerEvaluation = {
   feedback: string;
 };
 
+const cleanJsonResponse = (content: string): string => {
+  // Remove markdown code block markers and any whitespace before/after
+  return content
+    .replace(/^```(?:json)?\s*/i, '')  // Remove opening ```json or ``` 
+    .replace(/\s*```$/, '')            // Remove closing ```
+    .trim();
+};
+
 export const generateMockQuestions = async (
   params: {
     jobTitle: string;
@@ -101,7 +109,7 @@ export const generateMockQuestions = async (
       .replace("{keywords}", params.keywords.join(", "))
       .replace("{count}", params.count.toString());
 
-    console.log("Sending prompt to OpenAI:", prompt);
+    // console.log("Sending prompt to OpenAI:", prompt);
 
     const result = await openai().chat.completions.create({
       messages: [{ role: "user", content: prompt }],
@@ -119,9 +127,11 @@ export const generateMockQuestions = async (
     const content = result.choices[0].message.content;
     if (!content) throw new Error(t`No content in OpenAI response`);
 
-    console.log("OpenAI response:", content);
+    // console.log("OpenAI response:", content);
 
-    const parsed = JSON.parse(content) as { questions: MockQuestion[] };
+    // Clean the response before parsing
+    const cleanedContent = cleanJsonResponse(content);
+    const parsed = JSON.parse(cleanedContent) as { questions: MockQuestion[] };
     return parsed.questions;
 
   } catch (error) {
@@ -153,7 +163,9 @@ export const evaluateAnswer = async (
       throw new Error(t`No evaluation returned from OpenAI`);
     }
 
-    return JSON.parse(result.choices[0].message.content) as AnswerEvaluation;
+    // Clean the response before parsing
+    const cleanedContent = cleanJsonResponse(result.choices[0].message.content);
+    return JSON.parse(cleanedContent) as AnswerEvaluation;
   } catch (error) {
     console.error("Failed to evaluate answer:", error);
     throw error;

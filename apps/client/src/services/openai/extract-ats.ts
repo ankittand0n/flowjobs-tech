@@ -4,6 +4,15 @@ import { t } from "@lingui/macro";
 import { DEFAULT_MAX_TOKENS, DEFAULT_MODEL } from "@/client/constants/llm";
 import { openai } from "./client";
 
+// Add helper function
+const cleanJsonResponse = (content: string): string => {
+  // Remove markdown code block markers and any whitespace before/after
+  return content
+    .replace(/^```(?:json)?\s*/i, '')  // Remove opening ```json or ``` 
+    .replace(/\s*```$/, '')            // Remove closing ```
+    .trim();
+};
+
 const PROMPT = `You are an AI assistant specialized in analyzing job descriptions and extracting key ATS (Applicant Tracking System) keywords.
 Analyze the following job description and extract relevant keywords in a structured JSON format.
 Follow this exact format for the response:
@@ -56,7 +65,9 @@ export const extractAtsKeywords = async (
     const content = result.choices[0].message.content;
     if (!content) throw new Error(t`No content in OpenAI response`);
 
-    return JSON.parse(content) as {
+    // Clean the response before parsing
+    const cleanedContent = cleanJsonResponse(content);
+    return JSON.parse(cleanedContent) as {
       skills: Array<{
         keyword: string;
         relevance: number;

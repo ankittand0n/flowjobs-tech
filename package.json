@@ -14,10 +14,10 @@
     "url": "https://github.com/AmruthPillai/Reactive-Resume.git"
   },
   "scripts": {
-    "dev": "nx run-many -t serve",
+    "dev": "nx run-many -t serve --parallel=4 --projects=client,server,artboard,extension",
     "test": "pnpm vitest run",
     "prebuild": "pnpm prisma:generate",
-    "build": "nx run-many -t build --projects=artboard,client,server,extension",
+    "build": "nx run-many -t build",
     "prestart": "pnpm prisma:migrate",
     "start": "node dist/apps/server/main",
     "lint": "nx run-many -t lint",
