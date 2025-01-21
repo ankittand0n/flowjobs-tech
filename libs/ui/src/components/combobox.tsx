@@ -54,14 +54,24 @@ const handleMultipleSelect = (props: ComboboxPropsMultiple, option: ComboboxOpti
   if (props.value?.includes(option.value)) {
     if (!props.clearable && props.value.length === 1) return false;
     props.onValueChange?.(props.value.filter((value) => value !== option.value));
-  } else {
-    props.onValueChange?.([...(props.value ?? []), option.value]);
+    return true;
   }
+  return false;
 };
 
 export const Combobox = forwardRef(
   (props: ComboboxProps, ref: React.ForwardedRef<HTMLInputElement>) => {
     const [open, setOpen] = useState(false);
+
+    const handleSelect = (props: ComboboxProps, option: ComboboxOption) => {
+      if (props.multiple) {
+        handleMultipleSelect(props as ComboboxPropsMultiple, option);
+        return;
+      }
+
+      handleSingleSelect(props as ComboboxPropsSingle, option);
+      setOpen(false);
+    };
 
     return (
       <Popover open={open} onOpenChange={setOpen}>
@@ -110,16 +120,10 @@ export const Combobox = forwardRef(
                       const option = props.options.find(
                         (option) => option.value.toLowerCase().trim() === selectedValue,
                       );
-
-                      if (!option) return null;
-
-                      if (props.multiple) {
-                        handleMultipleSelect(props, option);
-                      } else {
-                        handleSingleSelect(props, option);
-
-                        setOpen(false);
+                      if (option) {
+                        handleSelect(props, option);
                       }
+                      return true;
                     }}
                   >
                     <Check

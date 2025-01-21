@@ -17,10 +17,12 @@
     "dev": "nx run-many -t serve",
     "test": "pnpm vitest run",
     "prebuild": "pnpm prisma:generate",
-    "build": "nx run-many -t build",
+    "build": "nx run-many -t build --projects=artboard,client,server,extension",
     "prestart": "pnpm prisma:migrate",
     "start": "node dist/apps/server/main",
     "lint": "nx run-many -t lint",
+    "extension:dev": "nx serve extension",
+    "extension:build": "nx build extension",
     "format:check": "pnpm exec prettier -c --log-level error .",
     "format:write": "pnpm exec prettier -w --log-level error .",
     "crowdin:sync": "crowdin push && crowdin pull",
@@ -60,6 +62,7 @@
     "@tiptap/core": "^2.11.2",
     "@types/async-retry": "^1.4.9",
     "@types/bcryptjs": "^2.4.6",
+    "@types/chrome": "^0.0.298",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.1",
@@ -256,5 +259,9 @@
   },
   "prisma": {
     "schema": "tools/prisma/schema.prisma"
-  }
+  },
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ]
 }

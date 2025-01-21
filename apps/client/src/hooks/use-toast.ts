@@ -129,37 +129,53 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
-function toast({ ...props }: Toast) {
-  const id = createId();
+type ToastFunction = {
+  id: string;
+  dismiss: () => void;
+  update: (props: ToasterToast) => void;
+  error: (message: string) => void;
+  success: (message: string) => void;
+};
 
-  const update = (props: ToasterToast) => {
+const toastFn = Object.assign(
+  function ({ ...props }: Toast): ToastFunction {
+    const id = createId();
+
+    const update = (props: ToasterToast) => {
+      dispatch({
+        type: "UPDATE_TOAST",
+        toast: { ...props, id },
+      });
+    };
+    const dismiss = () => {
+      dispatch({ type: "DISMISS_TOAST", toastId: id });
+    };
+
     dispatch({
-      type: "UPDATE_TOAST",
-      toast: { ...props, id },
-    });
-  };
-  const dismiss = () => {
-    dispatch({ type: "DISMISS_TOAST", toastId: id });
-  };
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
+      type: "ADD_TOAST",
+      toast: {
+        ...props,
+        id,
+        open: true,
+        onOpenChange: (open) => {
+          if (!open) dismiss();
+        },
       },
-    },
-  });
+    });
 
-  return {
-    id: id,
-    dismiss,
-    update,
-  };
-}
+    return {
+      id,
+      dismiss,
+      update,
+      error: (message: string) => toastFn({ variant: "error", description: message }),
+      success: (message: string) => toastFn({ description: message })
+    };
+  },
+  {
+    error: (message: string) => toastFn({ variant: "error", description: message }),
+    success: (message: string) => toastFn({ description: message })
+  }
+);
 
 function useToast() {
   const [state, setState] = useState<State>(memoryState);
@@ -175,11 +191,11 @@ function useToast() {
 
   return {
     ...state,
-    toast,
+    toast: toastFn,
     dismiss: (toastId?: string) => {
       dispatch({ type: "DISMISS_TOAST", toastId });
     },
   };
 }
 
-export { toast, useToast };
+export { toastFn as toast, useToast };

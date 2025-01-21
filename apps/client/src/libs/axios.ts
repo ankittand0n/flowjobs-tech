@@ -4,6 +4,7 @@ import { deepSearchAndParseDates } from "@reactive-resume/utils";
 import Axios from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import { redirect } from "react-router";
+import type { AxiosError } from "axios";
 
 import { refreshToken } from "@/client/services/auth";
 
@@ -12,18 +13,19 @@ import { toast } from "../hooks/use-toast";
 import { translateError } from "../services/errors/translate-error";
 import { queryClient } from "./query-client";
 
-export const axios = Axios.create({
+const instance = Axios.create({
   baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 // Add a response interceptor
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const errorMessage = error.response?.data?.message || t`An unexpected error occurred`;
+  (error: AxiosError<{ error: string }>) => {
+    const errorMessage = error.response?.data?.error || t`An unexpected error occurred`;
     
     toast({
       variant: "error",
@@ -48,5 +50,7 @@ const handleRefreshError = async () => {
 };
 
 // Intercept responses to check for 401 and 403 errors, refresh token and retry the request
-createAuthRefreshInterceptor(axios, handleAuthError, { statusCodes: [401, 403] });
+createAuthRefreshInterceptor(instance, handleAuthError, { statusCodes: [401, 403] });
 createAuthRefreshInterceptor(axiosForRefresh, handleRefreshError);
+
+export { instance as axios };

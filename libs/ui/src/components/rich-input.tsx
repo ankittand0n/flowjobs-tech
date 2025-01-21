@@ -124,7 +124,7 @@ const InsertImageForm = ({ onInsert }: InsertImageProps) => {
 
 const Toolbar = ({ editor }: { editor: Editor }) => {
   const setLink = useCallback(() => {
-    const previousUrl = editor.getAttributes("link").href;
+    const previousUrl = editor.getAttributes("link")['href'];
     const url = window.prompt("URL", previousUrl);
 
     // cancelled

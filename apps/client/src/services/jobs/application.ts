@@ -1,7 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axios } from "../../libs/axios";
 
-type JobApplication = {
+// For form input in TrackJobDialog
+export interface JobApplicationInput {
+  title: string;
+  company: string;
+  description: string;
+  location: string;
+  url: string;
+  type?: string;
+  salary?: string;
+  status?: string;
+  resumeId?: string;
+  notes?: string;
+}
+
+// For API response and data storage
+export interface JobApplication {
   id: string;
   jobId: string;
   status: string;
@@ -17,7 +32,7 @@ type JobApplication = {
     id: string;
     title: string;
   };
-};
+}
 
 export const useJobApplications = () => {
   return useQuery({
