@@ -1,10 +1,9 @@
 import { t } from "@lingui/macro";
 import { OpenAI } from "openai";
 
-import { useOpenAiStore } from "@/client/stores/openai";
-
 export const openai = () => {
-  const { apiKey, baseURL } = useOpenAiStore.getState();
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  const baseURL = import.meta.env.VITE_OPENAI_BASE_URL;
 
   if (!apiKey) {
     throw new Error(
@@ -12,16 +11,9 @@ export const openai = () => {
     );
   }
 
-  if (baseURL) {
-    return new OpenAI({
-      apiKey,
-      baseURL,
-      dangerouslyAllowBrowser: true,
-    });
-  }
-
   return new OpenAI({
     apiKey,
+    baseURL,
     dangerouslyAllowBrowser: true,
   });
 };
