@@ -83,6 +83,12 @@ export const configSchema = z.object({
   OPENID_SCOPE: z.string().optional(),
   OPENID_TOKEN_URL: z.string().url().optional(),
   OPENID_USER_INFO_URL: z.string().url().optional(),
+
+  // OpenAI Configuration
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_BASE_URL: z.string().default('https://api.openai.com/v1'),
+  OPENAI_MODEL: z.string().default('gpt-4o'),
+  OPENAI_MAX_TOKENS: z.number().default(4096),
 });
 
 export type Config = z.infer<typeof configSchema>;

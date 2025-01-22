@@ -2,6 +2,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea
 import { AnimatePresence } from "framer-motion";
 import { Separator } from "@reactive-resume/ui";
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
 
 import { useJobApplications, useUpdateJobApplication } from "@/client/services/jobs/application";
 import { ColumnConfig } from "../../page";
@@ -14,6 +15,8 @@ interface Props {
 export const GridView = ({ enabledColumns }: Props) => {
   const { data: applications } = useJobApplications();
   const { mutateAsync: updateApplication } = useUpdateJobApplication();
+  const isMobile = useMediaQuery("(max-width: 640px)");  // Mobile
+  const isTablet = useMediaQuery("(max-width: 1024px)"); // Tablet
 
   const [columns, setColumns] = useState<Record<string, string[]>>({
     draft: [],
@@ -91,24 +94,56 @@ export const GridView = ({ enabledColumns }: Props) => {
   const getApplicationById = (id: string) =>
     applications?.find((application) => application.id === id);
 
-  const splitColumns = (columns: ColumnConfig[]) => {
+  // Responsive column layout
+  const getColumns = (columns: ColumnConfig[]) => {
     const enabledCols = columns.filter(col => col.enabled);
+    
+    if (isMobile) {
+      return [enabledCols]; // Single column for mobile
+    }
+    
+    if (isTablet) {
+      return [
+        enabledCols.slice(0, 2),  // First row - 2 columns
+        enabledCols.slice(2, 4),  // Second row - 2 columns
+        enabledCols.slice(4, 6),  // Third row - 2 columns
+        enabledCols.slice(6)      // Fourth row - remaining columns
+      ].filter(row => row.length > 0);
+    }
+    
+    // Desktop - 3 columns per row
     return [
-      enabledCols.slice(0, 5),  // First row
-      enabledCols.slice(5, 10)  // Second row
-    ];
+      enabledCols.slice(0, 3),    // First row - 3 columns
+      enabledCols.slice(3, 6),    // Second row - 3 columns
+      enabledCols.slice(6, 9),    // Third row - 3 columns
+      enabledCols.slice(9)        // Fourth row - remaining columns
+    ].filter(row => row.length > 0);
   };
 
   return (
     <div className="h-full flex flex-col">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="flex-1 overflow-x-auto">
+        <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-4">
-            {splitColumns(enabledColumns).map((rowColumns, rowIndex) => (
-              <div key={rowIndex} className="flex gap-4 p-4 min-w-max">
+            {getColumns(enabledColumns).map((rowColumns, rowIndex) => (
+              <div 
+                key={rowIndex} 
+                className={`
+                  flex gap-4 p-4
+                  ${isMobile ? 'flex-col' : 'flex-row'}
+                  ${!isMobile && 'justify-center'}
+                `}
+              >
                 {rowColumns.map((column, index) => (
-                  <div key={column.id} className="w-[280px] flex flex-col relative">
-                    {index > 0 && (
+                  <div 
+                    key={column.id} 
+                    className={`
+                      flex flex-col relative
+                      ${isMobile ? 'w-full' : 'w-[calc(50%-8px)]'}
+                      ${!isMobile && !isTablet && 'w-[280px]'}
+                    `}
+                  >
+                    {!isMobile && index > 0 && (
                       <Separator
                         orientation="vertical"
                         className="absolute -left-2 top-0 h-full"
@@ -120,7 +155,12 @@ export const GridView = ({ enabledColumns }: Props) => {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className="flex-1 space-y-3 bg-secondary/20 rounded-lg p-3 overflow-y-auto h-[calc((100vh-280px)/2)]"
+                          className={`
+                            flex-1 space-y-3 bg-secondary/20 rounded-lg p-3 overflow-y-auto
+                            ${isMobile ? 'h-[300px]' : 
+                              isTablet ? 'h-[400px]' : 
+                              'h-[calc((100vh-280px)/2)]'}
+                          `}
                         >
                           <AnimatePresence>
                             {columns[column.id].map((id, index) => {

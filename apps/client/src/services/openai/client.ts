@@ -1,10 +1,12 @@
 import { t } from "@lingui/macro";
 import { OpenAI } from "openai";
+import { useOpenAiStore } from "@/client/stores/openai";
+
 
 export const openai = () => {
   // Get API configuration from environment variables
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  const baseURL = import.meta.env.VITE_OPENAI_BASE_URL;
+  const apiKey = import.meta.env.OPENAI_API_KEY;
+  const baseURL = import.meta.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
 
   // Check if API key exists
   if (!apiKey) {
@@ -17,6 +19,6 @@ export const openai = () => {
   return new OpenAI({
     apiKey,
     baseURL,
-    dangerouslyAllowBrowser: true,  // Enable client-side API calls
+    dangerouslyAllowBrowser: true,
   });
 };
