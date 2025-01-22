@@ -2338,3 +2338,13 @@ msgstr "Failed to create application"
 
 msgid "Applying..."
 msgstr "Applying..."
+
+msgid "An unexpected error occurred"
+msgstr "An unexpected error occurred"
+
+msgid "Powered by"
+msgstr "Powered by"
+
+msgid "Reactive Resume"
+msgstr "Reactive Resume"
+

@@ -12,6 +12,11 @@ export const Copyright = ({ className }: Props) => (
       className,
     )}
   >
+    
+    <span>{t`By the community, for the community.`}</span>
+    <span className="mt-4">
+       {t`Powered by`} <a href="https://github.com/AmruthPillai/Reactive-Resume">{t`Reactive Resume`}</a> {"v" + appVersion}
+    </span>
     <span>
       <Trans>
         Licensed under{" "}
@@ -23,16 +28,6 @@ export const Copyright = ({ className }: Props) => (
           MIT
         </a>
       </Trans>
-    </span>
-    <span>{t`By the community, for the community.`}</span>
-    <span>
-      <Trans>
-        A passion project by <a href="https://www.amruthpillai.com/">Amruth Pillai</a>
-      </Trans>
-    </span>
-
-    <span className="mt-4">
-      {t`Reactive Resume`} {"v" + appVersion}
     </span>
   </div>
 );
