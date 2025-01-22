@@ -37,8 +37,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export const OpenAISettings = () => {
-  const { apiKey, setApiKey, baseURL, setBaseURL, model, setModel, maxTokens, setMaxTokens } =
-    useOpenAiStore();
+  const { apiKey, baseURL, model, maxTokens } = useOpenAiStore();
 
   const isEnabled = !!apiKey;
 
@@ -53,23 +52,23 @@ export const OpenAISettings = () => {
   });
 
   const onSubmit = ({ apiKey, baseURL, model, maxTokens }: FormValues) => {
-    setApiKey(apiKey);
-    if (baseURL) {
-      setBaseURL(baseURL);
-    }
-    if (model) {
-      setModel(model);
-    }
-    if (maxTokens) {
-      setMaxTokens(maxTokens);
-    }
+    // setApiKey(apiKey);
+    // if (baseURL) {
+    //   setBaseURL(baseURL);
+    // }
+    // if (model) {
+    //   setModel(model);
+    // }
+    // if (maxTokens) {
+    //   setMaxTokens(maxTokens);
+    // }
   };
 
   const onRemove = () => {
-    setApiKey(null);
-    setBaseURL(null);
-    setModel(DEFAULT_MODEL);
-    setMaxTokens(DEFAULT_MAX_TOKENS);
+    // setApiKey(null);
+    // setBaseURL(null);
+    // setModel(DEFAULT_MODEL);
+    // setMaxTokens(DEFAULT_MAX_TOKENS);
     form.reset({ apiKey: "", baseURL: "", model: DEFAULT_MODEL, maxTokens: DEFAULT_MAX_TOKENS });
   };
 
