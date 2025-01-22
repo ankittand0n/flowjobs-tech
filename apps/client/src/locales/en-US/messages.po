@@ -2159,6 +2159,9 @@ msgstr "Keywords found in resume"
 msgid "Select Keywords for Test Questions"
 msgstr "Select Keywords for Test Questions"
 
+msgid "Generating..."
+msgstr "Generating..."
+
 msgid "Generating questions..."
 msgstr "Generating questions..."
 
@@ -2348,3 +2351,75 @@ msgstr "Powered by"
 msgid "Reactive Resume"
 msgstr "Reactive Resume"
 
+msgid "Evaluating..."
+msgstr "Evaluating..."
+
+msgid "Test Complete!"
+msgstr "Test Complete!"
+
+msgid "Your final score:"
+msgstr "Your final score:"
+
+msgid "Score:"
+msgstr "Score:"
+
+msgid "Not answered yet"
+msgstr "Not answered yet"
+
+msgid "Back to Mock Tests"
+msgstr "Back to Mock Tests"
+
+msgid "Your Answer:"
+msgstr "Your Answer:"
+
+msgid "Question"
+msgstr "Question"
+
+msgid "of"
+msgstr "of"
+
+msgid "Past Tests"
+msgstr "Past Tests"
+
+msgid "Score:"
+msgstr "Score:"
+
+msgid "Not answered"
+msgstr "Not answered"
+
+msgid "Final Score:"
+msgstr "Final Score:"
+
+msgid "Your Results"
+msgstr "Your Results"
+
+msgid "Date:"
+msgstr "Date:"
+
+msgid "Options:"
+msgstr "Options:"
+
+msgid "Correct answer!"
+msgstr "Correct answer!"
+
+msgid "Incorrect answer."
+msgstr "Incorrect answer."
+
+
+msgid "Practice Mock Tests"
+msgstr "Practice Mock Tests"
+
+msgid "Skip Application"
+msgstr "Skip Application"
+
+msgid "Saving Application..."
+msgstr "Saving Application..."
+
+msgid "Saving Job..."
+msgstr "Saving Job..."
+
+msgid "Save Application"
+msgstr "Save Application"
+
+msgid "Save Job"
+msgstr "Save Job"

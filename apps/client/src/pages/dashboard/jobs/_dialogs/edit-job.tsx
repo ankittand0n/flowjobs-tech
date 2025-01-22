@@ -28,14 +28,10 @@ type Job = {
   location?: string;
   type?: string;
   salary?: string;
-  status: string;
   url?: string;
   description?: string;
-  notes?: string;
-  resumeId?: string;
-  resume?: {
-    title: string;
-  };
+  createdBy: string;
+  canEdit: boolean;
 };
 
 type Props = {
@@ -54,10 +50,8 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
     location: job.location || "",
     type: job.type || "",
     salary: job.salary || "",
-    status: job.status,
     url: job.url || "",
     description: job.description || "",
-    notes: job.notes || "",
   });
 
   useEffect(() => {
@@ -67,39 +61,54 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
       location: job.location || "",
       type: job.type || "",
       salary: job.salary || "",
-      status: job.status,
       url: job.url || "",
       description: job.description || "",
-      notes: job.notes || "",
     });
   }, [job]);
+
+  useEffect(() => {
+    if (!job.canEdit) {
+      console.error("You don't have permission to edit this job");
+      onClose();
+    }
+  }, [job, onClose]);
+
+  if (!job.canEdit) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      console.log('Preparing job update:', {
+        jobId: job.id,
+        currentData: jobData,
+        canEdit: job.canEdit
+      });
+
       const updateData = {
         id: job.id,
         title: jobData.title.trim(),
         company: jobData.company.trim(),
-        location: jobData.location?.trim() || undefined,
-        type: jobData.type || undefined,
-        salary: jobData.salary?.trim() || undefined,
-        status: jobData.status,
-        url: jobData.url?.trim() || undefined,
+        location: jobData.location?.trim(),
+        type: jobData.type,
+        salary: jobData.salary?.trim(),
+        url: jobData.url?.trim(),
         description: jobData.description,
-        notes: jobData.notes,
-        resumeId: job.resumeId || undefined,
       };
 
-      Object.keys(updateData).forEach(
-        (key) => updateData[key as keyof typeof updateData] === undefined && delete updateData[key as keyof typeof updateData]
-      );
+      console.log('Sending update data:', updateData);
 
       await updateJob(updateData);
+      console.log('Update completed successfully');
       onClose();
     } catch (error) {
-      console.error("Failed to update job:", error);
+      console.error("Failed to update job:", {
+        error,
+        jobId: job.id,
+        updateData: jobData
+      });
     }
   };
 
@@ -114,7 +123,7 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[1200px]">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[1200px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl">{t`Edit Job`}</DialogTitle>
           <DialogDescription>
@@ -122,91 +131,78 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>{t`Job Title`}</Label>
-                <Input
-                  required
-                  value={jobData.title}
-                  onChange={(e) => setJobData({ ...jobData, title: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t`Company`}</Label>
-                <Input
-                  required
-                  value={jobData.company}
-                  onChange={(e) => setJobData({ ...jobData, company: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t`Location`}</Label>
-                <Input
-                  value={jobData.location}
-                  onChange={(e) => setJobData({ ...jobData, location: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t`Job Type`}</Label>
-                <Select
-                  value={jobData.type}
-                  onValueChange={(value) => setJobData({ ...jobData, type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t`Select job type`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                  <SelectItem value="full-time">{t`Full-time`}</SelectItem>
-                  <SelectItem value="part-time">{t`Part-time`}</SelectItem>
-                  <SelectItem value="contract">{t`Contract`}</SelectItem>
-                  <SelectItem value="internship">{t`Internship`}</SelectItem>
-                  <SelectItem value="freelance">{t`Freelance`}</SelectItem>
-                  <SelectItem value="remote">{t`Remote`}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>
-                  {t`Salary Range`}
-                  <span className="text-xs text-muted-foreground ml-1">({t`Optional`})</span>
-                </Label>
-                <Input
-                  value={jobData.salary}
-                  onChange={(e) => setJobData({ ...jobData, salary: e.target.value })}
-                  placeholder={t`e.g. $80k - $100k`}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t`Job URL`}</Label>
-                <Input
-                  type="url"
-                  value={jobData.url}
-                  onChange={(e) => setJobData({ ...jobData, url: e.target.value })}
-                  placeholder={t`e.g. https://example.com/job-posting`}
-                />
-              </div>
-
-              {job.resumeId && (
-                <div className="space-y-2">
-                  <Label>{t`Resume Used`}</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                    onClick={() => window.open(`/builder/${job.resumeId}`, '_blank')}
-                  >
-                    <span className="truncate">{job.resume?.title || t`View Resume`}</span>
-                    <ArrowSquareOut className="ml-2 h-4 w-4" />
-                  </Button>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>{t`Job Title`}</Label>
+                  <Input
+                    required
+                    value={jobData.title}
+                    onChange={(e) => setJobData({ ...jobData, title: e.target.value })}
+                  />
                 </div>
-              )}
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>{t`Company`}</Label>
+                  <Input
+                    required
+                    value={jobData.company}
+                    onChange={(e) => setJobData({ ...jobData, company: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t`Location`}</Label>
+                  <Input
+                    value={jobData.location}
+                    onChange={(e) => setJobData({ ...jobData, location: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t`Job Type`}</Label>
+                  <Select
+                    value={jobData.type}
+                    onValueChange={(value) => setJobData({ ...jobData, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t`Select job type`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">{t`Full-time`}</SelectItem>
+                      <SelectItem value="part-time">{t`Part-time`}</SelectItem>
+                      <SelectItem value="contract">{t`Contract`}</SelectItem>
+                      <SelectItem value="internship">{t`Internship`}</SelectItem>
+                      <SelectItem value="freelance">{t`Freelance`}</SelectItem>
+                      <SelectItem value="remote">{t`Remote`}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>
+                    {t`Salary Range`}
+                    <span className="text-xs text-muted-foreground ml-1">({t`Optional`})</span>
+                  </Label>
+                  <Input
+                    value={jobData.salary}
+                    onChange={(e) => setJobData({ ...jobData, salary: e.target.value })}
+                    placeholder={t`e.g. $80k - $100k`}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t`Job URL`}</Label>
+                  <Input
+                    type="url"
+                    value={jobData.url}
+                    onChange={(e) => setJobData({ ...jobData, url: e.target.value })}
+                    placeholder={t`e.g. https://example.com/job-posting`}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -215,38 +211,29 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
                 <RichInput
                   content={jobData.description}
                   onChange={(value) => setJobData({ ...jobData, description: value })}
-                  className="min-h-[250px]"
+                  className="min-h-[200px] sm:min-h-[250px]"
                   placeholder={t`Enter or paste the job description here...`}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t`Notes`}</Label>
-                <RichInput
-                  content={jobData.notes}
-                  onChange={(value) => setJobData({ ...jobData, notes: value })}
-                  className="min-h-[250px]"
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-col gap-2 sm:flex-row">
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
             <Button 
               type="button" 
               variant="error"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               <Trash className="mr-2 h-4 w-4" />
               {isDeleting ? t`Deleting...` : t`Delete Job`}
             </Button>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto order-1 sm:order-2">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 sm:flex-initial">
                 {t`Cancel`}
               </Button>
-              <Button type="submit" className="w-full sm:w-auto" disabled={isUpdating}>
+              <Button type="submit" className="flex-1 sm:flex-initial" disabled={isUpdating}>
                 {isUpdating ? t`Saving...` : t`Save Changes`}
               </Button>
             </div>

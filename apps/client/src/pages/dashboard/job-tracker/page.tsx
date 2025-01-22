@@ -16,7 +16,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 
-import { TrackJobDialog } from "@/client/components/dialogs/track-job";
 import { GridView } from "@/client/pages/dashboard/job-tracker/_layouts/grid";
 import { ListView } from "@/client/pages/dashboard/job-tracker/_layouts/list";
 
@@ -45,7 +44,6 @@ const defaultColumns: ColumnConfig[] = [
 
 export const JobTrackerPage = () => {
   const [layout, setLayout] = useState<Layout>("grid");
-  const [isTrackJobOpen, setIsTrackJobOpen] = useState(false);
   const [enabledColumns, setEnabledColumns] = useState<ColumnConfig[]>(defaultColumns);
   const [columns, setColumns] = useState<string[]>(["Column 1", "Column 2"]);
 
@@ -90,16 +88,6 @@ export const JobTrackerPage = () => {
           </motion.h1>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsTrackJobOpen(true)}
-              className="w-full sm:w-auto bg-foreground text-background hover:bg-foreground/90"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {t`Track New Job`}
-            </Button>
-
             {layout === "grid" && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -151,11 +139,6 @@ export const JobTrackerPage = () => {
           </TabsContent>
         </ScrollArea>
       </Tabs>
-
-      <TrackJobDialog
-        isOpen={isTrackJobOpen}
-        onClose={() => setIsTrackJobOpen(false)}
-      />
     </>
   );
 };

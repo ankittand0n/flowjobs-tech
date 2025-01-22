@@ -36,10 +36,7 @@ const updateJobSchema = z.object({
   type: z.string().optional(),
   salary: z.string().optional(),
   url: z.string().url().optional(),
-  status: z.string(),
-  resumeId: z.string().optional(),
   description: z.string().optional(),
-  notes: z.string().optional(),
   atsKeywords: atsKeywordsSchema.optional(),
 });
 

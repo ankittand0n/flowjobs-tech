@@ -36,6 +36,7 @@ Follow this exact format for the response:
 Return only valid JSON with no additional text.
 Make 60% multiple choice and 40% open-ended questions.
 Each multiple choice question should have 4 options.
+Ensure that difficulty level is based on the job title.
 
 Job Details:
 Title: {jobTitle}

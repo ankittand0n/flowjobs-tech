@@ -7,8 +7,6 @@ import { CreateJobDto } from "@reactive-resume/dto";
 import { cn } from "@reactive-resume/utils";
 import { useResumeStore } from "@/client/stores/resume";
 
-import { getSectionIcon } from "../shared/section-icon";
-
 export const AiToolsSection = () => {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [matchedKeywords, setMatchedKeywords] = useState<Set<string>>(new Set());

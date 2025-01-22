@@ -18,8 +18,6 @@ import {
 } from "@reactive-resume/ui";
 import { useState } from "react";
 import { useCreateJob } from "@/client/services/jobs/job";
-import { useCreateJobApplication } from "@/client/services/jobs/application";
-import { useResumes } from "@/client/services/resume";
 import { cn } from "@reactive-resume/utils";
 
 type Props = {
@@ -33,8 +31,6 @@ const StepDescription = ({ step }: { step: number }) => {
       return <>{t`Enter basic job information`}</>;
     case 2:
       return <>{t`Add detailed job information`}</>;
-    case 3:
-      return <>{t`Track your application`}</>;
     default:
       return null;
   }
@@ -46,18 +42,14 @@ const StepTitle = ({ step }: { step: number }) => {
       return <>{t`Basic Info`}</>;
     case 2:
       return <>{t`Job Details`}</>;
-    case 3:
-      return <>{t`Application`}</>;
     default:
       return null;
   }
 };
 
-export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
+export const AddJobDialog = ({ isOpen, onClose }: Props) => {
   const [currentStep, setCurrentStep] = useState(1);
   const { mutateAsync: createJob, isPending: isCreatingJob } = useCreateJob();
-  const { mutateAsync: createApplication, isPending: isCreatingApp } = useCreateJobApplication();
-  const { resumes } = useResumes();
 
   const [jobData, setJobData] = useState({
     // Basic Info (Step 1)
@@ -70,22 +62,14 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
     type: "",
     salary: "",
     description: "",
-
-    // Application Details (Step 3)
-    status: "draft",
-    resumeId: "",
-    notes: "",
   });
 
-  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 2));
   const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSaveJob = async () => {
     try {
-      // Create job first
-      const job = await createJob({
+      await createJob({
         title: jobData.title,
         company: jobData.company,
         location: jobData.location || undefined,
@@ -95,20 +79,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
         description: jobData.description || undefined,
       });
 
-      // Then create application
-      await createApplication({
-        jobId: job.id,
-        status: jobData.status,
-        resumeId: jobData.resumeId || undefined,
-        notes: jobData.notes || undefined,
-        job: {
-          id: job.id,
-          title: job.title,
-          company: job.company,
-          location: job.location || undefined,
-        },
-      });
-
+      // Reset form and close dialog
       setJobData({
         title: "",
         company: "",
@@ -117,9 +88,6 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
         salary: "",
         description: "",
         url: "",
-        status: "draft",
-        resumeId: "",
-        notes: "",
       });
       setCurrentStep(1);
       onClose();
@@ -217,74 +185,21 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
           </div>
         );
 
-      case 3:
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t`Application Status`}</Label>
-              <Select
-                required
-                value={jobData.status}
-                onValueChange={(value) => setJobData({ ...jobData, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">{t`Draft`}</SelectItem>
-                  <SelectItem value="applied">{t`Applied`}</SelectItem>
-                  <SelectItem value="interviewing">{t`Interviewing`}</SelectItem>
-                  <SelectItem value="offer">{t`Offer`}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t`Resume`}</Label>
-              <Select
-                value={jobData.resumeId}
-                onValueChange={(value) => setJobData({ ...jobData, resumeId: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t`Select a resume`} />
-                </SelectTrigger>
-                <SelectContent>
-                  {resumes?.map((resume) => (
-                    <SelectItem key={resume.id} value={resume.id}>
-                      {resume.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t`Notes`}</Label>
-              <RichInput
-                content={jobData.notes}
-                onChange={(content) => setJobData({ ...jobData, notes: content })}
-              />
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
   };
 
-  const isLoading = isCreatingJob || isCreatingApp;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{t`Track New Job`}</DialogTitle>
+          <DialogTitle>{t`Add New Job`}</DialogTitle>
         </DialogHeader>
 
         {/* Steps Indicator */}
         <div className="mb-8 flex items-center justify-between">
-          {[1, 2, 3].map((step, index) => (
+          {[1, 2].map((step, index) => (
             <div key={step} className="flex-1">
               <div className="flex items-center">
                 <div
@@ -312,7 +227,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
                     <StepDescription step={step} />
                   </p>
                 </div>
-                {index < 2 && (
+                {index < 1 && (
                   <div
                     className={cn(
                       "mx-4 h-[2px] flex-1",
@@ -325,7 +240,7 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-4">
           {renderStepContent()}
 
           <DialogFooter>
@@ -334,13 +249,18 @@ export const TrackJobDialog = ({ isOpen, onClose }: Props) => {
                 {t`Back`}
               </Button>
             )}
-            {currentStep < 3 ? (
+            {currentStep === 1 && (
               <Button type="button" onClick={handleNext}>
                 {t`Next`}
               </Button>
-            ) : (
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? t`Creating job...` : t`Create Job`}
+            )}
+            {currentStep === 2 && (
+              <Button 
+                type="button" 
+                onClick={handleSaveJob}
+                disabled={isCreatingJob}
+              >
+                {isCreatingJob ? t`Saving Job...` : t`Save Job`}
               </Button>
             )}
           </DialogFooter>

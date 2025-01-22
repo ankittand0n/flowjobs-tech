@@ -16,6 +16,9 @@ type TestState = {
 export const MockTestPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Add this line to generate a unique test ID
+  const testId = location.state?.questions?.map((q: any) => q.question).join('').slice(0, 32);
 
   // Add state validation and fallback
   if (!location.state || !location.state.questions || !location.state.duration) {
@@ -62,6 +65,27 @@ export const MockTestPage = () => {
     return () => clearInterval(timer);
   }, [state.isComplete]);
 
+  // Add a useEffect to load saved answers from localStorage
+  useEffect(() => {
+    const savedAnswers = localStorage.getItem(`test-answers-${testId}`);
+    const savedTime = localStorage.getItem(`test-time-${testId}`);
+    if (savedAnswers) {
+      setState(prev => ({
+        ...prev,
+        answers: JSON.parse(savedAnswers),
+        currentQuestionIndex: parseInt(localStorage.getItem(`test-current-index-${testId}`) || '0'),
+        timeRemaining: savedTime ? parseInt(savedTime) : duration * 60
+      }));
+    }
+  }, [testId, duration]);
+
+  // Save answers and timer state along with other state
+  useEffect(() => {
+    localStorage.setItem(`test-answers-${testId}`, JSON.stringify(state.answers));
+    localStorage.setItem(`test-current-index-${testId}`, state.currentQuestionIndex.toString());
+    localStorage.setItem(`test-time-${testId}`, state.timeRemaining.toString());
+  }, [state.answers, state.currentQuestionIndex, state.timeRemaining, testId]);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -73,14 +97,35 @@ export const MockTestPage = () => {
     
     setIsSubmitting(true);
     try {
-      const evaluation = await evaluateAnswer(
-        questions[state.currentQuestionIndex].question, 
-        currentAnswer
-      );
+      const currentQuestion = questions[state.currentQuestionIndex];
+      const answerText = currentQuestion.format === "multiple-choice" 
+        ? currentQuestion.options?.[parseInt(currentAnswer)] || ""
+        : currentAnswer;
+
+      if (!answerText) return;
+
+      let evaluation: AnswerEvaluation;
+
+      if (currentQuestion.format === "multiple-choice") {
+        const correctAnswer = currentQuestion.options?.[currentQuestion.correctOption || 0];
+        const isCorrect = correctAnswer ? answerText === correctAnswer : false;
+        evaluation = {
+          score: isCorrect ? 100 : 0,
+          feedback: isCorrect ? t`Correct answer!` : t`Incorrect answer.`,
+          keyPoints: [],
+          modelAnswer: correctAnswer || ''
+        };
+      } else {
+        // For open-ended questions, use OpenAI evaluation
+        evaluation = await evaluateAnswer(
+          currentQuestion.question,
+          answerText
+        );
+      }
       
       setState(prev => ({
         ...prev,
-        answers: { ...prev.answers, [prev.currentQuestionIndex]: currentAnswer },
+        answers: { ...prev.answers, [prev.currentQuestionIndex]: answerText },
         evaluations: { ...prev.evaluations, [prev.currentQuestionIndex]: evaluation },
         currentQuestionIndex: prev.currentQuestionIndex + 1,
         isComplete: prev.currentQuestionIndex === questions.length - 1
@@ -98,6 +143,29 @@ export const MockTestPage = () => {
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   };
 
+  const saveTestToHistory = () => {
+    const history = JSON.parse(localStorage.getItem('mock-test-history') || '[]');
+    history.unshift({
+      id: testId,
+      jobTitle: location.state?.jobTitle || 'Unknown Job',
+      company: location.state?.company || 'Unknown Company',
+      date: new Date().toISOString(),
+      score: calculateFinalScore(),
+      duration,
+      questions: questions,
+      answers: state.answers,
+      evaluations: state.evaluations
+    });
+    localStorage.setItem('mock-test-history', JSON.stringify(history));
+  };
+
+  // Call saveTestToHistory when test is complete
+  useEffect(() => {
+    if (state.isComplete) {
+      saveTestToHistory();
+    }
+  }, [state.isComplete]);
+
   if (state.isComplete) {
     return (
       <div className="p-4 space-y-4">
@@ -106,7 +174,7 @@ export const MockTestPage = () => {
             <Brain className="h-12 w-12" />
             <div>
               <h2 className="text-xl font-semibold">{t`Test Complete!`}</h2>
-              <p className="text-muted-foreground">{t`Your final score: ${calculateFinalScore()}%`}</p>
+              <p className="text-muted-foreground">{t`Your final score:`} {calculateFinalScore()}%</p>
             </div>
           </div>
 
@@ -116,12 +184,12 @@ export const MockTestPage = () => {
                 <h3 className="font-medium">Question {index + 1}</h3>
                 <p>{question.question}</p>
                 <div className="rounded-lg bg-secondary/50 p-3">
-                  <p className="font-medium">{t`Your Answer:`}</p>
-                  <p className="text-sm">{state.answers[index]}</p>
+                  <p className="font-medium">{t`Question`} {index + 1} <br/> {t`Your Answer:`}</p>
+                  <p className="text-sm">{state.answers[index] || t`Not answered yet`}</p>
                 </div>
                 {state.evaluations[index] && (
                   <div className="rounded-lg bg-secondary/50 p-3 space-y-2">
-                    <p className="font-medium">{t`Score: ${state.evaluations[index].score}%`}</p>
+                    <p className="font-medium">{t`Score:`} {state.evaluations[index].score}%</p>
                     <p className="text-sm">{state.evaluations[index].feedback}</p>
                     <div>
                       <p className="font-medium">{t`Key Points:`}</p>
@@ -149,11 +217,7 @@ export const MockTestPage = () => {
   return (
     <div className="container mx-auto p-4 space-y-4">
       <Card className="p-6 space-y-6">
-        {/* Add debug info */}
-        <div className="text-sm text-muted-foreground">
-          Debug: {questions.length} questions, {duration} minutes
-        </div>
-
+  
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Timer className="h-6 w-6" />

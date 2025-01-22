@@ -9,8 +9,21 @@ import { useNavigate } from "react-router";
 import { useJobs } from "@/client/services/jobs/job";
 import { SelectKeywordsDialog } from "@/client/pages/dashboard/mock-tests/_dialogs/select-keywords";
 import { generateMockQuestions, MockQuestion } from "@/client/services/openai/generate-questions";
+import { ViewTestDialog } from "@/client/pages/dashboard/mock-tests/_dialogs/view-test";
 
 type TestDuration = "15" | "30" | "60";
+
+type TestHistory = {
+  id: string;
+  jobTitle: string;
+  company: string;
+  date: string;
+  score: number;
+  duration: number;
+  questions: any[];
+  answers: Record<number, string>;
+  evaluations: Record<number, any>;
+};
 
 export const MockTestsPage = () => {
   const { data: jobs } = useJobs();
@@ -19,6 +32,11 @@ export const MockTestsPage = () => {
   const [isKeywordDialogOpen, setIsKeywordDialogOpen] = useState(false);
   const [questions, setQuestions] = useState<MockQuestion[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [testHistory, setTestHistory] = useState<TestHistory[]>(() => {
+    const saved = localStorage.getItem('mock-test-history');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [selectedTest, setSelectedTest] = useState<TestHistory | null>(null);
   const navigate = useNavigate();
 
   const selectedJobData = jobs?.find((job: any) => job.id === selectedJob);
@@ -51,7 +69,9 @@ export const MockTestsPage = () => {
       navigate("/dashboard/mock-tests/test", {
         state: { 
           questions: generatedQuestions,
-          duration: parseInt(duration)
+          duration: parseInt(duration),
+          jobTitle: selectedJobData.title,
+          company: selectedJobData.company
         },
         replace: true
       });
@@ -92,7 +112,7 @@ export const MockTestsPage = () => {
             <div className="flex items-center gap-4">
               <Brain className="h-12 w-12" />
               <div>
-                <h2 className="text-xl font-semibold">{t`Practice Interview Questions`}</h2>
+                <h2 className="text-xl font-semibold">{t`Practice Mock Tests`}</h2>
                 <p className="text-muted-foreground">
                   {t`Get personalized interview questions based on the job description and requirements.`}
                 </p>
@@ -153,6 +173,35 @@ export const MockTestsPage = () => {
             </Button>
           </div>
         </Card>
+
+        {testHistory.length > 0 && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">{t`Past Tests`}</h2>
+            <div className="space-y-4">
+              {testHistory.map((test) => (
+                <div
+                  key={test.id}
+                  className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 cursor-pointer hover:bg-secondary/70"
+                  onClick={() => setSelectedTest(test)}
+                >
+                  <div>
+                    <h3 className="font-medium">{test.jobTitle}</h3>
+                    <p className="text-sm text-muted-foreground">{test.company}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(test.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">{t`Score:`} {test.score}%</p>
+                    <p className="text-sm text-muted-foreground">
+                      {test.duration} {t`minutes`}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
 
       <SelectKeywordsDialog
@@ -162,6 +211,14 @@ export const MockTestsPage = () => {
         atsKeywords={selectedJobData?.atsKeywords?.skills}
         isLoading={isGenerating}
       />
+
+      {selectedTest && (
+        <ViewTestDialog
+          isOpen={!!selectedTest}
+          onClose={() => setSelectedTest(null)}
+          test={selectedTest}
+        />
+      )}
     </>
   );
 };

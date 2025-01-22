@@ -3,10 +3,10 @@ import { stripHtml } from "@/client/utils/string";
 
 import { axios } from "../../libs/axios";
 import { extractAtsKeywords } from "../openai/extract-ats";
-import { t } from "@lingui/macro";
-import { UpdateJobDto } from "@reactive-resume/dto";
 
-type CreateJobDto = {
+// Base type for Job properties
+type BaseJob = {
+  id: string;
   title: string;
   company: string;
   location?: string;
@@ -15,27 +15,30 @@ type CreateJobDto = {
   url?: string;
   description?: string;
   atsKeywords?: {
-    skills: {
-      keyword: string;
-      relevance: number;
-      count: number;
-    }[];
-    requirements: {
-      keyword: string;
-      type: "must-have" | "nice-to-have";
-    }[];
-    experience: {
-      keyword: string;
-      yearsRequired?: number;
-    }[];
-    education: {
-      level: string;
-      field?: string;
-    }[];
+    skills: Array<{ keyword: string; relevance: number; count: number }>;
+    requirements: Array<{ keyword: string; type: "must-have" | "nice-to-have" }>;
+    experience: Array<{ keyword: string; yearsRequired?: number }>;
+    education: Array<{ level: string; field?: string }>;
   };
 };
 
-type UpdateJobStatusDto = {
+// Full Job type with additional properties from server
+export type Job = BaseJob & {
+  createdBy: string;
+  currentUserId?: string;
+  canEdit?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// DTO for creating a new job
+export type CreateJobDto = Omit<BaseJob, 'id' | 'status'>;
+
+// DTO for updating a job
+export type UpdateJobDto = Partial<Omit<BaseJob, 'id' | 'status'>>;
+
+// DTO for updating just the status
+export type UpdateJobStatusDto = {
   id: string;
   status: string;
 };
@@ -45,10 +48,21 @@ export const useJobs = () => {
     queryKey: ["jobs"],
     queryFn: async () => {
       const { data } = await axios.get("/jobs");
-      return data.map((job: any) => ({
-        ...job,
-        canEdit: job.userId === job.currentUserId
-      }));
+      const { currentUserId, jobs } = data;
+
+      return jobs.map((job: any) => {
+        console.log('Job permissions:', {
+          jobId: job.id,
+          createdBy: job.createdBy,
+          currentUserId,
+          canEdit: job.createdBy === currentUserId
+        });
+
+        return {
+          ...job,
+          canEdit: job.createdBy === currentUserId
+        };
+      });
     },
   });
 };
@@ -101,23 +115,44 @@ export const useUpdateJob = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string } & Omit<UpdateJobDto, "atsKeywords">) => {
+    mutationFn: async ({ id, ...data }: { id: string } & Omit<BaseJob, 'id' | 'atsKeywords'>) => {
       try {
-        const { data: updatedJob } = await axios.patch(`/jobs/${id}`, {
-          title: data.title,
-          company: data.company,
-          location: data.location,
-          type: data.type,
-          salary: data.salary,
-          url: data.url,
-          description: data.description,
-          notes: data.notes,
-          status: data.status,
-          resumeId: data.resumeId,
+        const updateData = {
+          title: data.title?.trim(),
+          company: data.company?.trim(),
+          location: data.location?.trim() || null,
+          type: data.type || null,
+          salary: data.salary?.trim() || null,
+          url: data.url?.trim() || null,
+          description: data.description || null,
+        };
+
+        Object.keys(updateData).forEach((key) => {
+          if (updateData[key as keyof typeof updateData] === null) {
+            delete updateData[key as keyof typeof updateData];
+          }
         });
-        return updatedJob;
-      } catch (error) {
-        console.error("Error in updateJob mutation:", error);
+
+        console.log('Making update request:', {
+          endpoint: `/jobs/${id}`,
+          method: 'PATCH',
+          requestData: updateData
+        });
+
+        const response = await axios.patch(`/jobs/${id}`, updateData);
+        console.log('Update response:', response);
+        
+        return response.data;
+      } catch (error: any) {
+        console.error("Job Update Error:", {
+          message: error.message,
+          response: error.response ? {
+            data: error.response.data,
+            status: error.response.status,
+            statusText: error.response.statusText,
+          } : 'No response',
+          request: error.request ? 'Request was made but no response received' : 'No request made',
+        });
         throw error;
       }
     },

@@ -81,12 +81,6 @@ export const JobCard = forwardRef<HTMLDivElement, Props>(
                   </div>
                 )}
 
-                {application.notes && (
-                  <div className="mt-2 text-xs">
-                    <div className="font-medium mb-1">{t`Notes`}:</div>
-                    <div className="line-clamp-2">{application.notes}</div>
-                  </div>
-                )}
               </div>
             </div>
           </Card>

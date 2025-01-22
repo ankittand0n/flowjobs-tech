@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
@@ -12,7 +12,7 @@ export class JobController {
 
   @Get()
   async getJobs(@GetUser() user: User) {
-    return this.prisma.job.findMany({
+    const jobs = await this.prisma.job.findMany({
       include: { 
         applications: {
           where: { userId: user.id }
@@ -20,6 +20,13 @@ export class JobController {
       },
       orderBy: { createdAt: "desc" },
     });
+
+    return {
+      currentUserId: user.id,
+      jobs: jobs.map(job => ({
+        ...job
+      }))
+    };
   }
 
   @Post()
@@ -66,29 +73,87 @@ export class JobController {
     @Param("id") id: string,
     @Body() updateJobDto: UpdateJobDto,
   ) {
-    const job = await this.prisma.job.findUnique({
-      where: { id },
-    });
+    try {
+      console.log('Raw update request:', {
+        body: updateJobDto,
+        params: { id },
+        user: { id: user.id }
+      });
 
-    if (!job || job.createdBy !== user.id) {
-      throw new ForbiddenException('You cannot edit this job');
-    }
+      // Detailed validation logging
+      const validationIssues = {
+        title: !updateJobDto.title?.trim() ? 'Title is empty or missing' : null,
+        company: !updateJobDto.company?.trim() ? 'Company is empty or missing' : null,
+        location: updateJobDto.location && typeof updateJobDto.location !== 'string' ? 'Location must be a string' : null,
+        type: updateJobDto.type && typeof updateJobDto.type !== 'string' ? 'Type must be a string' : null,
+        salary: updateJobDto.salary && typeof updateJobDto.salary !== 'string' ? 'Salary must be a string' : null,
+        url: updateJobDto.url && typeof updateJobDto.url !== 'string' ? 'URL must be a string' : null,
+        description: updateJobDto.description && typeof updateJobDto.description !== 'string' ? 'Description must be a string' : null,
+      };
 
-    return this.prisma.job.update({
-      where: {
-        id,
-        createdBy: user.id,
-      },
-      data: {
-        ...updateJobDto,
+      console.log('Validation check:', {
+        dto: updateJobDto,
+        issues: Object.entries(validationIssues).filter(([_, value]) => value !== null)
+      });
+
+      // Required field validation
+      if (!updateJobDto.title?.trim()) {
+        throw new BadRequestException('Title is required');
+      }
+      if (!updateJobDto.company?.trim()) {
+        throw new BadRequestException('Company is required');
+      }
+
+      const job = await this.prisma.job.findUnique({
+        where: { id },
+        include: { applications: true }
+      });
+
+      if (!job) {
+        throw new BadRequestException('Job not found');
+      }
+
+      if (job.createdBy !== user.id) {
+        throw new ForbiddenException('You cannot edit this job');
+      }
+
+      // Clean and validate the update data
+      const validUpdateData = {
+        title: updateJobDto.title.trim(),
+        company: updateJobDto.company.trim(),
+        ...(updateJobDto.location && { location: updateJobDto.location.trim() }),
+        ...(updateJobDto.type && { type: updateJobDto.type }),
+        ...(updateJobDto.salary && { salary: updateJobDto.salary.trim() }),
+        ...(updateJobDto.url && { url: updateJobDto.url.trim() }),
+        ...(updateJobDto.description && { description: updateJobDto.description }),
         updatedAt: new Date(),
-      },
-      include: {
-        applications: {
-          where: { userId: user.id }
+      };
+
+      console.log('Processed update data:', validUpdateData);
+
+      const updatedJob = await this.prisma.job.update({
+        where: {
+          id,
+          createdBy: user.id,
         },
-      },
-    });
+        data: validUpdateData,
+        include: {
+          applications: {
+            where: { userId: user.id }
+          },
+        },
+      });
+
+      return updatedJob;
+    } catch (error) {
+      console.error('Update job error:', {
+        error: error.message,
+        stack: error.stack,
+        data: updateJobDto,
+        validation: error.response?.message
+      });
+      throw error;
+    }
   }
 
   @Delete(":id")
