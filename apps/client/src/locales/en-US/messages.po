@@ -2423,3 +2423,13 @@ msgstr "Save Application"
 
 msgid "Save Job"
 msgstr "Save Job"
+
+msgid "Your OpenAI API Key has not been set yet."
+msgstr "Your OpenAI API Key has not been set yet."
+
+
+msgid "Analyzing..."
+msgstr "Analyzing..."
+
+msgid "Add New Job"
+msgstr "Add New Job"

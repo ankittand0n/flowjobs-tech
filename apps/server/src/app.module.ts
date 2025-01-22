@@ -20,6 +20,7 @@ import { TranslationModule } from "./translation/translation.module";
 import { UserModule } from "./user/user.module";
 import { JobModule } from "./job/job.module";
 import { JobApplicationModule } from "./job-application/job-application.module";
+import { OpenAIModule } from './openai/openai.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { JobApplicationModule } from "./job-application/job-application.module";
     HealthModule,
     JobApplicationModule,
     JobModule,
+    OpenAIModule,
 
     // Feature Modules
     AuthModule.register(),
