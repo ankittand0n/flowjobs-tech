@@ -30,7 +30,7 @@ type Props = {
   onClose: () => void;
 };
 
-export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
+export const TrackJobDialog = ({ job, isOpen, onClose }: Props) => {
   const { resumes } = useResumes();
   const { mutateAsync: createApplication, isPending } = useCreateJobApplication();
 
@@ -56,7 +56,7 @@ export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
         }
       });
 
-      toast.success(t`Successfully applied to job`);
+      toast.success(t`Successfully started tracking job application`);
       onClose();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t`Failed to create application`);
@@ -68,9 +68,9 @@ export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{t`Apply to Job`}</DialogTitle>
+          <DialogTitle>{t`Track Job Application`}</DialogTitle>
           <DialogDescription>
-            {t`Apply to` + ` ${job.title}` + ` at ` + `${job.company}`}
+            {t`Track application for` + ` ${job.title}` + ` at ` + `${job.company}`}
           </DialogDescription>
         </DialogHeader>
 
@@ -134,11 +134,11 @@ export const ApplyJobDialog = ({ job, isOpen, onClose }: Props) => {
               {t`Cancel`}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? t`Applying...` : t`Apply Now`}
+              {isPending ? t`Saving...` : t`Start Tracking`}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
-};
+}; 

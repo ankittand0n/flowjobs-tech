@@ -34,6 +34,7 @@ model User {
   secrets          Secrets?
   resumes          Resume[]
   applications JobApplication[]
+  mockTests        MockTest[]
 }
 
 model Secrets {
@@ -117,5 +118,22 @@ model JobApplication {
   @@index([userId])
   @@index([jobId])
   @@index([resumeId])
+}
+
+model MockTest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  score       Int
+  totalQuestions Int
+  category    String   // e.g., "Technical", "Behavioral", "System Design"
+  difficulty  String   // e.g., "Easy", "Medium", "Hard"
+  duration    Int      // in minutes
+  answers     Json     // Store detailed answers and feedback
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }
 

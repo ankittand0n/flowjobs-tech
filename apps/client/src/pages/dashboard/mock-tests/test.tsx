@@ -4,6 +4,8 @@ import { Button, Card, ScrollArea, TextArea } from "@reactive-resume/ui";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { MockQuestion, evaluateAnswer, AnswerEvaluation } from "@/client/services/openai/generate-questions";
+import { useCreateMockTest } from "@/client/services/mock-tests/mock-tests";
+import { toast } from "sonner";
 
 type TestState = {
   currentQuestionIndex: number;
@@ -16,6 +18,7 @@ type TestState = {
 export const MockTestPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { mutateAsync: createMockTest, isPending } = useCreateMockTest();
   
   // Add this line to generate a unique test ID
   const testId = location.state?.questions?.map((q: any) => q.question).join('').slice(0, 32);
@@ -98,8 +101,10 @@ export const MockTestPage = () => {
     setIsSubmitting(true);
     try {
       const currentQuestion = questions[state.currentQuestionIndex];
+      
+      // For MCQs, store the index as the answer
       const answerText = currentQuestion.format === "multiple-choice" 
-        ? currentQuestion.options?.[parseInt(currentAnswer)] || ""
+        ? currentAnswer // Already storing the index
         : currentAnswer;
 
       if (!answerText) return;
@@ -107,13 +112,13 @@ export const MockTestPage = () => {
       let evaluation: AnswerEvaluation;
 
       if (currentQuestion.format === "multiple-choice") {
-        const correctAnswer = currentQuestion.options?.[currentQuestion.correctOption || 0];
-        const isCorrect = correctAnswer ? answerText === correctAnswer : false;
+        // Compare indices for MCQs
+        const isCorrect = parseInt(currentAnswer) === ((currentQuestion.correctOption ?? 1) - 1);
         evaluation = {
           score: isCorrect ? 100 : 0,
           feedback: isCorrect ? t`Correct answer!` : t`Incorrect answer.`,
           keyPoints: [],
-          modelAnswer: correctAnswer || ''
+          modelAnswer: currentQuestion.options?.[(currentQuestion.correctOption ?? 1) - 1] || ''
         };
       } else {
         // For open-ended questions, use OpenAI evaluation
@@ -143,28 +148,36 @@ export const MockTestPage = () => {
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   };
 
-  const saveTestToHistory = () => {
-    const history = JSON.parse(localStorage.getItem('mock-test-history') || '[]');
-    history.unshift({
-      id: testId,
-      jobTitle: location.state?.jobTitle || 'Unknown Job',
-      company: location.state?.company || 'Unknown Company',
-      date: new Date().toISOString(),
-      score: calculateFinalScore(),
-      duration,
-      questions: questions,
-      answers: state.answers,
-      evaluations: state.evaluations
-    });
-    localStorage.setItem('mock-test-history', JSON.stringify(history));
-  };
+  const handleFinishTest = async () => {
+    const score = calculateFinalScore();
+    
+    try {
+      const result = await createMockTest({
+        title: "Technical Interview Test",
+        score,
+        totalQuestions: questions.length,
+        category: "Technical",
+        difficulty: "Medium",
+        duration: duration,
+        answers: {
+          userAnswers: state.answers,
+          correctAnswers: questions.map(q => q.format === "multiple-choice" 
+            ? q.options?.[((q.correctOption ?? 1) - 1)] 
+            : q.modelAnswer || ""),
+          questions
+        },
+      });
 
-  // Call saveTestToHistory when test is complete
-  useEffect(() => {
-    if (state.isComplete) {
-      saveTestToHistory();
+      toast.success("Test completed successfully!");
+      // Navigate back and trigger dialog open with the test ID
+      navigate("/dashboard/mock-tests", { 
+        state: { openTestId: result.id }
+      });
+    } catch (error) {
+      toast.error("Failed to save test results");
+      console.error("Failed to save test:", error);
     }
-  }, [state.isComplete]);
+  };
 
   if (state.isComplete) {
     return (
@@ -184,31 +197,41 @@ export const MockTestPage = () => {
                 <h3 className="font-medium">Question {index + 1}</h3>
                 <p>{question.question}</p>
                 <div className="rounded-lg bg-secondary/50 p-3">
-                  <p className="font-medium">{t`Question`} {index + 1} <br/> {t`Your Answer:`}</p>
-                  <p className="text-sm">{state.answers[index] || t`Not answered yet`}</p>
+                  <p className="font-medium">{t`Your Answer:`}</p>
+                  <p className="text-sm">
+                    {question.format === "multiple-choice"
+                      ? question.options?.[parseInt(state.answers[index])]
+                      : state.answers[index] || t`Not answered yet`}
+                  </p>
                 </div>
                 {state.evaluations[index] && (
                   <div className="rounded-lg bg-secondary/50 p-3 space-y-2">
                     <p className="font-medium">{t`Score:`} {state.evaluations[index].score}%</p>
                     <p className="text-sm">{state.evaluations[index].feedback}</p>
-                    <div>
-                      <p className="font-medium">{t`Key Points:`}</p>
-                      <ul className="list-disc list-inside text-sm">
-                        {state.evaluations[index].keyPoints.map((point, i) => (
-                          <li key={i}>{point}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {question.format !== "multiple-choice" && (
+                      <div>
+                        <p className="font-medium">{t`Key Points:`}</p>
+                        <ul className="list-disc list-inside text-sm">
+                          {state.evaluations[index].keyPoints.map((point, i) => (
+                            <li key={i}>{point}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          <Button onClick={() => navigate("/dashboard/mock-tests")}>
-            <CaretLeft className="mr-2 h-4 w-4" />
-            {t`Back to Mock Tests`}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button
+              onClick={handleFinishTest}
+              disabled={isPending}
+            >
+              {isPending ? t`Saving...` : t`Finish Test`}
+            </Button>
+          </div>
         </Card>
       </div>
     );

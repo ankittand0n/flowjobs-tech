@@ -23,12 +23,12 @@ export const axiosInstance = axios.create({
 // Add request interceptor for better error handling
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log('Making request:', {
-      method: config.method,
-      url: config.url,
-      data: config.data,
-      headers: config.headers
-    });
+    // console.log('Making request:', {
+    //   method: config.method,
+    //   url: config.url,
+    //   data: config.data,
+    //   headers: config.headers
+    // });
     return config;
   },
   (error) => {

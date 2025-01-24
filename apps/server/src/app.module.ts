@@ -21,6 +21,7 @@ import { UserModule } from "./user/user.module";
 import { JobModule } from "./job/job.module";
 import { JobApplicationModule } from "./job-application/job-application.module";
 import { OpenAIModule } from './openai/openai.module';
+import { MockTestModule } from "./mock-test/mock-test.module";
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { OpenAIModule } from './openai/openai.module';
       // eslint-disable-next-line unicorn/prefer-module
       rootPath: path.join(__dirname, "..", "client"),
     }),
+    MockTestModule,
   ],
   providers: [
     {

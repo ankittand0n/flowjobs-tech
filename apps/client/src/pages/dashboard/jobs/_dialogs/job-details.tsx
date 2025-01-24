@@ -1,5 +1,5 @@
 import { t } from "@lingui/macro";
-import { Brain } from "@phosphor-icons/react";
+import { Brain, ArrowSquareOut } from "@phosphor-icons/react";
 import {
   Button,
   Dialog,
@@ -95,19 +95,6 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
                         <p className="text-sm">{job.salary}</p>
                       </div>
                     )}
-                    {job.url && (
-                      <div>
-                        <label className="text-xs text-muted-foreground">{t`URL`}</label>
-                        <a
-                          href={job.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-500 hover:underline"
-                        >
-                          {t`View Job Posting`}
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -129,7 +116,7 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
                 {isExtracting && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Brain className="h-4 w-4 animate-pulse" />
-                    {t`Analyzing...`}
+                    {t`Analyzing`}
                   </div>
                 )}
               </div>
@@ -219,7 +206,17 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
           </div>
         </div>
 
-        <DialogFooter className="mt-4 flex-shrink-0">
+        <DialogFooter className="mt-4 flex-shrink-0 gap-2">
+          {job.url && (
+            <Button
+              variant="secondary"
+              onClick={() => window.open(job.url, "_blank", "noopener noreferrer")}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
+              <ArrowSquareOut className="mr-2 h-4 w-4" />
+              {t`View Job Posting`}
+            </Button>
+          )}
           <Button onClick={onClose}>{t`Close`}</Button>
         </DialogFooter>
       </DialogContent>

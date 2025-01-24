@@ -51,13 +51,6 @@ export const useJobs = () => {
       const { currentUserId, jobs } = data;
 
       return jobs.map((job: any) => {
-        console.log('Job permissions:', {
-          jobId: job.id,
-          createdBy: job.createdBy,
-          currentUserId,
-          canEdit: job.createdBy === currentUserId
-        });
-
         return {
           ...job,
           canEdit: job.createdBy === currentUserId

@@ -2,27 +2,34 @@ import { t } from "@lingui/macro";
 import { Brain, CaretRight, Clock } from "@phosphor-icons/react";
 import { Button, Card, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@reactive-resume/ui";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 import { useJobs } from "@/client/services/jobs/job";
 import { SelectKeywordsDialog } from "@/client/pages/dashboard/mock-tests/_dialogs/select-keywords";
 import { generateMockQuestions, MockQuestion } from "@/client/services/openai/generate-questions";
 import { ViewTestDialog } from "@/client/pages/dashboard/mock-tests/_dialogs/view-test";
+import { useMockTests } from "@/client/services/mock-tests/mock-tests";
 
 type TestDuration = "15" | "30" | "60";
 
 type TestHistory = {
   id: string;
-  jobTitle: string;
-  company: string;
-  date: string;
+  title: string;
   score: number;
   duration: number;
-  questions: any[];
-  answers: Record<number, string>;
-  evaluations: Record<number, any>;
+  createdAt: string;
+  answers: {
+    userAnswers: Record<number, string>;
+    correctAnswers: string[];
+    questions: Array<{
+      question: string;
+      format: "multiple-choice" | "open-ended";
+      options?: string[];
+      correctOption?: number;
+    }>;
+  };
 };
 
 export const MockTestsPage = () => {
@@ -32,14 +39,21 @@ export const MockTestsPage = () => {
   const [isKeywordDialogOpen, setIsKeywordDialogOpen] = useState(false);
   const [questions, setQuestions] = useState<MockQuestion[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [testHistory, setTestHistory] = useState<TestHistory[]>(() => {
-    const saved = localStorage.getItem('mock-test-history');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { data: testHistory = [], isLoading: isLoadingTests } = useMockTests();
   const [selectedTest, setSelectedTest] = useState<TestHistory | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const selectedJobData = jobs?.find((job: any) => job.id === selectedJob);
+
+  useEffect(() => {
+    // Open the dialog if we have a test ID from navigation
+    const testId = (location.state as any)?.openTestId;
+    if (testId) {
+      const test = testHistory.find((t: any) => t.id === testId);
+      if (test) setSelectedTest(test);
+    }
+  }, [location.state, testHistory]);
 
   const handleStartTest = () => {
     if (!selectedJob || !selectedJobData?.atsKeywords?.skills) return;
@@ -178,17 +192,16 @@ export const MockTestsPage = () => {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">{t`Past Tests`}</h2>
             <div className="space-y-4">
-              {testHistory.map((test) => (
+              {testHistory.map((test: any) => (
                 <div
                   key={test.id}
                   className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 cursor-pointer hover:bg-secondary/70"
                   onClick={() => setSelectedTest(test)}
                 >
                   <div>
-                    <h3 className="font-medium">{test.jobTitle}</h3>
-                    <p className="text-sm text-muted-foreground">{test.company}</p>
+                    <h3 className="font-medium">{test.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(test.date).toLocaleDateString()}
+                      {new Date(test.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
