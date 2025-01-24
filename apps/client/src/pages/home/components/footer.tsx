@@ -15,10 +15,10 @@ export const Footer = () => (
       <div className="flex flex-col gap-y-2">
         <Logo size={96} className="-ml-2" />
 
-        <h2 className="text-xl font-medium">{t`Reactive Resume`}</h2>
+        <h2 className="text-xl font-medium">{t`Flow Jobs`}</h2>
 
         <p className="prose prose-sm prose-zinc leading-relaxed opacity-60 dark:prose-invert">
-          {t`A free and open-source resume builder that simplifies the process of creating, updating, and sharing your resume.`}
+          {t`A Complete Job Tracking Solution to simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs.`}
         </p>
 
         <Copyright className="mt-6" />

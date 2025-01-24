@@ -23,7 +23,7 @@ export const HeroSection = () => (
         whileInView={{ opacity: 1, x: 0 }}
       >
         <div className="hidden items-center gap-x-4 sm:flex">
-          <Badge>{t`Version 4`}</Badge>
+          <Badge>{t`Rx Resume v4`}</Badge>
 
           <a
             href="https://docs.rxresu.me/overview/features"
@@ -37,12 +37,12 @@ export const HeroSection = () => (
         <div className="mt-10 space-y-2">
           <h6 className="text-base font-bold tracking-wide">{t`Finally,`}</h6>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-            {t`A free and open-source resume builder`}
+            {t`A Complete Job Tracking Solution`}
           </h1>
         </div>
 
         <p className="prose prose-base prose-zinc mt-6 text-lg leading-8 dark:prose-invert">
-          {t`A free and open-source resume builder that simplifies the process of creating, updating, and sharing your resume.`}
+          {t`Simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs.`}
         </p>
 
         <div className="mt-10 flex items-center gap-x-8">

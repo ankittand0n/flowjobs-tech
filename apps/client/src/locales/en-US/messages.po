@@ -2553,3 +2553,22 @@ msgstr "Finish Test"
 
 msgid "Saving..."
 msgstr "Saving..."
+
+
+msgid "Simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
+msgstr "Simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
+
+msgid "A Complete Job Tracking Solution"
+msgstr "A Complete Job Tracking Solution"
+
+msgid "Rx Resume v4"
+msgstr "Rx Resume v4"
+
+msgid "Powered By free and open-source resume builder that simplifies the process of creating, updating, and sharing your resume."
+msgstr "Powered By free and open-source resume builder that simplifies the process of creating, updating, and sharing your resume."
+
+msgid "Flow Jobs"
+msgstr "Flow Jobs"
+
+msgid "A Complete Job Tracking Solution to simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
+msgstr "A Complete Job Tracking Solution to simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
