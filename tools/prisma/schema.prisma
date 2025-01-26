@@ -19,6 +19,25 @@ enum Visibility {
   private
 }
 
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum SubscriptionStatus {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum PaymentProvider {
+  STRIPE
+  RAZORPAY
+  PAYPAL
+}
+
 model User {
   id               String   @id @default(cuid())
   name             String
@@ -35,6 +54,14 @@ model User {
   resumes          Resume[]
   applications JobApplication[]
   mockTests        MockTest[]
+  role             Role      @default(USER)
+  subscription     Subscription?
+  stripeCustomerId String?  @unique
+  razorpayCustomerId String?  @unique
+  paypalCustomerId String?  @unique
+  subscriptionStatus SubscriptionStatus @default(FREE)
+  subscriptionEndDate DateTime?
+  payments           Payment[]
 }
 
 model Secrets {
@@ -135,5 +162,49 @@ model MockTest {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Subscription {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId              String
+  status              SubscriptionStatus
+  provider            PaymentProvider
+  startDate           DateTime @default(now())
+  endDate             DateTime?
+  
+  // Payment provider specific IDs
+  stripeSubscriptionId  String?  @unique
+  stripePriceId         String?
+  razorpaySubId         String?  @unique
+  razorpayPlanId        String?
+  paypalSubId           String?  @unique
+  paypalPlanId          String?
+
+  payments              Payment[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Payment {
+  id            String          @id @default(cuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?
+  subscription   Subscription?  @relation(fields: [subscriptionId], references: [id])
+  amount        Float
+  currency      String
+  provider      PaymentProvider
+  status        String
+  providerId    String          @unique  // Payment ID from provider
+  metadata      Json?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([subscriptionId])
 }
 
