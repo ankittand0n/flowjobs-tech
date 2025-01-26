@@ -1,5 +1,5 @@
 import { t } from "@lingui/macro";
-import { Brain, ArrowSquareOut } from "@phosphor-icons/react";
+import { Brain, ArrowSquareOut, ArrowsClockwise } from "@phosphor-icons/react";
 import {
   Button,
   Dialog,
@@ -10,6 +10,10 @@ import {
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 import { useExtractAtsKeywords } from "@/client/services/jobs/job";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { axios } from "@/client/libs/axios";
+import { useAuth } from "@/client/hooks/use-auth";
+import { useToast } from "@/client/hooks/use-toast";
 
 type Props = {
   job: {
@@ -32,9 +36,31 @@ type Props = {
   onClose: () => void;
 };
 
+// Add mutation hook for refreshing ATS keywords
+const useRefreshAtsKeywords = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      const { data } = await axios.post(`/jobs/${jobId}/refresh-ats`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      toast({
+        title: "Success",
+        description: "ATS keywords have been refreshed",
+      });
+    },
+  });
+};
+
 export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
   const [atsKeywords, setAtsKeywords] = useState(job.atsKeywords);
   const { mutateAsync: extractAts, isPending: isExtracting } = useExtractAtsKeywords();
+  const { isAdmin } = useAuth();
+  const { mutateAsync: refreshAts, isPending: isRefreshing } = useRefreshAtsKeywords();
 
   useEffect(() => {
     const analyzeDescription = async () => {
@@ -215,6 +241,17 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
             >
               <ArrowSquareOut className="mr-2 h-4 w-4" />
               {t`View Job Posting`}
+            </Button>
+          )}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={() => refreshAts(job.id)}
+              disabled={isRefreshing}
+            >
+              <ArrowsClockwise className="h-4 w-4 mr-2" />
+              {console.log("Is Admin:", isAdmin)}
+              {isRefreshing ? "Refreshing..." : "Refresh ATS Keywords"}
             </Button>
           )}
           <Button onClick={onClose}>{t`Close`}</Button>

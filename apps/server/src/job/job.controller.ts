@@ -4,6 +4,8 @@ import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
 import { User as GetUser } from "../user/decorators/user.decorator";
 import { CreateJobDto, UpdateJobDto } from "@reactive-resume/dto";
+import { RoleGuard } from "../auth/guards/role.guard";
+import { Roles, Role } from "../auth/decorators/roles.decorator";
 
 @Controller("jobs")
 @UseGuards(AuthGuard("jwt"))
@@ -207,6 +209,23 @@ export class JobController {
       },
       data: {
         atsKeywords: data.atsKeywords,
+        updatedAt: new Date(),
+      },
+      include: {
+        applications: true,
+      },
+    });
+  }
+
+  @Post(':id/refresh-ats')
+  @UseGuards(RoleGuard)
+  @Roles(Role.ADMIN)
+  async refreshAtsKeywords(@Param('id') id: string) {
+    return this.prisma.job.update({
+      where: {
+        id,
+      },
+      data: {
         updatedAt: new Date(),
       },
       include: {

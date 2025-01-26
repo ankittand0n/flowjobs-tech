@@ -87,7 +87,16 @@ export class AuthController {
 
     if (user.twoFactorEnabled && !isTwoFactorAuth) status = "2fa_required";
 
-    const responseData = authResponseSchema.parse({ status, user });
+    console.log("User from DB:", user); // Debug log
+    console.log("User role:", user.role); // Add this to debug role
+
+    const responseData = authResponseSchema.parse({
+      status,
+      user,
+      role: user.role ?? "USER", // Provide default if undefined
+      subscriptionStatus: user.subscriptionStatus,
+      subscriptionEndDate: user.subscriptionEndDate
+    });
 
     redirectUrl.searchParams.set("status", status);
 

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { ErrorMessage } from "@reactive-resume/utils";
 import { PrismaService } from "nestjs-prisma";
@@ -26,45 +26,28 @@ export class UserService {
   }
 
   async findOneByIdentifier(identifier: string) {
-    const user = await (async (identifier: string) => {
-      // First, find the user by email
-      const user = await this.prisma.user.findUnique({
-        where: { email: identifier },
-        include: { secrets: true },
-      });
-
-      // If the user exists, return it
-      if (user) return user;
-
-      // Otherwise, find the user by username
-      // If the user doesn't exist, throw an error
-      return this.prisma.user.findUnique({
-        where: { username: identifier },
-        include: { secrets: true },
-      });
-    })(identifier);
-
-    return user;
+    return this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: identifier },
+          { username: identifier }
+        ],
+      },
+      include: { secrets: true }
+    });
   }
 
   async findOneByIdentifierOrThrow(identifier: string) {
-    const user = await (async (identifier: string) => {
-      // First, find the user by email
-      const user = await this.prisma.user.findUnique({
-        where: { email: identifier },
-        include: { secrets: true },
-      });
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }],
+      },
+      include: {
+        secrets: true,
+      },
+    });
 
-      // If the user exists, return it
-      if (user) return user;
-
-      // Otherwise, find the user by username
-      // If the user doesn't exist, throw an error
-      return this.prisma.user.findUniqueOrThrow({
-        where: { username: identifier },
-        include: { secrets: true },
-      });
-    })(identifier);
+    if (!user) throw new NotFoundException(ErrorMessage.UserNotFound);
 
     return user;
   }
@@ -73,8 +56,12 @@ export class UserService {
     return this.prisma.user.create({ data, include: { secrets: true } });
   }
 
-  updateByEmail(email: string, data: Prisma.UserUpdateArgs["data"]) {
-    return this.prisma.user.update({ where: { email }, data });
+  updateByEmail(email: string, data: Prisma.UserUpdateInput, options?: { include: { secrets: boolean } }) {
+    return this.prisma.user.update({ 
+      where: { email }, 
+      data,
+      ...options 
+    });
   }
 
   async updateByResetToken(resetToken: string, data: Prisma.SecretsUpdateArgs["data"]) {
