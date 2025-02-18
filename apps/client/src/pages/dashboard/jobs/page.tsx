@@ -87,10 +87,6 @@ const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm" variant="secondary" onClick={() => onApply(job)} className="flex-1 sm:flex-none">
-                  <Brain className="mr-2 h-4 w-4" />
-                  {t`Track Application`}
-                </Button>
 
                 <div className="flex gap-2">
                   <Button
@@ -183,10 +179,6 @@ export const JobsPage = () => {
             {t`Jobs`}
           </motion.h1>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => setIsExtractDialogOpen(true)} className="flex-1 sm:flex-none">
-              <Brain className="mr-2 h-4 w-4" />
-              {t`Extract Keywords`}
-            </Button>
             <Button 
               variant="secondary"
               onClick={() => setIsAddJobOpen(true)}
