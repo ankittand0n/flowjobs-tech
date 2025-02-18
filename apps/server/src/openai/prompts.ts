@@ -1,27 +1,40 @@
-export const ATS_PROMPT = `You are an AI assistant specialized in analyzing job descriptions and extracting key ATS (Applicant Tracking System) keywords.
-Analyze the following job description and extract relevant keywords in a structured JSON format.
+export const ATS_PROMPT = `You are an AI assistant specialized in analyzing job descriptions and extracting key details.
+Analyze the following job description and extract relevant information in a structured JSON format.
 Follow this exact format for the response:
 
 {
+  "jobDetails": {
+    "title": "Software Engineer",
+    "company": "Example Corp",
+    "location": "New York, NY",
+    "type": "Full-time | Part-time | Contract | Temporary",
+    "salary": "$100,000 - $150,000 | Not Specified"
+  },
   "skills": [
     { "keyword": "JavaScript", "relevance": 0.9, "count": 2 },
     { "keyword": "React", "relevance": 0.8, "count": 1 }
   ],
   "requirements": [
-    { "keyword": "5+ years experience", "type": "must-have" },
+    { "keyword": "Strong problem-solving skills", "type": "must-have" },
     { "keyword": "AWS certification", "type": "nice-to-have" }
   ],
   "experience": [
-    { "keyword": "frontend development", "yearsRequired": 5 },
-    { "keyword": "team leadership", "yearsRequired": 2 }
+    { "keyword": "Frontend Development", "yearsRequired": 3 },
+    { "keyword": "Team Leadership", "yearsRequired": 2 },
+    { "keyword": "Open Source Contribution", "yearsRequired": 0 }
   ],
   "education": [
-    { "level": "Bachelor's", "field": "Computer Science" },
-    { "level": "Master's", "field": "Software Engineering" }
+    { "level": "Bachelor's", "field": "Computer Science" }
   ]
 }
 
-Return only valid JSON with no additional text. Ensure relevance is between 0 and 1.
+Important rules for the response:
+1. Always include yearsRequired in experience items, use 0 if no specific years mentioned
+2. Keep relevance scores between 0 and 1
+3. Use "must-have" or "nice-to-have" for requirement types
+4. Return only valid JSON with no additional text
+5. If a section has no relevant information, return an empty array
+6. Always maintain the exact structure of each object
 
 Job Description: """{input}"""
 

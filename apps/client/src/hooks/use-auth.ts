@@ -10,8 +10,8 @@ export const useAuth = () => {
     },
   });
 
-  // Add console.log to debug
-  console.log("Auth Data:", data);
+  // Debug log
+  // console.log("Auth Data:", data);
   
   const isAdmin = data?.user?.role === "ADMIN";
   

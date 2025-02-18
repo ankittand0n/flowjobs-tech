@@ -250,7 +250,6 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
               disabled={isRefreshing}
             >
               <ArrowsClockwise className="h-4 w-4 mr-2" />
-              {console.log("Is Admin:", isAdmin)}
               {isRefreshing ? "Refreshing..." : "Refresh ATS Keywords"}
             </Button>
           )}

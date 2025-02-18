@@ -20,13 +20,13 @@ const atsKeywordsSchema = z.object({
       keyword: z.string(),
       yearsRequired: z.number().optional(),
     }),
-  ),
+  ).optional(),
   education: z.array(
     z.object({
       level: z.string(),
       field: z.string().optional(),
     }),
-  ),
+  ).optional(),
 });
 
 const createJobSchema = z.object({
@@ -38,6 +38,7 @@ const createJobSchema = z.object({
   url: z.string().url().optional(),
   description: z.string().optional(),
   atsKeywords: atsKeywordsSchema.optional(),
+  createdBy: z.string().optional(),
 });
 
 export class CreateJobDto extends createZodDto(createJobSchema) {}

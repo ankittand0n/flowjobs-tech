@@ -11,18 +11,21 @@ import {
   RichInput,
 } from "@reactive-resume/ui";
 import { useState } from "react";
-
 import { extractAtsKeywords } from "@/client/services/openai/extract-ats";
+import { useToast } from "@/client/hooks/use-toast";
+import type { CreateJobDto } from "@reactive-resume/dto";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onExtracted?: (jobData: Partial<CreateJobDto>) => void;
 };
 
-export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
+export const ExtractAtsDialog = ({ isOpen, onClose, onExtracted }: Props) => {
   const [description, setDescription] = useState("");
-  const [keywords, setKeywords] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [extractedData, setExtractedData] = useState<any>(null);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +33,39 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
 
     try {
       const result = await extractAtsKeywords(description);
-      setKeywords(result);
+      
+      const jobData: Partial<CreateJobDto> = {
+        title: result.jobDetails?.title || "",
+        company: result.jobDetails?.company || "",
+        location: result.jobDetails?.location,
+        salary: result.jobDetails?.salary,
+        type: result.jobDetails?.type,
+        description,
+        atsKeywords: {
+          skills: result.skills || [],
+          requirements: result.requirements || [],
+          experience: result.experience || [],
+          education: result.education || []
+        }
+      };
+
+      setExtractedData(result);
+
+      if (onExtracted) {
+        onExtracted(jobData);
+      }
+      
+      toast({
+        title: "Success",
+        description: "Job details extracted successfully"
+      });
     } catch (error) {
-      console.error("Failed to extract ATS keywords:", error);
+      console.error("Failed to extract job details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to extract job details",
+        variant: "error"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -42,9 +75,9 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl">{t`Extract ATS Keywords`}</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl">{t`Extract Job Details`}</DialogTitle>
           <DialogDescription>
-            {t`Analyze job descriptions to extract key ATS keywords and requirements.`}
+            {t`Paste the job description to automatically extract job details and ATS keywords.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -58,13 +91,26 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
             />
           </div>
 
-          {keywords && (
+          {extractedData && (
             <div className="space-y-4 rounded-lg border p-4">
-              {keywords.skills.length > 0 && (
+              {/* Job Details Section */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">{t`Job Details`}</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><span className="text-muted-foreground">Title:</span> {extractedData.jobDetails?.title}</div>
+                  <div><span className="text-muted-foreground">Company:</span> {extractedData.jobDetails?.company}</div>
+                  <div><span className="text-muted-foreground">Location:</span> {extractedData.jobDetails?.location}</div>
+                  <div><span className="text-muted-foreground">Type:</span> {extractedData.jobDetails?.type}</div>
+                  <div><span className="text-muted-foreground">Salary:</span> {extractedData.jobDetails?.salary}</div>
+                </div>
+              </div>
+
+              {/* Skills Section */}
+              {extractedData.skills?.length > 0 && (
                 <div>
                   <h3 className="font-semibold">{t`Skills`}</h3>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {keywords.skills.map((skill: any) => (
+                    {extractedData.skills.map((skill: any) => (
                       <div
                         key={skill.keyword}
                         className="rounded-full bg-secondary px-3 py-1 text-sm"
@@ -76,11 +122,12 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
                 </div>
               )}
 
-              {keywords.requirements.length > 0 && (
+              {/* Requirements Section */}
+              {extractedData.requirements?.length > 0 && (
                 <div>
                   <h3 className="font-semibold">{t`Requirements`}</h3>
                   <ul className="mt-2 list-inside list-disc space-y-1">
-                    {keywords.requirements.map((req: any) => (
+                    {extractedData.requirements.map((req: any) => (
                       <li key={req.keyword} className="text-sm">
                         {req.keyword}
                         <span className="ml-2 text-xs text-muted-foreground">
@@ -92,16 +139,36 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
                 </div>
               )}
 
-              {keywords.experience.length > 0 && (
+              {/* Experience Section */}
+              {extractedData.experience?.length > 0 && (
                 <div>
                   <h3 className="font-semibold">{t`Experience`}</h3>
                   <ul className="mt-2 list-inside list-disc space-y-1">
-                    {keywords.experience.map((exp: any) => (
+                    {extractedData.experience.map((exp: any) => (
                       <li key={exp.keyword} className="text-sm">
                         {exp.keyword}
                         {exp.yearsRequired && (
                           <span className="ml-2 text-xs text-muted-foreground">
                             ({exp.yearsRequired} years)
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Education Section */}
+              {extractedData.education?.length > 0 && (
+                <div>
+                  <h3 className="font-semibold">{t`Education`}</h3>
+                  <ul className="mt-2 list-inside list-disc space-y-1">
+                    {extractedData.education.map((edu: any) => (
+                      <li key={edu.level} className="text-sm">
+                        {edu.level}
+                        {edu.field && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({edu.field})
                           </span>
                         )}
                       </li>
@@ -118,7 +185,7 @@ export const ExtractAtsDialog = ({ isOpen, onClose }: Props) => {
             </Button>
             <Button type="submit" disabled={!description || isLoading}>
               <Brain className="mr-2 h-4 w-4" />
-              {isLoading ? t`Analyzing...` : t`Analyze Description`}
+              {isLoading ? t`Analyzing...` : t`Extract Details`}
             </Button>
           </DialogFooter>
         </form>

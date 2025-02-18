@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, BadRequestException, Logger } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
@@ -10,6 +10,8 @@ import { Roles, Role } from "../auth/decorators/roles.decorator";
 @Controller("jobs")
 @UseGuards(AuthGuard("jwt"))
 export class JobController {
+  private readonly logger = new Logger(JobController.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   @Get()
@@ -34,36 +36,31 @@ export class JobController {
   @Post()
   async createJob(@GetUser() user: User, @Body() createJobDto: CreateJobDto) {
     try {
-      if (createJobDto.url) {
-        const existingJob = await this.prisma.job.findFirst({
-          where: {
-            url: createJobDto.url,
-          },
-          include: {
-            applications: {
-              where: { userId: user.id }
-            },
-          },
-        });
+      this.logger.debug('Creating job with data:', {
+        dto: createJobDto,
+        userId: user.id
+      });
 
-        if (existingJob) {
-          return existingJob;
-        }
-      }
+      // Create a new object without createdBy from the DTO
+      const { createdBy, ...jobData } = createJobDto;
 
-      return await this.prisma.job.create({
+      const job = await this.prisma.job.create({
         data: {
-          ...createJobDto,
-          createdBy: user.id,
-        },
-        include: {
-          applications: {
-            where: { userId: user.id }
-          },
+          ...jobData,
+          createdBy: user.id, // Explicitly set createdBy from the authenticated user
         },
       });
+
+      return job;
     } catch (error) {
-      console.error("Error creating job:", error);
+      this.logger.error('Failed to create job:', {
+        error: error.message,
+        stack: error.stack,
+        data: createJobDto,
+        userId: user.id,
+        validationErrors: error.errors
+      });
+
       throw error;
     }
   }

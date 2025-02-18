@@ -2572,3 +2572,65 @@ msgstr "Flow Jobs"
 
 msgid "A Complete Job Tracking Solution to simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
 msgstr "A Complete Job Tracking Solution to simplify your job hunt: Track applications, build standout resumes, and craft impressive CVs."
+
+msgid "Extract Job Details"
+msgstr "Extract Job Details"
+
+msgid "Paste the job description to automatically extract job details and ATS keywords."
+msgstr "Paste the job description to automatically extract job details and ATS keywords."
+
+msgid "Analyzing..."
+msgstr "Analyzing..."
+
+msgid "Extract Details"
+msgstr "Extract Details"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Add Job - Step 2"
+msgstr "Add Job - Step 2"
+
+msgid "Add Job - Step 1"
+msgstr "Add Job - Step 1"
+
+msgid "Job Added Successfully"
+msgstr "Job Added Successfully"
+
+msgid "Job Details Extracted Successfully"
+msgstr "Job Details Extracted Successfully"
+
+msgid "Save and Continue"
+msgstr "Save and Continue"
+
+msgid "Back"
+msgstr "Back"
+
+msgid "Enter the job description to automatically extract details."
+msgstr "Enter the job description to automatically extract details."
+
+msgid "Review and edit the extracted job details."
+msgstr "Review and edit the extracted job details."
+
+msgid "Save & Add Job"
+msgstr "Save & Add Job"
+
+msgid "Add Job"
+msgstr "Add Job"
+
+msgid "Extracting..."
+msgstr "Extracting..."
+
+msgid "Extract Details"
+msgstr "Extract Details"
+
+msgid "Here are the extracted keywords and requirements."
+msgstr "Here are the extracted keywords and requirements."
+
+
+
+
+
+
+
+
