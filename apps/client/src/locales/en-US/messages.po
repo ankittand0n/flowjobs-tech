@@ -2630,6 +2630,37 @@ msgstr "Here are the extracted keywords and requirements."
 msgid "Start Tracking"
 msgstr "Start Tracking"
 
+msgid "Too Short"
+msgstr "Too Short"
+
+msgid "Too Long"
+msgstr "Too Long"
+
+msgid "Ideal"
+msgstr "Ideal"
+
+msgid "Consider condensing your resume to focus on the most relevant information."
+msgstr "Consider condensing your resume to focus on the most relevant information."
+
+msgid "Your resume is too short. Consider adding more relevant experiences and skills."
+msgstr "Your resume is too short. Consider adding more relevant experiences and skills."
+
+msgid "Your resume length is ideal for most job applications."
+msgstr "Your resume length is ideal for most job applications."
+
+msgid "Resume Length Analysis"
+msgstr "Resume Length Analysis"
+
+msgid "Word Count"
+msgstr "Word Count"
+
+msgid "words"
+msgstr "words"
+
+
+
+
+
 
 
 
