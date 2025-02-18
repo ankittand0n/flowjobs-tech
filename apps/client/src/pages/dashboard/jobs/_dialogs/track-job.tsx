@@ -48,12 +48,7 @@ export const TrackJobDialog = ({ job, isOpen, onClose }: Props) => {
         jobId: job.id,
         status: applicationData.status,
         resumeId: applicationData.resumeId || undefined,
-        notes: applicationData.notes || undefined,
-        job: {
-          id: job.id,
-          title: job.title,
-          company: job.company,
-        }
+        notes: applicationData.notes || undefined
       });
 
       toast.success(t`Successfully started tracking job application`);

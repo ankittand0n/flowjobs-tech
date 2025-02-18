@@ -11,7 +11,8 @@ import {
   PencilSimple,
   Plus,
   ListDashes,
-  Globe
+  Globe,
+  ClipboardText
 } from "@phosphor-icons/react";
 import { Button, Card, Input, Tabs, TabsContent, TabsList, TabsTrigger } from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
@@ -24,8 +25,9 @@ import { ExtractAtsDialog } from "./_dialogs/extract-ats";
 import { JobDetailsDialog } from "./_dialogs/job-details";
 import { EditJobDialog } from "./_dialogs/edit-job";
 import { AddJobDialog } from "./_dialogs/add-job";
+import { TrackJobDialog } from "./_dialogs/track-job";
 
-const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit, onView }: any) => {
+const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit, onView, onTrack }: any) => {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -87,8 +89,20 @@ const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-
                 <div className="flex gap-2">
+                  {!job.applications?.some((app: any) => app.userId === currentUserId) && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="bg-foreground text-background hover:bg-foreground/90 [&_svg]:text-background"
+                      onClick={() => onTrack(job)}
+                      title={t`Start Tracking`}
+                    >
+                      <ClipboardText className="mr-2 h-4 w-4" />
+                      {t`Start Tracking`}
+                    </Button>
+                  )}
+
                   <Button
                     size="sm"
                     variant="ghost"
@@ -141,6 +155,7 @@ export const JobsPage = () => {
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<any>(null);
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
+  const [trackingJob, setTrackingJob] = useState<any>(null);
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return { myJobs: [], allJobs: [] };
@@ -221,6 +236,7 @@ export const JobsPage = () => {
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}
+              onTrack={setTrackingJob}
             />
           </TabsContent>
 
@@ -233,6 +249,7 @@ export const JobsPage = () => {
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}
+              onTrack={setTrackingJob}
             />
           </TabsContent>
         </Tabs>
@@ -277,6 +294,14 @@ export const JobsPage = () => {
           setIsAddJobOpen(false);
         }}
       />
+
+      {trackingJob && (
+        <TrackJobDialog
+          job={trackingJob}
+          isOpen={!!trackingJob}
+          onClose={() => setTrackingJob(null)}
+        />
+      )}
     </>
   );
 };

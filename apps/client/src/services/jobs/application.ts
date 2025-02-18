@@ -3,14 +3,8 @@ import { axios } from "../../libs/axios";
 
 // For form input in TrackJobDialog
 export interface JobApplicationInput {
-  title: string;
-  company: string;
-  description: string;
-  location: string;
-  url: string;
-  type?: string;
-  salary?: string;
-  status?: string;
+  jobId: string;
+  status: string;
   resumeId?: string;
   notes?: string;
 }
@@ -48,25 +42,13 @@ export const useCreateJobApplication = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      jobId: string;
-      status: string;
-      resumeId?: string;
-      notes?: string;
-      job: {
-        id: string;
-        title: string;
-        company: string;
-        location?: string;
-      };
-    }) => {
+    mutationFn: async (data: JobApplicationInput) => {
       try {
         const response = await axios.post("/job-applications", {
           jobId: data.jobId,
           status: data.status,
           resumeId: data.resumeId,
-          notes: data.notes,
-          job: data.job
+          notes: data.notes
         });
         return response.data;
       } catch (error: any) {

@@ -30,10 +30,11 @@ Follow this exact format for the response:
 
 Important rules for the response:
 1. Always include yearsRequired in experience items, use 0 if no specific years mentioned
-2. Keep relevance scores between 0 and 1
-3. Use "must-have" or "nice-to-have" for requirement types
-4. Return only valid JSON with no additional text
-5. If a section has no relevant information, return an empty array
+2. Always include Education Field in education items relevant to the job description
+3. Keep relevance scores between 0 and 1
+4. Use "must-have" or "nice-to-have" for requirement types
+5. Return only valid JSON with no additional text
+6. If a section has no relevant information, return an empty array
 6. Always maintain the exact structure of each object
 
 Job Description: """{input}"""

@@ -36,11 +36,11 @@ export class JobApplicationController {
 
       return this.prisma.jobApplication.create({
         data: {
-          jobId: createJobApplicationDto.jobId,
           status: createJobApplicationDto.status,
           userId: user.id,
           notes: createJobApplicationDto.notes ?? "",
           resumeId: createJobApplicationDto.resumeId,
+          jobId: createJobApplicationDto.jobId
         },
         include: {
           job: true,

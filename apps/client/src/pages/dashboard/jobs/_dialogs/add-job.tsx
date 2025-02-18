@@ -121,13 +121,7 @@ export const AddJobDialog = ({ isOpen, onClose, initialStep = 1, initialJob }: P
       await createJobApplication({
         jobId: job.id,
         status: "draft",
-        notes: "",
-        job: {
-          id: job.id,
-          title: job.title,
-          company: job.company,
-          location: job.location
-        }
+        notes: ""
       });
 
       toast({

@@ -79,19 +79,19 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-3xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[72rem] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl">
             {job.title} - {job.company}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto pr-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex-1 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
             {/* Left Column - Job Description */}
-            <div className="space-y-6">
-              {/* Basic Info */}
-              <div className="border rounded-lg p-4">
+            <div className="flex flex-col space-y-6 min-h-0">
+              {/* Basic Info - Fixed */}
+              <div className="border rounded-lg p-4 flex-shrink-0">
                 <h4 className="text-sm font-medium mb-4">{t`Job Details`}</h4>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -125,8 +125,8 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
                 </div>
               </div>
 
-              {/* Description */}
-              <div className="border rounded-lg p-4">
+              {/* Description - Scrollable */}
+              <div className="border rounded-lg p-4 min-h-0 flex-1 overflow-y-auto">
                 <h4 className="text-sm font-medium mb-4">{t`Description`}</h4>
                 <div
                   className="prose prose-sm max-w-none"
@@ -136,15 +136,17 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
             </div>
 
             {/* Right Column - ATS Keywords */}
-            <div className="border rounded-lg p-4 space-y-4">
-              <div className="flex justify-between items-center">
-                <h4 className="text-sm font-medium">{t`ATS Keywords Analysis`}</h4>
-                {isExtracting && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Brain className="h-4 w-4 animate-pulse" />
-                    {t`Analyzing`}
-                  </div>
-                )}
+            <div className="border rounded-lg p-4 overflow-y-auto">
+              <div className="sticky top-0 bg-background pb-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-sm font-medium">{t`ATS Keywords Analysis`}</h4>
+                  {isExtracting && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Brain className="h-4 w-4 animate-pulse" />
+                      {t`Analyzing`}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {atsKeywords ? (
@@ -191,9 +193,9 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
                         {atsKeywords.experience.map((exp) => (
                           <li key={exp.keyword} className="text-sm">
                             {exp.keyword}
-                            {exp.yearsRequired && (
+                            {typeof exp.yearsRequired === 'number' && (
                               <span className="ml-2 text-xs text-muted-foreground">
-                                ({exp.yearsRequired} {t`years`})
+                                ({exp.yearsRequired} {exp.yearsRequired === 1 ? t`year` : t`years`})
                               </span>
                             )}
                           </li>

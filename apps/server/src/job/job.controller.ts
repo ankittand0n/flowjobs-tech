@@ -52,6 +52,18 @@ export class JobController {
         }
       }
 
+      return await this.prisma.job.create({
+        data: {
+          ...createJobDto,
+          createdBy: user.id
+        },
+        include: {
+          applications: {
+            where: { userId: user.id }
+          }
+        }
+      });
+
     } catch (error) {
       console.error("Error creating job:", error);
       throw error;

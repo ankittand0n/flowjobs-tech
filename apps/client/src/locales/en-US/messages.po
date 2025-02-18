@@ -2627,7 +2627,8 @@ msgstr "Extract Details"
 msgid "Here are the extracted keywords and requirements."
 msgstr "Here are the extracted keywords and requirements."
 
-
+msgid "Start Tracking"
+msgstr "Start Tracking"
 
 
 
