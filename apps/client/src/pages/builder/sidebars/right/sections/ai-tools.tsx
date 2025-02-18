@@ -1,16 +1,12 @@
 import { t } from "@lingui/macro";
-import { Brain, TextT, CaretDown } from "@phosphor-icons/react";
+import { Brain, TextT } from "@phosphor-icons/react";
 import { 
   Label, 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
-  SelectValue,
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
+  SelectValue
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
@@ -24,8 +20,6 @@ export const AiToolsSection = () => {
   const { data: jobs } = useJobs();
   const selectedJob = jobs?.find((job: CreateJobDto & { id: string }) => job.id === selectedJobId);
   const resume = useResumeStore((state) => state.resume);
-  const [isAtsOpen, setIsAtsOpen] = useState(true);
-  const [isLengthOpen, setIsLengthOpen] = useState(true);
 
   useEffect(() => {
     if (!selectedJob?.atsKeywords) return;
@@ -101,97 +95,84 @@ export const AiToolsSection = () => {
       </header>
 
       <main className="grid gap-y-4">
-        {/* ATS Analysis Section */}
-        <Accordion type="multiple" defaultValue={["ats", "length"]}>
-          <AccordionItem value="ats">
-            <AccordionTrigger className="hover:bg-secondary/50">
-              <span className="font-medium">{t`ATS Keywords Analysis`}</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-1.5">
-                <Label>{t`Select Job for ATS Keywords`}</Label>
-                <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t`Choose a job`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobs?.map((job: CreateJobDto & { id: string }) => (
-                      <SelectItem key={job.id} value={job.id}>
-                        {job.title} - {job.company}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Resume Length Analysis */}
+        <div className="space-y-4 border rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <TextT className="h-4 w-4" />
+            <h4 className="text-sm font-medium">{t`Resume Length Analysis`}</h4>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">{t`Word Count`}</span>
+              <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm">{t`Status`}</span>
+              <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
+                {wordCountAnalysis.rating.status}
+              </span>
+            </div>
+            
+            <div className="mt-2 text-sm text-muted-foreground">
+              {wordCountAnalysis.rating.message}
+            </div>
+          </div>
+        </div>
 
-              {selectedJob?.atsKeywords && (
-                <div className="space-y-4 border rounded-lg p-4">
-                  {getKeywordStats() && (
-                    <div className="mb-4 rounded-md bg-secondary/50 p-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span>{t`Keywords found in resume`}</span>
-                        <span className="font-medium">
-                          {getKeywordStats()?.matched}/{getKeywordStats()?.total} ({getKeywordStats()?.percentage}%)
-                        </span>
-                      </div>
-                    </div>
-                  )}
+        {/* ATS Analysis */}
+        <div className="space-y-1.5">
+          <Label>{t`Select Job for ATS Keywords`}</Label>
+          <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+            <SelectTrigger>
+              <SelectValue placeholder={t`Choose a job`} />
+            </SelectTrigger>
+            <SelectContent>
+              {jobs?.map((job: CreateJobDto & { id: string }) => (
+                <SelectItem key={job.id} value={job.id}>
+                  {job.title} - {job.company}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-                  {selectedJob.atsKeywords.skills?.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">{t`Skills`}</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedJob.atsKeywords.skills.map((skill: any) => (
-                          <div
-                            key={skill.keyword}
-                            className={cn(
-                              "rounded-full px-3 py-1 text-xs transition-colors",
-                              matchedKeywords.has(skill.keyword)
-                                ? "bg-green-500/20 text-green-700 dark:text-green-400"
-                                : "bg-secondary"
-                            )}
-                          >
-                            {skill.keyword} ({Math.round(skill.relevance * 100)}%)
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="length">
-            <AccordionTrigger className="hover:bg-secondary/50">
-              <div className="flex items-center gap-2">
-                <TextT className="h-4 w-4" />
-                <span className="font-medium">{t`Resume Length Analysis`}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4 border rounded-lg p-4">
-                <div className="space-y-2">
+          {selectedJob?.atsKeywords && (
+            <div className="space-y-4 border rounded-lg p-4">
+              {getKeywordStats() && (
+                <div className="mb-4 rounded-md bg-secondary/50 p-3 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">{t`Word Count`}</span>
-                    <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">{t`Status`}</span>
-                    <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
-                      {wordCountAnalysis.rating.status}
+                    <span>{t`Keywords found in resume`}</span>
+                    <span className="font-medium">
+                      {getKeywordStats()?.matched}/{getKeywordStats()?.total} ({getKeywordStats()?.percentage}%)
                     </span>
                   </div>
-                  
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    {wordCountAnalysis.rating.message}
+                </div>
+              )}
+
+              {selectedJob.atsKeywords.skills?.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">{t`Skills`}</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedJob.atsKeywords.skills.map((skill: any) => (
+                      <div
+                        key={skill.keyword}
+                        className={cn(
+                          "rounded-full px-3 py-1 text-xs transition-colors",
+                          matchedKeywords.has(skill.keyword)
+                            ? "bg-green-500/20 text-green-700 dark:text-green-400"
+                            : "bg-secondary"
+                        )}
+                      >
+                        {skill.keyword} ({Math.round(skill.relevance * 100)}%)
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+              )}
+            </div>
+          )}
+        </div>
       </main>
     </section>
   );
