@@ -7,7 +7,7 @@ ARG NX_CLOUD_ACCESS_TOKEN
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable pnpm && corepack prepare pnpm --activate
+RUN corepack enable
 
 WORKDIR /app
 
@@ -29,15 +29,7 @@ RUN pnpm run build
 FROM base AS release
 ARG NX_CLOUD_ACCESS_TOKEN
 
-# Install dependencies and MinIO
-RUN apt update && \
-    apt install -y dumb-init wget curl --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    wget --no-check-certificate https://dl.min.io/server/minio/release/linux-amd64/minio && \
-    chmod +x minio && \
-    mv minio /usr/local/bin/ && \
-    mkdir -p /data
+RUN apt update && apt install -y dumb-init --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node --from=build /app/.npmrc /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
@@ -49,19 +41,7 @@ RUN pnpm run prisma:generate
 ENV TZ=UTC
 ENV PORT=3000
 ENV NODE_ENV=production
-ENV MINIO_ROOT_USER=minioadmin
-ENV MINIO_ROOT_PASSWORD=minioadmin
 
 EXPOSE 3000
-EXPOSE 9000
 
-# Create a startup script
-COPY --chown=node:node <<EOF /usr/local/bin/start.sh
-#!/bin/bash
-minio server /data &
-dumb-init pnpm run start
-EOF
-
-RUN chmod +x /usr/local/bin/start.sh
-
-CMD [ "/usr/local/bin/start.sh" ]
+CMD [ "dumb-init", "pnpm", "run", "start" ]

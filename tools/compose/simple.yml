@@ -57,8 +57,8 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      - postgres
-      - minio
+      # - postgres
+      # - minio
       - chrome
     environment:
       PORT: ${PORT:-3000}
@@ -67,7 +67,7 @@ services:
       STORAGE_URL: ${STORAGE_URL:-http://localhost:9000/default}
       CHROME_TOKEN: ${CHROME_TOKEN:-chrome_token}
       CHROME_URL: ws://chrome:3000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/postgres}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-access_token_secret}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-refresh_token_secret}
       MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
