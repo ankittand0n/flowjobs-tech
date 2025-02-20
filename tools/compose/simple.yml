@@ -116,6 +116,10 @@ services:
       # OPENID_SCOPE: openid profile email
       # OPENID_TOKEN_URL:
       # OPENID_USER_INFO_URL:
+    build:
+      context: .
+      args:
+        NX_CLOUD_ACCESS_TOKEN: ${NX_CLOUD_ACCESS_TOKEN}
 
 volumes:
   minio_data:
