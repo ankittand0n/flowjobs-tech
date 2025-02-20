@@ -50,19 +50,16 @@ ENV TZ=UTC
 ENV PORT=3000
 ENV NODE_ENV=production
 
-EXPOSE 3000
 ENV MINIO_ROOT_USER=minioadmin
 ENV MINIO_ROOT_PASSWORD=minioadmin
 
 EXPOSE 3000
 EXPOSE 9000
 
-# Create a startup script
-COPY --chown=node:node <<EOF /usr/local/bin/start.sh
-#!/bin/bash
-minio server /data &
-dumb-init pnpm run start
-EOF
+# Create startup script
+RUN echo '#!/bin/bash\n\
+minio server /data &\n\
+dumb-init pnpm run start' > /usr/local/bin/start.sh
 
 RUN chmod +x /usr/local/bin/start.sh
 
