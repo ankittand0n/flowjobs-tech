@@ -58,7 +58,7 @@ services:
       - "${PORT:-3000}:3000"
     depends_on:
       # - postgres
-      # - minio
+      - minio
       - chrome
     environment:
       PORT: ${PORT:-3000}
