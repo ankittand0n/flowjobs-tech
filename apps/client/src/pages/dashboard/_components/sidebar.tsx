@@ -101,11 +101,11 @@ export const Sidebar = ({ setOpen }: SidebarProps) => {
       name: t`Mock Tests`,
       icon: <Brain />,
     },
-    {
-      path: "/dashboard/interview-prep",
-      name: t`Interview Prep.`,
-      icon: <User />,
-    },
+    // {
+    //   path: "/dashboard/interview-prep",
+    //   name: t`Interview Prep.`,
+    //   icon: <User />,
+    // },
     {
       path: "/dashboard/settings",
       name: t`Settings`,
