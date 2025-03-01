@@ -14,7 +14,7 @@
     "url": "https://github.com/AmruthPillai/Reactive-Resume.git"
   },
   "scripts": {
-    "dev": "nx run-many -t serve",
+    "dev": "nx run-many -t serve --parallel=3 --projects=client,server,artboard",
     "test": "pnpm vitest run",
     "prebuild": "pnpm prisma:generate",
     "build": "nx run-many -t build",
@@ -53,7 +53,7 @@
     "@nx/workspace": "^19.8.14",
     "@swc-node/register": "^1.10.9",
     "@swc/cli": "^0.4.0",
-    "@swc/core": "^1.7.22",
+    "@swc/core": "^1.10.7",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",

@@ -9,9 +9,12 @@ import {
   SheetHeader,
   SheetTitle,
   VisuallyHidden,
+  Button,
 } from "@reactive-resume/ui";
 import { cn } from "@reactive-resume/utils";
 import { Outlet } from "react-router";
+import { useState } from "react";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 import { useBuilderStore } from "@/client/stores/builder";
 
@@ -38,6 +41,8 @@ const OutletSlot = () => (
 
 export const BuilderLayout = () => {
   const { isDesktop } = useBreakpoint();
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
 
   const sheet = useBuilderStore((state) => state.sheet);
 
@@ -52,32 +57,58 @@ export const BuilderLayout = () => {
       <div className="relative size-full overflow-hidden">
         <PanelGroup direction="horizontal">
           <Panel
-            minSize={25}
-            maxSize={45}
-            defaultSize={30}
-            className={cn("z-10 bg-background", !leftHandle.isDragging && "transition-[flex]")}
+            minSize={leftCollapsed ? 0 : 25}
+            maxSize={leftCollapsed ? 0 : 45}
+            defaultSize={leftCollapsed ? 0 : 30}
+            className={cn(
+              "z-10 bg-background relative",
+              !leftHandle.isDragging && "transition-[flex]"
+            )}
             onResize={leftSetSize}
           >
             <LeftSidebar />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -right-8 top-2 z-50 bg-background shadow-md rounded-full"
+              onClick={() => setLeftCollapsed(!leftCollapsed)}
+            >
+              <CaretLeft className={cn("h-4 w-4 transition-transform", leftCollapsed && "rotate-180")} />
+            </Button>
           </Panel>
+
           <PanelResizeHandle
             isDragging={leftHandle.isDragging}
             onDragging={leftHandle.setDragging}
           />
+
           <Panel>
             <OutletSlot />
           </Panel>
+
           <PanelResizeHandle
             isDragging={rightHandle.isDragging}
             onDragging={rightHandle.setDragging}
           />
+
           <Panel
-            minSize={25}
-            maxSize={45}
-            defaultSize={30}
-            className={cn("z-10 bg-background", !rightHandle.isDragging && "transition-[flex]")}
+            minSize={rightCollapsed ? 0 : 25}
+            maxSize={rightCollapsed ? 0 : 45}
+            defaultSize={rightCollapsed ? 0 : 30}
+            className={cn(
+              "z-10 bg-background relative",
+              !rightHandle.isDragging && "transition-[flex]"
+            )}
             onResize={rightSetSize}
           >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -left-8 top-2 z-50 bg-background shadow-md rounded-full"
+              onClick={() => setRightCollapsed(!rightCollapsed)}
+            >
+              <CaretRight className={cn("h-4 w-4 transition-transform", rightCollapsed && "rotate-180")} />
+            </Button>
             <RightSidebar />
           </Panel>
         </PanelGroup>

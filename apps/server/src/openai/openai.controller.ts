@@ -1,5 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { OpenAIService } from './openai.service';
+import { ResumeChatDto, ResumeChatResponseDto } from '@reactive-resume/dto';
 
 @Controller('openai')
 export class OpenAIController {
@@ -47,5 +48,10 @@ export class OpenAIController {
   @Post('improve-writing')
   async improveWriting(@Body() { text }: { text: string }) {
     return this.openaiService.improveWriting(text);
+  }
+
+  @Post('resume-chat')
+  async resumeChat(@Body() { messages, resume, job }: ResumeChatDto): Promise<ResumeChatResponseDto> {
+    return this.openaiService.handleResumeChat(messages, resume, job);
   }
 } 

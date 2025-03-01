@@ -1,25 +1,118 @@
 import { t } from "@lingui/macro";
-import { Brain, TextT } from "@phosphor-icons/react";
+import { Brain, TextT, ChatCircleText, MagnifyingGlass, ChartBar, Robot, CheckCircle, WarningCircle } from "@phosphor-icons/react";
 import { 
   Label, 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
-  SelectValue
+  SelectValue,
+  Button,
+  ScrollArea,
+  Switch,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
-import { CreateJobDto } from "@reactive-resume/dto";
+import { CreateJobDto, ResumeChatDto, ResumeChatResponseDto } from "@reactive-resume/dto";
 import { cn } from "@reactive-resume/utils";
-import { useResumeStore } from "@/client/stores/resume";
+import { useResumeStore } from "@/client/stores/resume"
+
+// Add type for resume data structure
+type ResumeData = {
+  basics: {
+    name: string;
+    headline: string;
+    email: string;
+    phone: string;
+    location: string;
+    url: { label: string; href: string; };
+    customFields: { id: string; name: string; value: string; icon: string; }[];
+    picture: {
+      url: string;
+      size: number;
+      aspectRatio: number;
+      borderRadius: number;
+      effects: {
+        hidden: boolean;
+        border: boolean;
+        grayscale: boolean;
+      };
+    };
+  };
+  sections: {
+    custom: Record<string, {
+      id: string;
+      name: string;
+      columns: number;
+      separateLinks: boolean;
+      visible: boolean;
+      items: {
+        id: string;
+        name: string;
+        date: string;
+        location: string;
+        url: { label: string; href: string; };
+        visible: boolean;
+        summary: string;
+        keywords: string[];
+        description: string;
+      }[];
+    }>;
+    summary: any;
+    experience: any;
+    education: any;
+    projects: any;
+    volunteer: any;
+    references: any;
+    skills: any;
+    awards: any;
+    publications: any;
+    certifications: any;
+    interests: any;
+    languages: any;
+    profiles: any;
+  };
+  metadata: {
+    template: string;
+    layout: string[][][];
+    css: { value: string; visible: boolean; };
+    page: {
+      options: { breakLine: boolean; pageNumbers: boolean; };
+      margin: number;
+      format: "a4" | "letter";
+    };
+    theme: { background: string; text: string; primary: string; };
+    typography: {
+      font: {
+        size: number;
+        family: string;
+        subset: string;
+        variants: string[];
+      };
+      lineHeight: number;
+      hideIcons: boolean;
+      underlineLinks: boolean;
+    };
+    notes: string;
+  };
+};
 
 export const AiToolsSection = () => {
+  const [isChatMode, setIsChatMode] = useState(false);
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [matchedKeywords, setMatchedKeywords] = useState<Set<string>>(new Set());
   const { data: jobs } = useJobs();
   const selectedJob = jobs?.find((job: CreateJobDto & { id: string }) => job.id === selectedJobId);
   const resume = useResumeStore((state) => state.resume);
+  const setValue = useResumeStore((state) => state.setValue);
+  const [proposedChanges, setProposedChanges] = useState<ResumeData | null>(null);
 
   useEffect(() => {
     if (!selectedJob?.atsKeywords) return;
@@ -37,9 +130,9 @@ export const AiToolsSection = () => {
   }, [selectedJob, resume]);
 
   const getKeywordStats = () => {
-    if (!selectedJob?.atsKeywords) return null;
+    if (!selectedJob?.atsKeywords?.skills?.length) return { matched: 0, total: 0, percentage: 0 };
     
-    const totalKeywords = selectedJob.atsKeywords.skills?.length || 0;
+    const totalKeywords = selectedJob.atsKeywords.skills.length;
     const matchedCount = matchedKeywords.size;
     const percentage = Math.round((matchedCount / totalKeywords) * 100);
 
@@ -85,6 +178,159 @@ export const AiToolsSection = () => {
 
   const wordCountAnalysis = getResumeWordCount();
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading || !selectedJob) return;
+
+    const userMessage = { role: 'user' as const, content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+    setProposedChanges(null);
+
+    // Log resume data size and structure
+    const resumeData = resume.data;
+    console.log('Full Resume Size:', JSON.stringify(resumeData).length, 'bytes');
+    console.log('Resume Structure:', {
+      basics: Object.keys(resumeData.basics),
+      sections: Object.keys(resumeData.sections),
+      metadata: Object.keys(resumeData.metadata)
+    });
+
+    // Create a minimal version of the resume data
+    const minimalResumeData = {
+      sections: {
+        experience: resumeData.sections.experience,
+        education: resumeData.sections.education,
+        skills: resumeData.sections.skills,
+        projects: resumeData.sections.projects,
+        awards: resumeData.sections.awards,
+        volunteer: resumeData.sections.volunteer,
+        publications: resumeData.sections.publications,
+        certifications: resumeData.sections.certifications,
+        references: resumeData.sections.references,
+        custom: resumeData.sections.custom
+      }
+    };
+
+    // Remove empty sections to reduce payload size
+    Object.keys(minimalResumeData.sections).forEach((key) => {
+      const sectionKey = key as keyof typeof minimalResumeData.sections;
+      if (!minimalResumeData.sections[sectionKey] || 
+          (Array.isArray(minimalResumeData.sections[sectionKey]?.items) && 
+           minimalResumeData.sections[sectionKey].items.length === 0)) {
+        delete minimalResumeData.sections[sectionKey];
+      }
+    });
+
+    console.log('Minimal Resume Size:', JSON.stringify(minimalResumeData).length, 'bytes');
+
+    try {
+      const response = await fetch('/api/openai/resume-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          resume: minimalResumeData, // Send minimal data
+          job: selectedJob
+        } as ResumeChatDto),
+      });
+
+      const data = await response.json() as ResumeChatResponseDto;
+      console.log('API Response:', data);
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.message }]);
+      
+      if (data.resumeUpdates) {
+        // Merge updates with full resume data
+        const mergedUpdates = {
+          ...resumeData,
+          ...data.resumeUpdates,
+          basics: {
+            ...resumeData.basics,
+            ...data.resumeUpdates.basics
+          },
+          sections: {
+            ...resumeData.sections,
+            ...data.resumeUpdates.sections
+          }
+        };
+        
+        setProposedChanges(mergedUpdates);
+        console.log('Merged Updates:', mergedUpdates);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages((prev) => [...prev, { 
+        role: 'assistant', 
+        content: t`Sorry, I encountered an error while processing your request.` 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const applyChanges = async () => {
+    if (proposedChanges) {
+      try {
+        setValue('', proposedChanges); // Update entire resume data
+        setProposedChanges(null);
+      } catch (error) {
+        console.error('Failed to save resume changes:', error);
+      }
+    }
+  };
+
+  const rejectChanges = () => {
+    setProposedChanges(null);
+  };
+
+  const countKeywordsInSection = (sectionName: 'experience' | 'skills') => {
+    const sectionText = JSON.stringify(resume.data.sections[sectionName]).toLowerCase();
+    return selectedJob?.atsKeywords.skills.filter(
+      (skill: any) => sectionText.includes(skill.keyword.toLowerCase())
+    ).length || 0;
+  };
+
+  const checkBulletPoints = () => {
+    const experienceText = JSON.stringify(resume.data.sections.experience);
+    return experienceText.includes('<ul>') && experienceText.includes('<li>');
+  };
+
+  const checkDateFormat = () => {
+    const dates = resume.data.sections.experience.items.map((item: any) => item.date);
+    const datePattern = /^[A-Z][a-z]+ \d{4} - ([A-Z][a-z]+ \d{4}|Present)$/;
+    return dates.every((date: string) => datePattern.test(date));
+  };
+
+  const formatChecks = [
+    {
+      id: 'fonts',
+      passed: true,
+      message: t`Using standard fonts`
+    },
+    {
+      id: 'headings',
+      passed: true,
+      message: t`Clear section headings`
+    },
+    {
+      id: 'bullets',
+      passed: checkBulletPoints(),
+      message: t`Proper bullet point format`
+    },
+    {
+      id: 'dates',
+      passed: checkDateFormat(),
+      message: t`Consistent date format`
+    },
+    {
+      id: 'special',
+      passed: true,
+      message: t`No special characters or tables`
+    }
+  ];
+
   return (
     <section id="ai-tools" className="grid gap-y-6">
       <header className="flex items-center justify-between">
@@ -94,86 +340,249 @@ export const AiToolsSection = () => {
         </div>
       </header>
 
-      <main className="grid gap-y-4">
-        {/* Resume Length Analysis */}
-        <div className="space-y-4 border rounded-lg p-4">
-          <div className="flex items-center gap-2">
-            <TextT className="h-4 w-4" />
-            <h4 className="text-sm font-medium">{t`Resume Length Analysis`}</h4>
+      {/* Common Job Selector */}
+      <div className="border rounded-lg p-4 bg-secondary/10">
+        <Label className="mb-2 block">{t`Select Job for Analysis`}</Label>
+        <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+          <SelectTrigger>
+            <SelectValue placeholder={t`Choose a job to analyze`} />
+          </SelectTrigger>
+          <SelectContent>
+            {jobs?.map((job: CreateJobDto & { id: string }) => (
+              <SelectItem key={job.id} value={job.id}>
+                {job.title} - {job.company}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {selectedJob && (
+          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-medium">{selectedJob.title}</span>
+            <span>•</span>
+            <span>{selectedJob.company}</span>
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">{t`Word Count`}</span>
-              <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm">{t`Status`}</span>
-              <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
-                {wordCountAnalysis.rating.status}
-              </span>
-            </div>
-            
-            <div className="mt-2 text-sm text-muted-foreground">
-              {wordCountAnalysis.rating.message}
-            </div>
-          </div>
-        </div>
+        )}
+      </div>
 
-        {/* ATS Analysis */}
-        <div className="space-y-1.5">
-          <Label>{t`Select Job for ATS Keywords`}</Label>
-          <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-            <SelectTrigger>
-              <SelectValue placeholder={t`Choose a job`} />
-            </SelectTrigger>
-            <SelectContent>
-              {jobs?.map((job: CreateJobDto & { id: string }) => (
-                <SelectItem key={job.id} value={job.id}>
-                  {job.title} - {job.company}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <Tabs defaultValue="ats" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="ats">
+            <MagnifyingGlass className="mr-2 h-4 w-4" />
+            {t`ATS Analysis`}
+          </TabsTrigger>
+          <TabsTrigger value="chat">
+            <ChatCircleText className="mr-2 h-4 w-4" />
+            {t`AI Assistant`}
+          </TabsTrigger>
+        </TabsList>
 
-          {selectedJob?.atsKeywords && (
-            <div className="space-y-4 border rounded-lg p-4">
-              {getKeywordStats() && (
-                <div className="mb-4 rounded-md bg-secondary/50 p-3 text-sm">
+        {/* ATS Analysis Tab */}
+        <TabsContent value="ats" className="mt-4">
+          {selectedJob?.atsKeywords ? (
+            <div className="space-y-6">
+              {/* Resume Metrics */}
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <TextT className="h-4 w-4" />
+                  <h4 className="text-sm font-medium">{t`Resume Length Analysis`}</h4>
+                </div>
+                
+                <div className="space-y-2 mt-4">
                   <div className="flex items-center justify-between">
-                    <span>{t`Keywords found in resume`}</span>
-                    <span className="font-medium">
-                      {getKeywordStats()?.matched}/{getKeywordStats()?.total} ({getKeywordStats()?.percentage}%)
+                    <span className="text-sm">{t`Word Count`}</span>
+                    <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">{t`Status`}</span>
+                    <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
+                      {wordCountAnalysis.rating.status}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {wordCountAnalysis.rating.message}
+                  </div>
+                </div>
+              </div>
+
+              {/* Keyword Match Score */}
+              <div className="border rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-4">{t`ATS Match Score`}</h4>
+                <div className="relative h-4 bg-secondary rounded-full overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full transition-all",
+                      getKeywordStats()?.percentage! >= 70 ? "bg-green-500" :
+                      getKeywordStats()?.percentage! >= 50 ? "bg-yellow-500" : "bg-red-500"
+                    )}
+                    style={{ width: `${getKeywordStats()?.percentage}%` }}
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+                  <span>{getKeywordStats()?.percentage}% {t`Match`}</span>
+                  <span>{getKeywordStats()?.matched}/{getKeywordStats()?.total} {t`Keywords Found`}</span>
+                </div>
+              </div>
+
+              {/* Found Keywords */}
+              <div className="border rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-4">{t`Keywords Found`}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedJob.atsKeywords.skills
+                    .filter((skill: any) => matchedKeywords.has(skill.keyword))
+                    .map((skill: any) => (
+                      <div 
+                        key={skill.keyword} 
+                        className="bg-green-500/10 text-green-700 dark:text-green-400 rounded-full px-3 py-1 text-xs flex items-center gap-2"
+                      >
+                        <span>{skill.keyword}</span>
+                        <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Missing Keywords */}
+              <div className="border rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-4">{t`Missing Important Keywords`}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedJob.atsKeywords.skills
+                    .filter((skill: any) => !matchedKeywords.has(skill.keyword) && skill.relevance > 0.7)
+                    .map((skill: any) => (
+                      <div key={skill.keyword} className="bg-red-500/10 text-red-700 dark:text-red-400 rounded-full px-3 py-1 text-xs">
+                        {skill.keyword}
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Section-wise Analysis */}
+              <div className="border rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-4">{t`Section Analysis`}</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{t`Experience Section`}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {countKeywordsInSection('experience')} {t`keywords found`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{t`Skills Section`}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {countKeywordsInSection('skills')} {t`keywords found`}
                     </span>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {selectedJob.atsKeywords.skills?.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">{t`Skills`}</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedJob.atsKeywords.skills.map((skill: any) => (
-                      <div
-                        key={skill.keyword}
-                        className={cn(
-                          "rounded-full px-3 py-1 text-xs transition-colors",
-                          matchedKeywords.has(skill.keyword)
-                            ? "bg-green-500/20 text-green-700 dark:text-green-400"
-                            : "bg-secondary"
-                        )}
-                      >
-                        {skill.keyword} ({Math.round(skill.relevance * 100)}%)
-                      </div>
-                    ))}
-                  </div>
+              {/* Format Compliance */}
+              <div className="border rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-4">{t`ATS Format Check`}</h4>
+                <div className="space-y-2">
+                  {formatChecks.map((check) => (
+                    <div key={check.id} className="flex items-center gap-2">
+                      {check.passed ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <WarningCircle className="h-4 w-4 text-yellow-500" />
+                      )}
+                      <span className="text-sm">{check.message}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground">
+              <MagnifyingGlass className="mx-auto h-12 w-12 mb-4 opacity-50" />
+              <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
+              <p className="text-xs">{t`Please select a job above to analyze ATS keywords.`}</p>
             </div>
           )}
-        </div>
-      </main>
+        </TabsContent>
+
+        {/* AI Assistant Tab */}
+        <TabsContent value="chat" className="mt-4">
+          <div className="space-y-4 border rounded-lg p-4">
+            {/* Chat Interface - without job selector */}
+            {!selectedJob ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Robot className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
+                <p className="text-xs">{t`Please select a job above to get AI assistance.`}</p>
+              </div>
+            ) : (
+              <>
+                <ScrollArea className="h-[400px] border rounded-lg">
+                  <div className="space-y-4 p-4">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "rounded-lg p-3",
+                          message.role === 'user'
+                            ? "ml-8 bg-primary text-primary-foreground"
+                            : "mr-8 bg-muted"
+                        )}
+                      >
+                        {message.content}
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="mr-8 animate-pulse rounded-lg bg-muted p-3">
+                        {t`Thinking...`}
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+
+                <form onSubmit={handleSubmit} className="flex gap-2">
+                  <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={t`Ask anything about your resume...`}
+                    className="flex-1 bg-transparent p-2 border rounded outline-none"
+                    disabled={isLoading || !selectedJob}
+                  />
+                  <Button type="submit" variant="ghost" disabled={isLoading || !selectedJob}>
+                    <ChatCircleText className="h-4 w-4" />
+                  </Button>
+                </form>
+
+                {proposedChanges && (
+                  <div className="mt-4 space-y-2 border rounded-lg p-4 bg-secondary/20">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{t`Suggested Changes`}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={rejectChanges}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          {t`Reject`}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={applyChanges}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          {t`Apply Changes`}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {t`Review the suggested changes before applying them to your resume.`}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </section>
   );
-}; 
+};

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { ATS_PROMPT, QUESTIONS_PROMPT, ANSWER_EVALUATION_PROMPT, MOCK_QUESTIONS_PROMPT, CHANGE_TONE_PROMPT, FIX_GRAMMAR_PROMPT, IMPROVE_WRITING_PROMPT } from './prompts';
+import { ATS_PROMPT, QUESTIONS_PROMPT, ANSWER_EVALUATION_PROMPT, MOCK_QUESTIONS_PROMPT, CHANGE_TONE_PROMPT, FIX_GRAMMAR_PROMPT, IMPROVE_WRITING_PROMPT, RESUME_CHAT_PROMPT } from './prompts';
 
 @Injectable()
 export class OpenAIService {
@@ -232,5 +232,82 @@ export class OpenAIService {
     });
 
     return response.choices[0].message.content ?? text;
+  }
+
+  async handleResumeChat(messages: any[], resumeData: any, jobData: any) {
+    const lastMessage = messages[messages.length - 1].content;
+    const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
+    const maxTokens = 4096;
+    
+    const prompt = RESUME_CHAT_PROMPT
+      .replace('{resumeData}', JSON.stringify(resumeData))
+      .replace('{jobDetails}', JSON.stringify({
+        title: jobData.title,
+        company: jobData.company,
+        description: jobData.description,
+        atsKeywords: jobData.atsKeywords
+      }))
+      .replace('{query}', lastMessage);
+
+    const response = await this.openai.chat.completions.create({
+      model,
+      max_tokens: maxTokens,
+      temperature: 0.7,
+      messages: [
+        {
+          role: "system",
+          content: prompt
+        },
+        ...messages
+      ],
+      functions: [
+        {
+          name: "updateResume",
+          description: "Update the resume data structure",
+          parameters: {
+            type: "object",
+            properties: {
+              resumeData: {
+                type: "object",
+                description: "The updated resume data structure"
+              }
+            }
+          }
+        }
+      ]
+    });
+
+    const message = response.choices[0].message;
+    let resumeUpdates = null;
+
+    // Try to extract JSON from the message content
+    if (message.content) {
+      const jsonMatch = message.content.match(/```json\n([\s\S]*?)\n```/);
+      if (jsonMatch && jsonMatch[1]) {
+        try {
+          const parsedJson = JSON.parse(jsonMatch[1]);
+          resumeUpdates = parsedJson;
+          
+          // Remove the JSON block from the message
+          message.content = message.content.replace(/```json\n[\s\S]*?\n```/, '').trim();
+        } catch (e) {
+          console.error('Failed to parse JSON from message:', e);
+        }
+      }
+    }
+
+    // If no JSON in message content, check function call
+    if (!resumeUpdates && message.function_call) {
+      try {
+        resumeUpdates = JSON.parse(message.function_call.arguments).resumeData;
+      } catch (e) {
+        console.error('Failed to parse function call arguments:', e);
+      }
+    }
+
+    return {
+      message: message.content || "I couldn't process that request.",
+      resumeUpdates
+    };
   }
 } 

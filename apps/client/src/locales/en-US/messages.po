@@ -2725,6 +2725,239 @@ msgstr "Failed to delete post"
 msgid "Comments"
 msgstr "Comments"
 
+# Resume Chat
+msgid "Resume Assistant"
+msgstr "Resume Assistant"
+
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+msgid "Thinking..."
+msgstr "Thinking..."
+
+msgid "I couldn't process that request."
+msgstr "I couldn't process that request."
+
+msgid "Start Chat"
+msgstr "Start Chat"
+
+# AI Chat Section
+msgid "AI Resume Assistant"
+msgstr "AI Resume Assistant"
+
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+msgid "Thinking..."
+msgstr "Thinking..."
+
+msgid "Select a job for tailored advice"
+msgstr "Select a job for tailored advice"
+
+msgid "Chat with AI"
+msgstr "Chat with AI"
+
+# Resume Length Analysis
+msgid "Resume Length Analysis"
+msgstr "Resume Length Analysis"
+
+msgid "Word Count"
+msgstr "Word Count"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "words"
+msgstr "words"
+
+msgid "Too Short"
+msgstr "Too Short"
+
+msgid "Too Long"
+msgstr "Too Long"
+
+msgid "Ideal"
+msgstr "Ideal"
+
+msgid "Your resume is too short. Consider adding more relevant experiences and skills."
+msgstr "Your resume is too short. Consider adding more relevant experiences and skills."
+
+msgid "Your resume length is ideal for most job applications."
+msgstr "Your resume length is ideal for most job applications."
+
+msgid "Consider condensing your resume to focus on the most relevant information."
+msgstr "Consider condensing your resume to focus on the most relevant information."
+
+# AI Tools Section
+msgid "AI Tools"
+msgstr "AI Tools"
+
+msgid "ATS Analysis"
+msgstr "ATS Analysis"
+
+msgid "Resume Metrics"
+msgstr "Resume Metrics"
+
+msgid "AI Assistant"
+msgstr "AI Assistant"
+
+msgid "Select Job for Analysis"
+msgstr "Select Job for Analysis"
+
+msgid "Choose a job"
+msgstr "Choose a job"
+
+msgid "Keywords found in resume"
+msgstr "Keywords found in resume"
+
+msgid "Skills"
+msgstr "Skills"
+
+msgid "Resume Length Analysis"
+msgstr "Resume Length Analysis"
+
+msgid "Word Count"
+msgstr "Word Count"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "words"
+msgstr "words"
+
+msgid "Analyzing for:"
+msgstr "Analyzing for:"
+
+msgid "Please select a job in the ATS Analysis tab for tailored resume advice."
+msgstr "Please select a job in the ATS Analysis tab for tailored resume advice."
+
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+msgid "Select a job first to get tailored advice"
+msgstr "Select a job first to get tailored advice"
+
+msgid "Suggested Changes"
+msgstr "Suggested Changes"
+
+msgid "Reject"
+msgstr "Reject"
+
+msgid "Apply Changes"
+msgstr "Apply Changes"
+
+msgid "Review the suggested changes before applying them to your resume."
+msgstr "Review the suggested changes before applying them to your resume."
+
+msgid "Sorry, I encountered an error while processing your request."
+msgstr "Sorry, I encountered an error while processing your request."
+
+# AI Tools Section
+msgid "AI Tools"
+msgstr "AI Tools"
+
+msgid "Select Job for Analysis"
+msgstr "Select Job for Analysis"
+
+msgid "Choose a job to analyze"
+msgstr "Choose a job to analyze"
+
+msgid "ATS Analysis"
+msgstr "ATS Analysis"
+
+msgid "Resume Metrics"
+msgstr "Resume Metrics"
+
+msgid "AI Assistant"
+msgstr "AI Assistant"
+
+msgid "No Job Selected"
+msgstr "No Job Selected"
+
+msgid "Please select a job above to analyze ATS keywords."
+msgstr "Please select a job above to analyze ATS keywords."
+
+msgid "Please select a job above to get AI assistance."
+msgstr "Please select a job above to get AI assistance."
+
+# ATS Analysis Section
+msgid "ATS Match Score"
+msgstr "ATS Match Score"
+
+msgid "Match"
+msgstr "Match"
+
+msgid "Keywords Found"
+msgstr "Keywords Found"
+
+msgid "Missing Important Keywords"
+msgstr "Missing Important Keywords"
+
+msgid "Section Analysis"
+msgstr "Section Analysis"
+
+msgid "Experience Section"
+msgstr "Experience Section"
+
+msgid "Skills Section"
+msgstr "Skills Section"
+
+msgid "keywords found"
+msgstr "keywords found"
+
+msgid "ATS Format Check"
+msgstr "ATS Format Check"
+
+msgid "Using standard fonts"
+msgstr "Using standard fonts"
+
+msgid "Clear section headings"
+msgstr "Clear section headings"
+
+msgid "Proper bullet point format"
+msgstr "Proper bullet point format"
+
+msgid "Consistent date format"
+msgstr "Consistent date format"
+
+msgid "No special characters or tables"
+msgstr "No special characters or tables"
+
+# Resume Metrics Section
+msgid "Resume Length Analysis"
+msgstr "Resume Length Analysis"
+
+msgid "Word Count"
+msgstr "Word Count"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "words"
+msgstr "words"
+
+# Chat Section
+msgid "Thinking..."
+msgstr "Thinking..."
+
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+msgid "Suggested Changes"
+msgstr "Suggested Changes"
+
+msgid "Reject"
+msgstr "Reject"
+
+msgid "Apply Changes"
+msgstr "Apply Changes"
+
+msgid "Review the suggested changes before applying them to your resume."
+msgstr "Review the suggested changes before applying them to your resume."
+
+msgid "Sorry, I encountered an error while processing your request."
+msgstr "Sorry, I encountered an error while processing your request."
+
 
 
 
