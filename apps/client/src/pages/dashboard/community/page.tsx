@@ -47,6 +47,7 @@ export const CommunityPage = () => {
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [showPostDialog, setShowPostDialog] = useState(false);
   const { register, handleSubmit, reset } = useForm();
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const { data: posts, refetch } = useQuery({
     queryKey: ["community-posts"],
@@ -72,9 +73,7 @@ export const CommunityPage = () => {
       toast.success(t`Post created successfully!`);
       reset();
       refetch();
-      // Close the dialog
-      const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-      if (closeButton) closeButton.click();
+      setIsCreatePostOpen(false);
     } catch (error) {
       toast.error(t`Failed to create post`);
     }
@@ -104,7 +103,7 @@ export const CommunityPage = () => {
               </SelectContent>
             </Select>
           </div>
-          <Dialog>
+          <Dialog open={isCreatePostOpen} onOpenChange={setIsCreatePostOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="whitespace-nowrap">{t`Create Post`}</Button>
             </DialogTrigger>

@@ -4,10 +4,16 @@ import { useJobApplications } from "@/client/services/jobs/application";
 import { Card } from "@reactive-resume/ui";
 import { motion } from "framer-motion";
 import { formatDistance } from "date-fns";
-import { Buildings, Calendar } from "@phosphor-icons/react";
+import { Buildings, Calendar, Trophy, Star } from "@phosphor-icons/react";
+import { useResumes } from "@/client/services/resume";
+import { useJobs } from "@/client/services/jobs/job";
+import { Progress } from "@reactive-resume/ui";
+import { cn } from "@reactive-resume/utils";
 
 export const DashboardPage = () => {
   const { data: applications = [], isLoading } = useJobApplications();
+  const { resumes = [] } = useResumes();
+  const { data: jobs = [] } = useJobs();
 
   // Calculate statistics
   const totalApplications = applications.length;
@@ -20,6 +26,69 @@ export const DashboardPage = () => {
   const recentApplications = [...applications]
     .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
+
+  // Define milestones
+  const milestones = [
+    {
+      id: 'first-resume',
+      title: t`Create Your First Resume`,
+      description: t`Start your journey by creating a resume`,
+      target: 1,
+      current: resumes.length,
+      completed: resumes.length >= 1
+    },
+    {
+      id: 'first-job',
+      title: t`Track Your First Job`,
+      description: t`Add a job posting to track`,
+      target: 1,
+      current: jobs.length,
+      completed: jobs.length >= 1
+    },
+    {
+      id: 'optimize-resume',
+      title: t`Optimize Your Resume`,
+      description: t`Get an ATS score above 70%`,
+      target: 70,
+      current: 0,
+      completed: false
+    },
+    {
+      id: 'multiple-versions',
+      title: t`Create Multiple Versions`,
+      description: t`Customize your resume for different roles`,
+      target: 3,
+      current: resumes.length,
+      completed: resumes.length >= 3
+    },
+    {
+      id: 'track-applications',
+      title: t`Track Your Applications`,
+      description: t`Monitor your job application progress`,
+      target: 5,
+      current: applications.length,
+      completed: applications.length >= 5
+    },
+    {
+      id: 'power-user',
+      title: t`Become a Power User`,
+      description: t`Master resume customization`,
+      target: 10,
+      current: resumes.length,
+      completed: resumes.length >= 10
+    }
+  ];
+
+  const calculateOverallProgress = () => {
+    const totalProgress = milestones.reduce((sum, milestone) => {
+      const progress = Math.min(100, Math.round((milestone.current / milestone.target) * 100));
+      return sum + progress;
+    }, 0);
+    
+    return Math.round(totalProgress / milestones.length);
+  };
+
+  const overallProgress = calculateOverallProgress();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -76,20 +145,62 @@ export const DashboardPage = () => {
           {t`Dashboard`}
         </motion.h1>
 
-        <div className="grid gap-4 md:grid-cols-6 lg:grid-cols-6">
-          <Card className="p-4">
-            <h2 className="text-lg font-semibold">{t`Total Applications`}</h2>
-            <p className="mt-2 text-3xl font-bold">{totalApplications}</p>
-          </Card>
+        {/* Progress Section */}
+        <div className="rounded-lg border bg-card">
+          <div className="border-b p-4">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-yellow-500" />
+              <h2 className="text-lg font-semibold">{t`Your Progress`}</h2>
+            </div>
+          </div>
 
-          {Object.entries(applicationsByStatus).map(([status, count]) => (
-            <Card key={status} className="p-4">
-              <h2 className="text-lg font-semibold">
-                <span className={getStatusColor(status)}>{getStatusLabel(status)}</span>
-              </h2>
-              <p className="mt-2 text-3xl font-bold">{count}</p>
-            </Card>
-          ))}
+          <div className="p-4 space-y-6">
+            {/* Overall Progress */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{t`Overall Progress`}</span>
+                <span>{overallProgress}%</span>
+              </div>
+              <Progress value={overallProgress} className="h-2" />
+            </div>
+
+            {/* Individual Milestones */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {milestones.map((milestone) => {
+                const progress = Math.min(100, Math.round((milestone.current / milestone.target) * 100));
+                const isCompleted = progress >= 100;
+
+                return (
+                  <div 
+                    key={milestone.id}
+                    className={cn(
+                      "rounded-lg border p-4 transition-colors",
+                      isCompleted && "bg-primary/5 border-primary"
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">{milestone.title}</h3>
+                      {isCompleted && <Star weight="fill" className="h-5 w-5 text-yellow-500" />}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">{milestone.description}</p>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>
+                          {isCompleted ? t`Completed` : `${milestone.current}/${milestone.target}`}
+                        </span>
+                        <span>{progress}%</span>
+                      </div>
+                      <Progress 
+                        value={progress}
+                        className={cn("h-1", isCompleted && "bg-primary/20")}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <div className="rounded-lg border bg-card">

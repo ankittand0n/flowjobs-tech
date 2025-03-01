@@ -19,16 +19,17 @@ import { useCreateJob } from "@/client/services/jobs/job";
 import { useCreateJobApplication } from "@/client/services/jobs/application";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-type Props = {
+interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   initialStep?: number;
   initialJob?: any; // Or use proper job type
-};
+}
 
 type Step = 1 | 2 | 3;
 
-export const AddJobDialog = ({ isOpen, onClose, initialStep = 1, initialJob }: Props) => {
+export const AddJobDialog = ({ isOpen, onClose, onSuccess, initialStep = 1, initialJob }: Props) => {
   const [step, setStep] = useState<Step>(initialStep as Step);
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -128,6 +129,7 @@ export const AddJobDialog = ({ isOpen, onClose, initialStep = 1, initialJob }: P
         title: "Success",
         description: "Job added successfully"
       });
+      onSuccess?.();
       setStep(3);
     } catch (error: any) {
       // Detailed error logging

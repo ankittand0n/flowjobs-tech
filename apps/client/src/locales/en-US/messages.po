@@ -2958,6 +2958,58 @@ msgstr "Review the suggested changes before applying them to your resume."
 msgid "Sorry, I encountered an error while processing your request."
 msgstr "Sorry, I encountered an error while processing your request."
 
+# Progress Section
+msgid "Your Progress"
+msgstr "Your Progress"
+
+msgid "Overall Progress"
+msgstr "Overall Progress"
+
+msgid "Create Your First Resume"
+msgstr "Create Your First Resume"
+
+msgid "Start your journey by creating a resume"
+msgstr "Start your journey by creating a resume"
+
+msgid "Track Your First Job"
+msgstr "Track Your First Job"
+
+msgid "Add a job posting to track"
+msgstr "Add a job posting to track"
+
+msgid "Apply to 5 Jobs"
+msgstr "Apply to 5 Jobs"
+
+msgid "Track 5 job applications"
+msgstr "Track 5 job applications"
+
+msgid "Optimize Your Resume"
+msgstr "Optimize Your Resume"
+
+msgid "Get an ATS score above 70%"
+msgstr "Get an ATS score above 70%"
+
+msgid "Become a Power User"
+msgstr "Become a Power User"
+
+msgid "Master resume customization"
+msgstr "Master resume customization"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Create Multiple Versions"
+msgstr "Create Multiple Versions"
+
+msgid "Customize your resume for different roles"
+msgstr "Customize your resume for different roles"
+
+msgid "Track Your Applications"
+msgstr "Track Your Applications"
+
+msgid "Monitor your job application progress"
+msgstr "Monitor your job application progress"
+
 
 
 
