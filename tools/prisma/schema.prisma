@@ -38,6 +38,14 @@ enum PaymentProvider {
   PAYPAL
 }
 
+// Community Post Types
+enum PostType {
+  FEATURE_REQUEST
+  BUG_REPORT
+  DISCUSSION
+  ANNOUNCEMENT
+}
+
 model User {
   id               String   @id @default(cuid())
   name             String
@@ -62,6 +70,8 @@ model User {
   subscriptionStatus SubscriptionStatus @default(FREE)
   subscriptionEndDate DateTime?
   payments           Payment[]
+  posts     CommunityPost[]
+  comments  Comment[]
 }
 
 model Secrets {
@@ -173,7 +183,7 @@ model Subscription {
   provider            PaymentProvider
   startDate           DateTime @default(now())
   endDate             DateTime?
-  
+
   // Payment provider specific IDs
   stripeSubscriptionId  String?  @unique
   stripePriceId         String?
@@ -206,5 +216,43 @@ model Payment {
 
   @@index([userId])
   @@index([subscriptionId])
+}
+
+// Community Post Model
+model CommunityPost {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  type      PostType
+  status    String   @default("open") // open, closed, in-progress
+  votes     Int      @default(0)
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comments  Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Comments on Community Posts
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+
+  // Relations
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([userId])
 }
 

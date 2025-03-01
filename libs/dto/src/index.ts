@@ -9,3 +9,4 @@ export * from "./user";
 export * from "./jobs";
 export * from "./job-applications";
 export * from "./mock-tests";
+export * from "./community";

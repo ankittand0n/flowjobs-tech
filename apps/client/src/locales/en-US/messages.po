@@ -2193,13 +2193,13 @@ msgid "Score:"
 msgstr "Score:"
 
 msgid "Feedback:"
-msgstr "Feedback:"  
+msgstr "Feedback:"
 
 msgid "Next Question"
 msgstr "Next Question"
 
 msgid "Previous Question"
-msgstr "Previous Question"  
+msgstr "Previous Question"
 
 msgid "Submit"
 msgstr "Submit"
@@ -2229,7 +2229,7 @@ msgid "End Test"
 msgstr "End Test"
 
 msgid "Question"
-msgstr "Question"   
+msgstr "Question"
 
 msgid "of"
 msgstr "of"
@@ -2447,7 +2447,7 @@ msgid "No ATS keywords analysis available."
 msgstr "No ATS keywords analysis available."
 
 msgid "Extract Keywords"
-msgstr "Extract Keywords"   
+msgstr "Extract Keywords"
 
 msgid "Successfully applied to job"
 msgstr "Successfully applied to job"
@@ -2657,7 +2657,73 @@ msgstr "Word Count"
 msgid "words"
 msgstr "words"
 
+# Community Page Translations
+msgid "Community"
+msgstr "Community"
 
+msgid "Create Post"
+msgstr "Create Post"
+
+msgid "Create a New Post"
+msgstr "Create a New Post"
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Content"
+msgstr "Content"
+
+msgid "Select post type"
+msgstr "Select post type"
+
+msgid "Submit"
+msgstr "Submit"
+
+msgid "Posted by"
+msgstr "Posted by"
+
+msgid "Post created successfully!"
+msgstr "Post created successfully!"
+
+msgid "Failed to create post"
+msgstr "Failed to create post"
+
+# Post Types
+msgid "FEATURE_REQUEST"
+msgstr "Features"
+
+msgid "BUG_REPORT"
+msgstr "Bugs"
+
+msgid "DISCUSSION"
+msgstr "Discussion"
+
+msgid "ANNOUNCEMENT"
+msgstr "News"
+
+msgid "Add Comment"
+msgstr "Add Comment"
+
+msgid "Write your comment..."
+msgstr "Write your comment..."
+
+msgid "Comment added successfully!"
+msgstr "Comment added successfully!"
+
+msgid "Failed to add comment"
+msgstr "Failed to add comment"
+
+msgid "Failed to vote"
+msgstr "Failed to vote"
+
+msgid "Post deleted successfully!"
+msgstr "Post deleted successfully!"
+
+msgid "Failed to delete post"
+msgstr "Failed to delete post"
+
+msgid "Comments"
+msgstr "Comments"
 
 
 

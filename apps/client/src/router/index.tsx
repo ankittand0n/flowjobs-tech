@@ -13,6 +13,7 @@ import { builderLoader, BuilderPage } from "../pages/builder/page";
 import { DashboardLayout } from "../pages/dashboard/layout";
 import { ResumesPage } from "../pages/dashboard/resumes/page";
 import { JobTrackerPage } from "../pages/dashboard/job-tracker/page";
+import { CommunityPage } from "../pages/dashboard/community/page";
 import { SettingsPage } from "../pages/dashboard/settings/page";
 import { HomeLayout } from "../pages/home/layout";
 import { HomePage } from "../pages/home/page";
@@ -72,6 +73,7 @@ export const routes = createRoutesFromElements(
           <Route path="resumes" element={<ResumesPage />} />
           <Route path="jobs" element={<JobsPage />} />
           <Route path="job-tracker" element={<JobTrackerPage />} />
+          <Route path="community" element={<CommunityPage />} />
           <Route path="mock-tests">
             <Route index element={<MockTestsPage />} />
             <Route path="test" element={<MockTestPage />} />

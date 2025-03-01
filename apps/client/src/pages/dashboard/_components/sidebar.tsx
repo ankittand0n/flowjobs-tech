@@ -7,6 +7,7 @@ import {
   ReadCvLogo,
   Briefcase,
   Brain,
+  ChatCircle,
 } from "@phosphor-icons/react";
 
 import { Button, Separator } from "@reactive-resume/ui";
@@ -101,11 +102,11 @@ export const Sidebar = ({ setOpen }: SidebarProps) => {
       name: t`Mock Tests`,
       icon: <Brain />,
     },
-    // {
-    //   path: "/dashboard/interview-prep",
-    //   name: t`Interview Prep.`,
-    //   icon: <User />,
-    // },
+    {
+      path: "/dashboard/community",
+      name: t`Community`,
+      icon: <ChatCircle />,
+    },
     {
       path: "/dashboard/settings",
       name: t`Settings`,

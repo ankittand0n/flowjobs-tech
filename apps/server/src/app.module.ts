@@ -22,6 +22,7 @@ import { JobModule } from "./job/job.module";
 import { JobApplicationModule } from "./job-application/job-application.module";
 import { OpenAIModule } from './openai/openai.module';
 import { MockTestModule } from "./mock-test/mock-test.module";
+import { CommunityModule } from "./modules/community/community.module";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { MockTestModule } from "./mock-test/mock-test.module";
     FeatureModule,
     TranslationModule,
     ContributorsModule,
+    CommunityModule,
 
     // Static Assets
     ServeStaticModule.forRoot({
