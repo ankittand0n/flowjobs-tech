@@ -1,5 +1,5 @@
 import { t } from "@lingui/macro";
-import { Brain, TextT, ChatCircleText, MagnifyingGlass, ChartBar, Robot, CheckCircle, WarningCircle } from "@phosphor-icons/react";
+import { Brain, TextT, ChatCircleText, MagnifyingGlass, ChartBar, Robot, CheckCircle, WarningCircle, Plus } from "@phosphor-icons/react";
 import { 
   Label, 
   Select, 
@@ -20,6 +20,7 @@ import { useJobs } from "@/client/services/jobs/job";
 import { CreateJobDto, ResumeChatDto, ResumeChatResponseDto } from "@reactive-resume/dto";
 import { cn } from "@reactive-resume/utils";
 import { useResumeStore } from "@/client/stores/resume"
+import { AddJobDialog } from "@/client/pages/dashboard/jobs/_dialogs/add-job";
 
 // Add type for resume data structure
 type ResumeData = {
@@ -108,11 +109,12 @@ export const AiToolsSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [matchedKeywords, setMatchedKeywords] = useState<Set<string>>(new Set());
-  const { data: jobs } = useJobs();
+  const { data: jobs, refetch: refetchJobs } = useJobs();
   const selectedJob = jobs?.find((job: CreateJobDto & { id: string }) => job.id === selectedJobId);
   const resume = useResumeStore((state) => state.resume);
   const setValue = useResumeStore((state) => state.setValue);
   const [proposedChanges, setProposedChanges] = useState<ResumeData | null>(null);
+  const [isAddJobOpen, setIsAddJobOpen] = useState(false);
 
   useEffect(() => {
     if (!selectedJob?.atsKeywords) return;
@@ -331,6 +333,11 @@ export const AiToolsSection = () => {
     }
   ];
 
+  const onJobAdded = () => {
+    setIsAddJobOpen(false);
+    refetchJobs();  // Refresh jobs list after adding
+  };
+
   return (
     <section id="ai-tools" className="grid gap-y-6">
       <header className="flex items-center justify-between">
@@ -342,7 +349,18 @@ export const AiToolsSection = () => {
 
       {/* Common Job Selector */}
       <div className="border rounded-lg p-4 bg-secondary/10">
-        <Label className="mb-2 block">{t`Select Job for Analysis`}</Label>
+        <div className="flex items-center justify-between mb-2">
+          <Label>{t`Select Job for Analysis`}</Label>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setIsAddJobOpen(true)}
+            className="text-xs"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t`Add Job`}
+          </Button>
+        </div>
         <Select value={selectedJobId} onValueChange={setSelectedJobId}>
           <SelectTrigger>
             <SelectValue placeholder={t`Choose a job to analyze`} />
@@ -363,6 +381,12 @@ export const AiToolsSection = () => {
           </div>
         )}
       </div>
+
+      <AddJobDialog 
+        isOpen={isAddJobOpen} 
+        onClose={() => setIsAddJobOpen(false)}
+        onSuccess={onJobAdded}
+      />
 
       <Tabs defaultValue="ats" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
