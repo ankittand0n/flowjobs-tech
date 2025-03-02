@@ -40,6 +40,9 @@ export const AdminStatisticsPage = () => {
       const response = await axios.get("/admin/statistics");
       return response.data;
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   if (!isAdmin) {

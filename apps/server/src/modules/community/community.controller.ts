@@ -2,17 +2,12 @@ import { Controller, Get, Post, Body, Param, UseGuards, Request, Delete, Unautho
 import { CommunityService } from './community.service';
 import { JwtGuard } from '../../auth/guards/jwt.guard';
 import { CreatePostDto, CreateCommentDto } from '@reactive-resume/dto';
-import { PrismaClient } from '@prisma/client';
+import { User } from '@prisma/client';
 
 @Controller('community')
+@UseGuards(JwtGuard)
 export class CommunityController {
-  private prisma: PrismaClient;
-
-  constructor(
-    private readonly communityService: CommunityService
-  ) {
-    this.prisma = new PrismaClient();
-  }
+  constructor(private readonly communityService: CommunityService) {}
 
   @Get()
   async getAllPosts() {
@@ -20,76 +15,57 @@ export class CommunityController {
   }
 
   @Post()
-  @UseGuards(JwtGuard)
-  async createPost(@Request() req: any, @Body() createPostDto: CreatePostDto) {
+  async createPost(@Request() req: { user: User }, @Body() createPostDto: CreatePostDto) {
     return this.communityService.createPost(req.user.id, createPostDto);
   }
 
+  @Get(':id')
+  async getPost(@Param('id') id: string) {
+    return this.communityService.getPostById(id);
+  }
+
   @Post(':id/vote')
-  @UseGuards(JwtGuard)
   async votePost(@Param('id') id: string) {
     return this.communityService.votePost(id);
   }
 
   @Post(':id/comment')
-  @UseGuards(JwtGuard)
   async addComment(
-    @Request() req: any,
+    @Request() req: { user: User },
     @Param('id') postId: string,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    return this.communityService.addComment(req.user.id, postId, createCommentDto);
+    return this.communityService.addComment(postId, req.user.id, createCommentDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtGuard)
-  async deletePost(@Request() req: any, @Param('id') id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: req.user.id } });
-    const post = await this.prisma.communityPost.findUnique({ 
-      where: { id },
-      select: { userId: true }
-    });
-
-    if (!post) {
-      throw new ForbiddenException('Post not found');
-    }
-
-    // Allow if user is admin OR if they created the post
-    if (user?.role !== 'ADMIN' && post.userId !== user?.id) {
-      throw new ForbiddenException('You cannot delete this post');
+  async deletePost(@Request() req: { user: User }, @Param('id') id: string) {
+    const post = await this.communityService.getPostById(id);
+    if (!post) throw new ForbiddenException('Post not found');
+    
+    if (post.userId !== req.user.id && req.user.role !== 'ADMIN') {
+      throw new UnauthorizedException('You can only delete your own posts');
     }
 
     return this.communityService.deletePost(id);
   }
 
   @Delete(':postId/comment/:commentId')
-  @UseGuards(JwtGuard)
   async deleteComment(
-    @Request() req: any,
+    @Request() req: { user: User },
     @Param('postId') postId: string,
     @Param('commentId') commentId: string,
   ) {
-    const user = await this.prisma.user.findUnique({ where: { id: req.user.id } });
-    const comment = await this.prisma.comment.findUnique({
-      where: { id: commentId },
-      select: { userId: true }
-    });
+    const post = await this.communityService.getPostById(postId);
+    if (!post) throw new ForbiddenException('Post not found');
 
-    if (!comment) {
-      throw new ForbiddenException('Comment not found');
-    }
+    const comment = post.comments.find((c) => c.id === commentId);
+    if (!comment) throw new ForbiddenException('Comment not found');
 
-    // Allow if user is admin OR if they created the comment
-    if (user?.role !== 'ADMIN' && comment.userId !== user?.id) {
-      throw new ForbiddenException('You cannot delete this comment');
+    if (comment.userId !== req.user.id && req.user.role !== 'ADMIN') {
+      throw new UnauthorizedException('You can only delete your own comments');
     }
 
     return this.communityService.deleteComment(commentId);
-  }
-
-  @Get(':id')
-  @UseGuards(JwtGuard)
-  async getPost(@Param('id') id: string) {
-    return this.communityService.getPost(id);
   }
 }

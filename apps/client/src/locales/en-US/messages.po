@@ -3296,3 +3296,6 @@ msgstr "Last 7 Days"
 
 msgid "Active Rate (24h)"
 msgstr "Active Rate (24h)"
+
+msgid "Overview of platform usage and metrics."
+msgstr "Overview of platform usage and metrics."
