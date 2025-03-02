@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import slugify from "@sindresorhus/slugify";
+import slugify from "slugify";
 import { createZodDto } from "nestjs-zod/dto";
 import { z } from "zod";
 

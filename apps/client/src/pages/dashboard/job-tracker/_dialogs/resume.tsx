@@ -41,7 +41,7 @@ import { z } from "zod";
 import { useCreateResume, useDeleteResume, useUpdateResume } from "@/client/services/resume";
 import { useImportResume } from "@/client/services/resume/import";
 import { useDialog } from "@/client/stores/dialog";
-import slugify from "@sindresorhus/slugify";
+import slugify from "slugify";
 
 const formSchema = createResumeSchema.extend({ id: idSchema.optional() });
 

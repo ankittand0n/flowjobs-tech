@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, Logger, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createId } from "@paralleldrive/cuid2";
-import slugify from "@sindresorhus/slugify";
+import slugify from "slugify";
 import { MinioClient, MinioService } from "nestjs-minio-client";
 import sharp from "sharp";
 
