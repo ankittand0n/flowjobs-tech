@@ -1,5 +1,5 @@
 import { t } from "@lingui/macro";
-import { Brain, TextT, ChatCircleText, MagnifyingGlass, ChartBar, Robot, CheckCircle, WarningCircle, Plus } from "@phosphor-icons/react";
+import { Brain, TextT, ChatCircleText, MagnifyingGlass, ChartBar, Robot, CheckCircle, WarningCircle, Plus, Info } from "@phosphor-icons/react";
 import { 
   Label, 
   Select, 
@@ -13,7 +13,10 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
@@ -451,7 +454,12 @@ export const AiToolsSection = () => {
 
               {/* Found Keywords */}
               <div className="border rounded-lg p-4">
-                <h4 className="text-sm font-medium mb-4">{t`Keywords Found`}</h4>
+                <div className="flex items-center gap-2 mb-4">
+                  <h4 className="text-sm font-medium">{t`Keywords Found`}</h4>
+                  <Tooltip content={t`Percentage shows how relevant each keyword is to the job`}>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </Tooltip>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {selectedJob.atsKeywords.skills
                     .filter((skill: any) => matchedKeywords.has(skill.keyword))
@@ -469,13 +477,28 @@ export const AiToolsSection = () => {
 
               {/* Missing Keywords */}
               <div className="border rounded-lg p-4">
-                <h4 className="text-sm font-medium mb-4">{t`Missing Important Keywords`}</h4>
+                <div className="flex items-center gap-2 mb-4">
+                  <h4 className="text-sm font-medium">{t`Missing Important Keywords`}</h4>
+                  <Tooltip content={t`Higher percentage indicates greater importance for the job`}>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </Tooltip>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {selectedJob.atsKeywords.skills
-                    .filter((skill: any) => !matchedKeywords.has(skill.keyword) && skill.relevance > 0.7)
+                    .filter((skill: any) => !matchedKeywords.has(skill.keyword))
+                    .sort((a: any, b: any) => b.relevance - a.relevance)
                     .map((skill: any) => (
-                      <div key={skill.keyword} className="bg-red-500/10 text-red-700 dark:text-red-400 rounded-full px-3 py-1 text-xs">
-                        {skill.keyword}
+                      <div 
+                        key={skill.keyword} 
+                        className={cn(
+                          "rounded-full px-3 py-1 text-xs flex items-center gap-2",
+                          skill.relevance > 0.7 
+                            ? "bg-red-500/10 text-red-700 dark:text-red-400"
+                            : "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
+                        )}
+                      >
+                        <span>{skill.keyword}</span>
+                        <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
                       </div>
                     ))}
                 </div>
