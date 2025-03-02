@@ -57,12 +57,12 @@ export const CommunityPage = () => {
   const currentUserId = useAuthStore((state) => state.user?.id);
   const authStoreUser = useAuthStore((state) => state.user);
 
-  console.log("Community Page Auth Debug:", {
-    isAdmin,
-    currentUserId,
-    authStoreUser,
-    authStoreRole: authStoreUser?.role,
-  });
+  // console.log("Community Page Auth Debug:", {
+  //   isAdmin,
+  //   currentUserId,
+  //   authStoreUser,
+  //   authStoreRole: authStoreUser?.role,
+  // });
 
   const { data: posts, refetch } = useQuery({
     queryKey: ["community-posts"],
