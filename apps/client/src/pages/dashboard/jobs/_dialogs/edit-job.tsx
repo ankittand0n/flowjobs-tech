@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
+import { useAuthStore } from "@/client/stores/auth";
 
 import { useUpdateJob, useDeleteJob } from "@/client/services/jobs/job";
 
@@ -43,6 +44,8 @@ type Props = {
 export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
   const { mutateAsync: updateJob, isPending: isUpdating } = useUpdateJob();
   const { mutateAsync: deleteJob, isPending: isDeleting } = useDeleteJob();
+  const authStoreUser = useAuthStore((state) => state.user);
+  const isAdmin = authStoreUser?.role === "ADMIN";
 
   const [jobData, setJobData] = useState({
     title: job.title,
@@ -67,13 +70,14 @@ export const EditJobDialog = ({ isOpen, onClose, job }: Props) => {
   }, [job]);
 
   useEffect(() => {
-    if (!job.canEdit) {
+    const hasPermission = isAdmin || job.createdBy === authStoreUser?.id;
+    if (!hasPermission) {
       console.error("You don't have permission to edit this job");
       onClose();
     }
-  }, [job, onClose]);
+  }, [job, onClose, isAdmin, authStoreUser?.id]);
 
-  if (!job.canEdit) {
+  if (!isAdmin && !job.canEdit) {
     return null;
   }
 

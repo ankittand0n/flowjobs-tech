@@ -3010,10 +3010,286 @@ msgstr "Track Your Applications"
 msgid "Monitor your job application progress"
 msgstr "Monitor your job application progress"
 
+# Job Management
+msgid "Jobs"
+msgstr "Jobs"
 
+msgid "Add New Job"
+msgstr "Add New Job"
 
+msgid "Edit Job"
+msgstr "Edit Job"
 
+msgid "Delete Job"
+msgstr "Delete Job"
 
+msgid "View Job Posting"
+msgstr "View Job Posting"
 
+msgid "Start Tracking"
+msgstr "Start Tracking"
 
+msgid "View Details"
+msgstr "View Details"
 
+#: Job Management
+msgid "Apply on Website"
+msgstr "Apply on Website"
+
+msgid "Job Details"
+msgstr "Job Details"
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Company"
+msgstr "Company"
+
+msgid "Location"
+msgstr "Location"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Salary"
+msgstr "Salary"
+
+msgid "Description"
+msgstr "Description"
+
+#: Job Types
+msgid "Full-time"
+msgstr "Full-time"
+
+msgid "Part-time"
+msgstr "Part-time"
+
+msgid "Contract"
+msgstr "Contract"
+
+msgid "Internship"
+msgstr "Internship"
+
+msgid "Freelance"
+msgstr "Freelance"
+
+msgid "Remote"
+msgstr "Remote"
+
+#: ATS Keywords
+msgid "ATS Keywords Analysis"
+msgstr "ATS Keywords Analysis"
+
+msgid "Skills"
+msgstr "Skills"
+
+msgid "Requirements"
+msgstr "Requirements"
+
+msgid "Experience"
+msgstr "Experience"
+
+msgid "Education"
+msgstr "Education"
+
+msgid "year"
+msgstr "year"
+
+msgid "years"
+msgstr "years"
+
+msgid "Refresh ATS Keywords"
+msgstr "Refresh ATS Keywords"
+
+msgid "Refreshing..."
+msgstr "Refreshing..."
+
+msgid "No ATS keywords analysis available."
+msgstr "No ATS keywords analysis available."
+
+#: Success Messages
+msgid "Job created successfully!"
+msgstr "Job created successfully!"
+
+msgid "Job updated successfully!"
+msgstr "Job updated successfully!"
+
+msgid "Job deleted successfully!"
+msgstr "Job deleted successfully!"
+
+msgid "ATS keywords have been refreshed"
+msgstr "ATS keywords have been refreshed"
+
+#: Error Messages
+msgid "Failed to create job"
+msgstr "Failed to create job"
+
+msgid "Failed to update job"
+msgstr "Failed to update job"
+
+msgid "Failed to delete job"
+msgstr "Failed to delete job"
+
+msgid "Failed to refresh ATS keywords"
+msgstr "Failed to refresh ATS keywords"
+
+msgid "No job description provided"
+msgstr "No job description provided"
+
+msgid "Job not found"
+msgstr "Job not found"
+
+msgid "You cannot edit this job"
+msgstr "You cannot edit this job"
+
+msgid "You cannot delete this job"
+msgstr "You cannot delete this job"
+
+msgid "You cannot update ATS keywords for this job"
+msgstr "You cannot update ATS keywords for this job"
+
+#: Search and Filters
+msgid "Search Jobs"
+msgstr "Search Jobs"
+
+msgid "My Jobs"
+msgstr "My Jobs"
+
+msgid "All Jobs"
+msgstr "All Jobs"
+
+msgid "No Jobs Found"
+msgstr "No Jobs Found"
+
+#: Form Labels and Placeholders
+msgid "Job Title"
+msgstr "Job Title"
+
+msgid "Select job type"
+msgstr "Select job type"
+
+msgid "e.g. $80k - $100k"
+msgstr "e.g. $80k - $100k"
+
+msgid "e.g. https://example.com/job-posting"
+msgstr "e.g. https://example.com/job-posting"
+
+msgid "Enter or paste the job description here..."
+msgstr "Enter or paste the job description here..."
+
+msgid "Optional"
+msgstr "Optional"
+
+#: Actions
+msgid "Save Changes"
+msgstr "Save Changes"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Deleting..."
+msgstr "Deleting..."
+
+msgid "Analyzing"
+msgstr "Analyzing"
+
+# Admin Statistics
+msgid "Admin Statistics"
+msgstr "Admin Statistics"
+
+msgid "Platform Statistics"
+msgstr "Platform Statistics"
+
+msgid "User Statistics"
+msgstr "User Statistics"
+
+msgid "Total Users"
+msgstr "Total Users"
+
+msgid "Active Users (24h)"
+msgstr "Active Users (24h)"
+
+msgid "Active Users (7d)"
+msgstr "Active Users (7d)"
+
+msgid "Users by Role"
+msgstr "Users by Role"
+
+msgid "Resume Statistics"
+msgstr "Resume Statistics"
+
+msgid "Total Resumes"
+msgstr "Total Resumes"
+
+msgid "Public Resumes"
+msgstr "Public Resumes"
+
+msgid "Average Views"
+msgstr "Average Views"
+
+msgid "Average Downloads"
+msgstr "Average Downloads"
+
+msgid "Job Statistics"
+msgstr "Job Statistics"
+
+msgid "Total Jobs"
+msgstr "Total Jobs"
+
+msgid "Jobs by Type"
+msgstr "Jobs by Type"
+
+msgid "Application Statistics"
+msgstr "Application Statistics"
+
+msgid "Total Applications"
+msgstr "Total Applications"
+
+msgid "Applications by Status"
+msgstr "Applications by Status"
+
+# Authentication
+msgid "Invalid email or password"
+msgstr "Invalid email or password"
+
+msgid "Login successful"
+msgstr "Login successful"
+
+msgid "Logout successful"
+msgstr "Logout successful"
+
+msgid "Password reset email sent"
+msgstr "Password reset email sent"
+
+msgid "Password updated successfully"
+msgstr "Password updated successfully"
+
+msgid "Account verification successful"
+msgstr "Account verification successful"
+
+msgid "Please verify your email address"
+msgstr "Please verify your email address"
+
+msgid "Unspecified"
+msgstr "Unspecified"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Active Users"
+msgstr "Active Users"
+
+msgid "Last 24 Hours"
+msgstr "Last 24 Hours"
+
+msgid "Last 7 Days"
+msgstr "Last 7 Days"
+
+msgid "Active Rate (24h)"
+msgstr "Active Rate (24h)"

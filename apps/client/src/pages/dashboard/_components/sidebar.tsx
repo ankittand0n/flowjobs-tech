@@ -8,6 +8,7 @@ import {
   Briefcase,
   Brain,
   ChatCircle,
+  ChartBar,
 } from "@phosphor-icons/react";
 
 import { Button, Separator } from "@reactive-resume/ui";
@@ -20,9 +21,11 @@ import { Icon } from "@/client/components/icon";
 import { UserAvatar } from "@/client/components/user-avatar";
 import { UserOptions } from "@/client/components/user-options";
 import { useUser } from "@/client/services/user";
+import { useAuth } from "@/client/hooks/use-auth";
 
 type Props = {
   className?: string;
+  setOpen?: (open: boolean) => void;
 };
 
 const ActiveIndicator = ({ className }: Props) => (
@@ -69,12 +72,9 @@ const SidebarItem = ({ path, name, icon, onClick }: SidebarItemProps) => {
   );
 };
 
-type SidebarProps = {
-  setOpen?: (open: boolean) => void;
-};
-
-export const Sidebar = ({ setOpen }: SidebarProps) => {
+export const Sidebar = ({ setOpen }: Props) => {
   const { user } = useUser();
+  const { isAdmin } = useAuth();
 
   const sidebarItems: SidebarItem[] = [
     {
@@ -107,6 +107,15 @@ export const Sidebar = ({ setOpen }: SidebarProps) => {
       name: t`Community`,
       icon: <ChatCircle />,
     },
+    ...(isAdmin
+      ? [
+          {
+            path: "/dashboard/admin/statistics",
+            name: t`Admin Statistics`,
+            icon: <ChartBar />,
+          },
+        ]
+      : []),
     {
       path: "/dashboard/settings",
       name: t`Settings`,

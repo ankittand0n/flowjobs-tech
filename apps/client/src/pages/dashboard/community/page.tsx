@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { axios } from "@/client/libs/axios";
 import { toast } from "sonner";
+import { useAuth } from "@/client/hooks/use-auth";
+import { useAuthStore } from "@/client/stores/auth";
+import { ThumbsUp, ChatCircle, MagnifyingGlass, Trash } from "@phosphor-icons/react";
 
 enum PostType {
   FEATURE_REQUEST = "FEATURE_REQUEST",
@@ -21,6 +24,7 @@ type Post = {
   status: string;
   votes: number;
   user: {
+    id: string;
     name: string;
     username: string;
     picture: string | null;
@@ -34,6 +38,7 @@ type Post = {
     id: string;
     content: string;
     createdAt: string;
+    userId: string;
     user: {
       name: string;
       picture: string | null;
@@ -48,6 +53,16 @@ export const CommunityPage = () => {
   const [showPostDialog, setShowPostDialog] = useState(false);
   const { register, handleSubmit, reset } = useForm();
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const { isAdmin } = useAuth();
+  const currentUserId = useAuthStore((state) => state.user?.id);
+  const authStoreUser = useAuthStore((state) => state.user);
+
+  console.log("Community Page Auth Debug:", {
+    isAdmin,
+    currentUserId,
+    authStoreUser,
+    authStoreRole: authStoreUser?.role,
+  });
 
   const { data: posts, refetch } = useQuery({
     queryKey: ["community-posts"],
@@ -79,17 +94,25 @@ export const CommunityPage = () => {
     }
   };
 
+  const canDeletePost = (post: Post) => {
+    return isAdmin || post.user.id === currentUserId;
+  };
+
+  const canDeleteComment = (comment: { userId: string }) => {
+    return isAdmin || comment.userId === currentUserId;
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t`Community`}</h1>
-        <div className="flex items-center gap-2">
-          <div className="block sm:hidden">
+    <div className="space-y-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t`Community`}</h1>
+        <div className="flex items-center gap-3">
+          <div className="block sm:hidden flex-1">
             <Select
               value={selectedTab}
               onValueChange={(value) => setSelectedTab(value as PostType)}
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue>
                   <span className="capitalize">{selectedTab.toLowerCase().replace(/_/g, " ")}</span>
                 </SelectValue>
@@ -105,7 +128,12 @@ export const CommunityPage = () => {
           </div>
           <Dialog open={isCreatePostOpen} onOpenChange={setIsCreatePostOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="whitespace-nowrap">{t`Create Post`}</Button>
+              <Button 
+                size="sm" 
+                className="bg-foreground text-background hover:bg-foreground/90 whitespace-nowrap flex-1 sm:flex-none"
+              >
+                {t`Create Post`}
+              </Button>
             </DialogTrigger>
             <DialogContent className="w-[95vw] max-w-lg">
               <DialogHeader>
@@ -195,7 +223,8 @@ export const CommunityPage = () => {
                           }
                         }}
                       >
-                        👍 {post.votes}
+                        <ThumbsUp className="mr-2 h-4 w-4" />
+                        {post.votes}
                       </Button>
                       <Button
                         variant="outline"
@@ -206,7 +235,8 @@ export const CommunityPage = () => {
                           setShowCommentDialog(true);
                         }}
                       >
-                        💬 {post._count.comments}
+                        <ChatCircle className="mr-2 h-4 w-4" />
+                        {post._count.comments}
                       </Button>
                       <Button
                         variant="primary"
@@ -216,9 +246,10 @@ export const CommunityPage = () => {
                           setShowPostDialog(true);
                         }}
                       >
-                        🔍 {t`View`}
+                        <MagnifyingGlass className="mr-2 h-4 w-4" />
+                        {t`View`}
                       </Button>
-                      {post.user.role === "ADMIN" && (
+                      {canDeletePost(post) && (
                         <Button
                           variant="error"
                           size="sm"
@@ -232,7 +263,8 @@ export const CommunityPage = () => {
                             }
                           }}
                         >
-                          🗑️ {t`Delete`}
+                          <Trash className="mr-2 h-4 w-4" />
+                          {t`Delete`}
                         </Button>
                       )}
                     </div>
@@ -259,13 +291,32 @@ export const CommunityPage = () => {
               <div className="space-y-4">
                 {postDetails?.comments?.map((comment) => (
                   <div key={comment.id} className="border p-3 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium">{comment.user.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{comment.user.name}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {canDeleteComment(comment) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await axios.delete(`/community/${selectedPost?.id}/comment/${comment.id}`);
+                              toast.success(t`Comment deleted successfully!`);
+                              refetch();
+                            } catch (error) {
+                              toast.error(t`Failed to delete comment`);
+                            }
+                          }}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
-                    <p>{comment.content}</p>
+                    <p className="mt-2">{comment.content}</p>
                   </div>
                 ))}
               </div>

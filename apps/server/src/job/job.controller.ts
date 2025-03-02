@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, BadRequestException, Logger } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
@@ -10,6 +10,7 @@ import { Roles, Role } from "../auth/decorators/roles.decorator";
 @Controller("jobs")
 @UseGuards(AuthGuard("jwt"))
 export class JobController { 
+  private readonly logger = new Logger(JobController.name);
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -71,17 +72,17 @@ export class JobController {
   }
 
   @Patch(":id")
-  @UseGuards(AuthGuard("jwt"))
+  @UseGuards(RoleGuard)
   async updateJob(
     @GetUser() user: User,
     @Param("id") id: string,
     @Body() updateJobDto: UpdateJobDto,
   ) {
     try {
-      console.log('Raw update request:', {
-        body: updateJobDto,
-        params: { id },
-        user: { id: user.id }
+      this.logger.debug('Processing job update request', {
+        jobId: id,
+        userId: user.id,
+        role: user.role
       });
 
       // Detailed validation logging
@@ -95,10 +96,10 @@ export class JobController {
         description: updateJobDto.description && typeof updateJobDto.description !== 'string' ? 'Description must be a string' : null,
       };
 
-      console.log('Validation check:', {
-        dto: updateJobDto,
-        issues: Object.entries(validationIssues).filter(([_, value]) => value !== null)
-      });
+      const issues = Object.entries(validationIssues).filter(([_, value]) => value !== null);
+      if (issues.length > 0) {
+        this.logger.warn('Validation issues detected', { issues });
+      }
 
       // Required field validation
       if (!updateJobDto.title?.trim()) {
@@ -117,7 +118,8 @@ export class JobController {
         throw new BadRequestException('Job not found');
       }
 
-      if (job.createdBy !== user.id) {
+      // Allow if user is admin OR if they created the job
+      if (job.createdBy !== user.id && user.role !== Role.ADMIN) {
         throw new ForbiddenException('You cannot edit this job');
       }
 
@@ -133,13 +135,10 @@ export class JobController {
         updatedAt: new Date(),
       };
 
-      console.log('Processed update data:', validUpdateData);
+      this.logger.debug('Updating job with data', { jobId: id, data: validUpdateData });
 
       const updatedJob = await this.prisma.job.update({
-        where: {
-          id,
-          createdBy: user.id,
-        },
+        where: { id },
         data: validUpdateData,
         include: {
           applications: {
@@ -148,12 +147,13 @@ export class JobController {
         },
       });
 
+      this.logger.debug('Job updated successfully', { jobId: id });
       return updatedJob;
     } catch (error) {
-      console.error('Update job error:', {
+      this.logger.error('Failed to update job', {
+        jobId: id,
         error: error.message,
         stack: error.stack,
-        data: updateJobDto,
         validation: error.response?.message
       });
       throw error;
@@ -204,11 +204,23 @@ export class JobController {
       };
     },
   ) {
+    // First find the job
+    const job = await this.prisma.job.findUnique({
+      where: { id },
+      select: { createdBy: true }
+    });
+
+    if (!job) {
+      throw new BadRequestException('Job not found');
+    }
+
+    // Allow if user is admin OR if they created the job
+    if (job.createdBy !== user.id && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('You cannot update ATS keywords for this job');
+    }
+
     return this.prisma.job.update({
-      where: {
-        id,
-        createdBy: user.id,
-      },
+      where: { id },
       data: {
         atsKeywords: data.atsKeywords,
         updatedAt: new Date(),

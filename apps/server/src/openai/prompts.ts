@@ -24,18 +24,48 @@ Follow this exact format for the response:
     { "keyword": "Open Source Contribution", "yearsRequired": 0 }
   ],
   "education": [
-    { "level": "Bachelor's", "field": "Computer Science" }
+    { "level": "Bachelor's Degree", "field": "Computer Science" }
   ]
 }
 
 Important rules for the response:
-1. Always include yearsRequired in experience items, use 0 if no specific years mentioned
-2. Always include Education Field in education items relevant to the job description
-3. Keep relevance scores between 0 and 1
-4. Use "must-have" or "nice-to-have" for requirement types
-5. Return only valid JSON with no additional text
-6. If a section has no relevant information, return an empty array
-6. Always maintain the exact structure of each object
+1. ALL sections (skills, requirements, experience, education) are REQUIRED and must not be empty
+2. Skills section rules:
+   - Must include at least 3 relevant skills
+   - Each skill must have relevance (0 to 1) and count
+   - If specific skills aren't mentioned, infer from job context
+   - Include both technical and soft skills
+
+3. Requirements section rules:
+   - Must include at least 2 requirements
+   - Each requirement must be marked as "must-have" or "nice-to-have"
+   - If no clear requirements found, infer from job responsibilities
+   - Include both technical and professional requirements
+
+4. Experience section rules:
+   - Must include at least 2 experience items
+   - Always include yearsRequired (use 0 if not specified)
+   - If no years mentioned, infer from seniority level
+   - Include both technical and role-related experience
+
+5. Education section rules:
+   - Must include at least 1 education requirement
+   - Use ONLY these values for level:
+     * "High School Diploma"
+     * "Associate's Degree"
+     * "Bachelor's Degree"
+     * "Master's Degree"
+     * "Doctoral Degree"
+     * "Professional Certification"
+   - Always include field of study
+   - Default to "Bachelor's Degree" with relevant field if not specified
+
+6. General rules:
+   - Keep relevance scores between 0 and 1
+   - Return only valid JSON with no additional text
+   - Always maintain the exact structure of each object
+   - If information is not explicitly stated, infer from context
+   - Ensure all arrays have at least the minimum required items
 
 Job Description: """{input}"""
 

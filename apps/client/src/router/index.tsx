@@ -27,6 +27,8 @@ import { InterviewPrepPage } from "../pages/dashboard/interview-prep/page";
 import { JobsPage } from "../pages/dashboard/jobs/page";
 import { MockTestsPage } from "../pages/dashboard/mock-tests/page";
 import { MockTestPage } from "../pages/dashboard/mock-tests/test";
+import { AdminStatisticsPage } from "../pages/dashboard/admin/statistics/page";
+import { AdminGuard } from "./guards/admin";
 
 export const routes = createRoutesFromElements(
   // eslint-disable-next-line lingui/no-unlocalized-strings
@@ -80,6 +82,11 @@ export const routes = createRoutesFromElements(
           </Route>
           <Route path="interview-prep" element={<InterviewPrepPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          
+          {/* Admin Routes */}
+          <Route element={<AdminGuard />}>
+            <Route path="admin/statistics" element={<AdminStatisticsPage />} />
+          </Route>
 
           <Route index element={<Navigate replace to="/dashboard/resumes" />} />
         </Route>

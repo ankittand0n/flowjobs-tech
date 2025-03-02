@@ -14,6 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axios } from "@/client/libs/axios";
 import { useAuth } from "@/client/hooks/use-auth";
 import { useToast } from "@/client/hooks/use-toast";
+import { stripHtml } from "@/client/utils/string";
 
 type Props = {
   job: {
@@ -42,15 +43,34 @@ const useRefreshAtsKeywords = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (jobId: string) => {
-      const { data } = await axios.post(`/jobs/${jobId}/refresh-ats`);
+    mutationFn: async ({ jobId, description }: { jobId: string; description: string }) => {
+      if (!description) {
+        throw new Error("No job description available");
+      }
+
+      const plainDescription = stripHtml(description);
+      
+      if (!plainDescription.trim()) {
+        throw new Error("Job description is empty after processing");
+      }
+
+      // Then refresh ATS
+      const { data } = await axios.post(`/jobs/${jobId}/refresh-ats`, { description: plainDescription });
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       toast({
         title: "Success",
         description: "ATS keywords have been refreshed",
+      });
+      return data;
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to refresh ATS keywords",
+        variant: "error",
       });
     },
   });
@@ -61,12 +81,13 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
   const { mutateAsync: extractAts, isPending: isExtracting } = useExtractAtsKeywords();
   const { isAdmin } = useAuth();
   const { mutateAsync: refreshAts, isPending: isRefreshing } = useRefreshAtsKeywords();
+  const { toast } = useToast();
 
   useEffect(() => {
     const analyzeDescription = async () => {
       if (isOpen && job.description && !job.atsKeywords) {
         try {
-          const keywords = await extractAts(job.id);
+          const keywords = await extractAts({ jobId: job.id, description: job.description });
           setAtsKeywords(keywords);
         } catch (error) {
           console.error("Failed to extract ATS keywords:", error);
@@ -76,6 +97,35 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
 
     analyzeDescription();
   }, [isOpen, job.id, job.description, job.atsKeywords, extractAts]);
+
+  const handleRefreshAts = async () => {
+    try {
+      // Log initial job data from props
+      console.log('Debug - Initial Job Data:', {
+        id: job.id,
+        title: job.title,
+        company: job.company,
+        hasDescription: !!job.description,
+        descriptionLength: job.description?.length
+      });
+
+      if (!job.description) {
+        throw new Error("Job description is missing");
+      }
+
+      // Send the HTML description directly - the backend will handle stripping HTML
+      await refreshAts({ jobId: job.id, description: job.description });
+      const newKeywords = await extractAts({ jobId: job.id, description: job.description });
+      setAtsKeywords(newKeywords);
+    } catch (error) {
+      console.error("Failed to refresh ATS keywords:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to refresh ATS keywords",
+        variant: "error"
+      });
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -248,7 +298,7 @@ export const JobDetailsDialog = ({ job, isOpen, onClose }: Props) => {
           {isAdmin && (
             <Button
               variant="outline"
-              onClick={() => refreshAts(job.id)}
+              onClick={handleRefreshAts}
               disabled={isRefreshing}
             >
               <ArrowsClockwise className="h-4 w-4 mr-2" />

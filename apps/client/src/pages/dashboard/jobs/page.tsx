@@ -26,8 +26,10 @@ import { JobDetailsDialog } from "./_dialogs/job-details";
 import { EditJobDialog } from "./_dialogs/edit-job";
 import { AddJobDialog } from "./_dialogs/add-job";
 import { TrackJobDialog } from "./_dialogs/track-job";
+import { useAuth } from "@/client/hooks/use-auth";
+import { useAuthStore } from "@/client/stores/auth";
 
-const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit, onView, onTrack }: any) => {
+const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, isAdmin, onApply, onEdit, onView, onTrack }: any) => {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -125,7 +127,7 @@ const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, onApply, onEdit
                     </Button>
                   )}
 
-                  {job.createdBy === currentUserId && (
+                  {(isAdmin || job.createdBy === currentUserId) && (
                     <Button
                       size="sm"
                       variant="ghost"
@@ -156,6 +158,10 @@ export const JobsPage = () => {
   const [editingJob, setEditingJob] = useState<any>(null);
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   const [trackingJob, setTrackingJob] = useState<any>(null);
+  const { isAdmin } = useAuth();
+  const currentUserId = useAuthStore((state) => state.user?.id);
+  const authStoreUser = useAuthStore((state) => state.user);
+
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return { myJobs: [], allJobs: [] };
@@ -233,6 +239,7 @@ export const JobsPage = () => {
               isLoading={isLoading}
               searchQuery={searchQuery}
               currentUserId={user?.id}
+              isAdmin={isAdmin}
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}
@@ -246,6 +253,7 @@ export const JobsPage = () => {
               isLoading={isLoading}
               searchQuery={searchQuery}
               currentUserId={user?.id}
+              isAdmin={isAdmin}
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}

@@ -106,6 +106,12 @@ export class CommunityService {
     });
   }
 
+  async deleteComment(id: string) {
+    return this.prisma.comment.delete({
+      where: { id },
+    });
+  }
+
   async getPost(id: string) {
     return this.prisma.communityPost.findUnique({
       where: { id },
@@ -116,12 +122,14 @@ export class CommunityService {
             name: true,
             username: true,
             picture: true,
+            role: true,
           },
         },
         comments: {
           include: {
             user: {
               select: {
+                id: true,
                 name: true,
                 picture: true,
               },

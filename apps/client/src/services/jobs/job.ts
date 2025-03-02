@@ -3,6 +3,22 @@ import { stripHtml } from "@/client/utils/string";
 
 import { axios } from "../../libs/axios";
 import { extractAtsKeywords } from "../openai/extract-ats";
+import { useAuthStore } from "@/client/stores/auth";
+import { useToast } from "@/client/hooks/use-toast";
+
+// Create a simple logging utility that can be disabled in production
+const logger = {
+  debug: (...args: any[]) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[Jobs Service]', ...args);
+    }
+  },
+  error: (...args: any[]) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[Jobs Service]', ...args);
+    }
+  }
+};
 
 // Base type for Job properties
 type BaseJob = {
@@ -44,6 +60,9 @@ export type UpdateJobStatusDto = {
 };
 
 export const useJobs = () => {
+  const authStoreUser = useAuthStore((state) => state.user);
+  const isAdmin = authStoreUser?.role === "ADMIN";
+
   return useQuery({
     queryKey: ["jobs"],
     queryFn: async () => {
@@ -53,7 +72,7 @@ export const useJobs = () => {
       return jobs.map((job: any) => {
         return {
           ...job,
-          canEdit: job.createdBy === currentUserId
+          canEdit: isAdmin || job.createdBy === currentUserId
         };
       });
     },
@@ -167,36 +186,58 @@ export const usePublicJobs = () => {
 
 export const useExtractAtsKeywords = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (jobId: string) => {
+    mutationFn: async ({ jobId, description }: { jobId: string; description: string }) => {
       try {
-        console.log('Starting ATS extraction for job:', jobId);
+        logger.debug('Starting ATS extraction', {
+          jobId,
+          hasDescription: !!description,
+          descriptionLength: description?.length
+        });
 
-        const { data: job } = await axios.get(`/jobs/${jobId}`);
-
-        if (!job.description) {
+        if (!description) {
           throw new Error("No job description provided");
         }
 
-        const plainDescription = stripHtml(job.description);
-        console.log('Sending to OpenAI:', plainDescription);
-
-        const keywords = await extractAtsKeywords(plainDescription);
-        console.log('Received from OpenAI:', keywords);
-
-        await axios.patch(`/jobs/${jobId}/ats-keywords`, {
-          atsKeywords: keywords,
+        const plainDescription = stripHtml(description);
+        logger.debug('Processed description', {
+          originalLength: description.length,
+          plainLength: plainDescription.length,
+          hasContent: !!plainDescription.trim()
         });
 
-        return keywords;
+        const extractedKeywords = await extractAtsKeywords(plainDescription);
+        
+        logger.debug('Extracted keywords', {
+          skills: extractedKeywords.skills?.length || 0,
+          requirements: extractedKeywords.requirements?.length || 0,
+          experience: extractedKeywords.experience?.length || 0,
+          education: extractedKeywords.education?.length || 0
+        });
+
+        const formattedKeywords = {
+          atsKeywords: {
+            skills: Array.isArray(extractedKeywords.skills) ? extractedKeywords.skills : [],
+            requirements: Array.isArray(extractedKeywords.requirements) ? extractedKeywords.requirements : [],
+            experience: Array.isArray(extractedKeywords.experience) ? extractedKeywords.experience : [],
+            education: Array.isArray(extractedKeywords.education) ? extractedKeywords.education : []
+          }
+        };
+
+        logger.debug('Sending request to server', {
+          jobId,
+          endpoint: `/jobs/${jobId}/ats-keywords`
+        });
+
+        const response = await axios.patch(`/jobs/${jobId}/ats-keywords`, formattedKeywords);
+        return formattedKeywords.atsKeywords;
       } catch (error: unknown) {
-        console.error('Failed to extract ATS keywords:', error);
-        if (error && typeof error === 'object' && 'response' in error &&
-            error.response && typeof error.response === 'object' && 'data' in error.response &&
-            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data) {
-          throw new Error(error.response.data.message as string);
-        }
+        logger.error('ATS Extraction failed', {
+          errorType: error instanceof Error ? 'Error' : typeof error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        });
         throw error;
       }
     },
