@@ -1,0 +1,33 @@
+{
+  "name": "@flowjobs/chrome-extension",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "convert-icons": "node scripts/convert-icons.js",
+    "prebuild": "pnpm convert-icons"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@reactive-resume/ui": "workspace:*",
+    "@reactive-resume/utils": "workspace:*",
+    "@reactive-resume/hooks": "workspace:*",
+    "react-hook-form": "^7.50.0"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.0",
+    "@types/chrome": "^0.0.260",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}

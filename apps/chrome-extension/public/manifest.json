@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "FlowJobs Application Tracker",
+  "version": "1.0.0",
+  "description": "Track your job applications from FlowJobs",
+  "permissions": [
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "http://localhost:5173/*",
+    "http://localhost:3000/*",
+    "https://*.flowjobs.com/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+} 
