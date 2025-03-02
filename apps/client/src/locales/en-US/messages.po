@@ -1928,6 +1928,9 @@ msgstr "View Resume"
 msgid "No jobs found"
 msgstr "No jobs found"
 
+msgid "Search jobs..."
+msgstr "Search jobs..."
+
 msgid "No jobs found matching"
 msgstr "No jobs found matching"
 
