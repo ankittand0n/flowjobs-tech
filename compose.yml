@@ -13,6 +13,11 @@ services:
     environment:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   # Chrome Browser (for printing and previews)
   chrome:
@@ -26,19 +31,26 @@ services:
       TOKEN: ${CHROME_TOKEN:-chrome_token}
       EXIT_ON_HEALTH_FAILURE: "true"
       PRE_REQUEST_HEALTH_CHECK: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.rx
       args:
         - NX_CLOUD_ACCESS_TOKEN=${NX_CLOUD_ACCESS_TOKEN}
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      - minio
-      - chrome
+      minio:
+        condition: service_healthy
+      chrome:
+        condition: service_healthy
     environment:
       PORT: ${PORT:-3000}
       NODE_ENV: ${NODE_ENV:-production}
@@ -61,6 +73,11 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_MODEL: ${OPENAI_MODEL}
       OPENAI_MAX_TOKENS: ${OPENAI_MAX_TOKENS}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
 volumes:
   minio_data: 
