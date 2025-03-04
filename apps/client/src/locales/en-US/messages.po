@@ -3427,3 +3427,165 @@ msgstr "Salary Range"
 #: apps/client/src/pages/dashboard/jobs/page.tsx
 msgid "Apply on Adzuna"
 msgstr "Apply on Adzuna"
+
+msgid "Streamline Your Job Search"
+msgstr "Streamline Your Job Search"
+
+msgid "Your All-in-One Job Search Platform"
+msgstr "Your All-in-One Job Search Platform"
+
+msgid "Track your job applications, build ATS-friendly resumes, and manage your entire job search journey in one place. Get insights into your application status and improve your chances of landing your dream job."
+msgstr "Track your job applications, build ATS-friendly resumes, and manage your entire job search journey in one place. Get insights into your application status and improve your chances of landing your dream job."
+
+msgid "Everything You Need for Your Job Search"
+msgstr "Everything You Need for Your Job Search"
+
+msgid "Streamline your job search with our comprehensive suite of tools. From application tracking to resume building, we've got you covered."
+msgstr "Streamline your job search with our comprehensive suite of tools. From application tracking to resume building, we've got you covered."
+
+msgid "Application Tracking"
+msgstr "Application Tracking"
+
+msgid "Keep track of all your job applications in one place. Monitor status, deadlines, and follow-ups effortlessly."
+msgstr "Keep track of all your job applications in one place. Monitor status, deadlines, and follow-ups effortlessly."
+
+msgid "ATS-Friendly Resumes"
+msgstr "ATS-Friendly Resumes"
+
+msgid "Create professional resumes that pass Applicant Tracking Systems. Multiple templates optimized for success."
+msgstr "Create professional resumes that pass Applicant Tracking Systems. Multiple templates optimized for success."
+
+msgid "AI-Powered Analysis"
+msgstr "AI-Powered Analysis"
+
+msgid "Get intelligent insights on job descriptions and optimize your applications with AI assistance."
+msgstr "Get intelligent insights on job descriptions and optimize your applications with AI assistance."
+
+msgid "Job Matching"
+msgstr "Job Matching"
+
+msgid "Find relevant job opportunities that match your skills and experience from multiple sources."
+msgstr "Find relevant job opportunities that match your skills and experience from multiple sources."
+
+msgid "Interview Preparation"
+msgstr "Interview Preparation"
+
+msgid "Access interview questions, preparation tips, and track your interview progress."
+msgstr "Access interview questions, preparation tips, and track your interview progress."
+
+msgid "Quick Apply"
+msgstr "Quick Apply"
+
+msgid "Apply to jobs faster with saved resumes and application templates."
+msgstr "Apply to jobs faster with saved resumes and application templates."
+
+msgid "Trusted by Job Seekers"
+msgstr "Trusted by Job Seekers"
+
+msgid "Our platform integrates with top job boards and has helped candidates land roles at leading companies."
+msgstr "Our platform integrates with top job boards and has helped candidates land roles at leading companies."
+
+msgid "Success Stories"
+msgstr "Success Stories"
+
+msgid "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
+msgstr "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
+
+msgid "Flow Jobs"
+msgstr "Flow Jobs"
+
+msgid "Your complete job search companion. Track applications, build ATS-friendly resumes, and land your dream job."
+msgstr "Your complete job search companion. Track applications, build ATS-friendly resumes, and land your dream job."
+
+msgid "Job Seekers"
+msgstr "Job Seekers"
+
+msgid "Career Resources"
+msgstr "Career Resources"
+
+msgid "Job Application Tracking"
+msgstr "Job Application Tracking"
+
+msgid "Resume Builder"
+msgstr "Resume Builder"
+
+msgid "AI Assistant"
+msgstr "AI Assistant"
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Rx Resume v4"
+msgstr "Rx Resume v4"
+
+msgid "What's new in the latest version"
+msgstr "What's new in the latest version"
+
+msgid "Streamline Your Job Search"
+msgstr "Streamline Your Job Search"
+
+msgid "Your All-in-One Job Search Platform"
+msgstr "Your All-in-One Job Search Platform"
+
+msgid "Track your job applications, build ATS-friendly resumes, and manage your entire job search journey in one place. Get insights into your application status and improve your chances of landing your dream job."
+msgstr "Track your job applications, build ATS-friendly resumes, and manage your entire job search journey in one place. Get insights into your application status and improve your chances of landing your dream job."
+
+msgid "Flow Jobs - Screenshot - Job Tracking Dashboard"
+msgstr "Flow Jobs - Screenshot - Job Tracking Dashboard"
+
+msgid "Flow Jobs - Screenshot - Resume Builder"
+msgstr "Flow Jobs - Screenshot - Resume Builder"
+
+msgid "Everything You Need for Your Job Search"
+msgstr "Everything You Need for Your Job Search"
+
+msgid "Streamline your job search with our comprehensive suite of tools. From application tracking to resume building, we've got you covered."
+msgstr "Streamline your job search with our comprehensive suite of tools. From application tracking to resume building, we've got you covered."
+
+msgid "Application Tracking"
+msgstr "Application Tracking"
+
+msgid "Keep track of all your job applications in one place. Monitor status, deadlines, and follow-ups effortlessly."
+msgstr "Keep track of all your job applications in one place. Monitor status, deadlines, and follow-ups effortlessly."
+
+msgid "ATS-Friendly Resumes"
+msgstr "ATS-Friendly Resumes"
+
+msgid "Create professional resumes that pass Applicant Tracking Systems. Multiple templates optimized for success."
+msgstr "Create professional resumes that pass Applicant Tracking Systems. Multiple templates optimized for success."
+
+msgid "AI-Powered Analysis"
+msgstr "AI-Powered Analysis"
+
+msgid "Get intelligent insights on job descriptions and optimize your applications with AI assistance."
+msgstr "Get intelligent insights on job descriptions and optimize your applications with AI assistance."
+
+msgid "Job Matching"
+msgstr "Job Matching"
+
+msgid "Find relevant job opportunities that match your skills and experience from multiple sources."
+msgstr "Find relevant job opportunities that match your skills and experience from multiple sources."
+
+msgid "Interview Preparation"
+msgstr "Interview Preparation"
+
+msgid "Access interview questions, preparation tips, and track your interview progress."
+msgstr "Access interview questions, preparation tips, and track your interview progress."
+
+msgid "Quick Apply"
+msgstr "Quick Apply"
+
+msgid "Apply to jobs faster with saved resumes and application templates."
+msgstr "Apply to jobs faster with saved resumes and application templates."
+
+msgid "Trusted by Job Seekers"
+msgstr "Trusted by Job Seekers"
+
+msgid "Our platform integrates with top job boards and has helped candidates land roles at leading companies."
+msgstr "Our platform integrates with top job boards and has helped candidates land roles at leading companies."
+
+msgid "Success Stories"
+msgstr "Success Stories"
+
+msgid "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
+msgstr "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
