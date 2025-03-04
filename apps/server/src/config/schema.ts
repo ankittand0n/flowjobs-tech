@@ -37,7 +37,7 @@ export const configSchema = z.object({
   STORAGE_ENDPOINT: z.string(),
   STORAGE_PORT: z.coerce.number(),
   STORAGE_REGION: z.string().default("us-east-1"),
-  STORAGE_BUCKET: z.string(),
+  STORAGE_BUCKET: z.string().default("flowjobs"),
   STORAGE_ACCESS_KEY: z.string(),
   STORAGE_SECRET_KEY: z.string(),
   STORAGE_USE_SSL: z
@@ -92,6 +92,10 @@ export const configSchema = z.object({
   OPENAI_BASE_URL: z.string(),
   OPENAI_MODEL: z.string(),
   OPENAI_MAX_TOKENS: z.coerce.number(),
+
+  // Adzuna API
+  ADZUNA_APP_ID: z.string(),
+  ADZUNA_APP_KEY: z.string(),
 });
 
 export type Config = z.infer<typeof configSchema>;
