@@ -131,6 +131,7 @@ model Job {
   url         String?  @unique
   description String?
   atsKeywords Json?
+  source      String?  // To track where the job came from (e.g., 'adzuna', 'manual')
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdBy   String?  // Optional field to track who created the job

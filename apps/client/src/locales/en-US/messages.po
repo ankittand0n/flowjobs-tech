@@ -3299,3 +3299,99 @@ msgstr "Active Rate (24h)"
 
 msgid "Overview of platform usage and metrics."
 msgstr "Overview of platform usage and metrics."
+
+msgid "Track Job Application"
+msgstr "Track Job Application"
+
+msgid "Track application for"
+msgstr "Track application for"
+
+msgid "at"
+msgstr "at"
+
+msgid "Application Status"
+msgstr "Application Status"
+
+msgid "Draft"
+msgstr "Draft"
+
+msgid "Applied"
+msgstr "Applied"
+
+msgid "Interviewing"
+msgstr "Interviewing"
+
+msgid "Offer"
+msgstr "Offer"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Select a resume"
+msgstr "Select a resume"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Add any notes about your application..."
+msgstr "Add any notes about your application..."
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Start Tracking"
+msgstr "Start Tracking"
+
+msgid "Successfully started tracking job application"
+msgstr "Successfully started tracking job application"
+
+msgid "Failed to create application"
+msgstr "Failed to create application"
+
+msgid "Job Title or Keywords"
+msgstr "Job Title or Keywords"
+
+msgid "Location"
+msgstr "Location"
+
+msgid "Select Country"
+msgstr "Select Country"
+
+msgid "Searching..."
+msgstr "Searching..."
+
+msgid "Search Jobs"
+msgstr "Search Jobs"
+
+msgid "No jobs found. Try adjusting your search criteria."
+msgstr "No jobs found. Try adjusting your search criteria."
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Save for ATS Analysis"
+msgstr "Save for ATS Analysis"
+
+msgid "Job saved successfully"
+msgstr "Job saved successfully"
+
+msgid "Failed to save job"
+msgstr "Failed to save job"
+
+msgid "View Details"
+msgstr "View Details"
+
+msgid "Apply on Website"
+msgstr "Apply on Website"
+
+msgid "Edit Job"
+msgstr "Edit Job"
+
+msgid "Add New Job"
+msgstr "Add New Job"
+
+msgid "My Jobs"
+msgstr "My Jobs"
