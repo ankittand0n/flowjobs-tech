@@ -12,7 +12,8 @@ import {
   Plus,
   ListDashes,
   Globe,
-  ClipboardText
+  ClipboardText,
+  Briefcase
 } from "@phosphor-icons/react";
 import { Button, Card, Input, Tabs, TabsContent, TabsList, TabsTrigger } from "@reactive-resume/ui";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,6 +29,7 @@ import { AddJobDialog } from "./_dialogs/add-job";
 import { TrackJobDialog } from "./_dialogs/track-job";
 import { useAuth } from "@/client/hooks/use-auth";
 import { useAuthStore } from "@/client/stores/auth";
+import { useAdzunaJobs, type AdzunaJob } from "@/client/services/jobs/adzuna";
 
 const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, isAdmin, onApply, onEdit, onView, onTrack }: any) => {
   if (isLoading) {
@@ -148,10 +150,128 @@ const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, isAdmin, onAppl
   );
 };
 
+const AdzunaJobsList = ({ jobs, isLoading, searchQuery, onTrack }: any) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} className="bg-muted animate-pulse p-4" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!jobs?.results?.length) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-muted-foreground py-8 text-center"
+      >
+        {searchQuery ? t`No jobs found on Adzuna` + ` "${searchQuery}"` : t`No jobs found on Adzuna`}
+      </motion.div>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      {jobs.results.map((job: AdzunaJob, index: number) => (
+        <motion.div
+          key={job.id}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0, transition: { delay: index * 0.1 } }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          <Card className="p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium">{job.title}</h3>
+                </div>
+
+                <div className="text-muted-foreground flex flex-wrap gap-2 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Buildings className="h-4 w-4" />
+                    <span>{job.company.display_name}</span>
+                  </div>
+
+                  {job.location.display_name && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{job.location.display_name}</span>
+                    </div>
+                  )}
+
+                  {(job.salary_min || job.salary_max) && (
+                    <div className="flex items-center gap-1">
+                      <Money className="h-4 w-4" />
+                      <span title={t`Salary Range`}>
+                        {job.salary_min && job.salary_max
+                          ? `${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()}`
+                          : job.salary_min
+                          ? `${job.salary_min.toLocaleString()}+`
+                          : `Up to ${job.salary_max.toLocaleString()}`}
+                      </span>
+                    </div>
+                  )}
+
+                  {job.contract_type && (
+                    <div className="flex items-center gap-1">
+                      <Briefcase className="h-4 w-4" />
+                      <span title={t`Contract Type`}>{job.contract_type}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="bg-foreground text-background hover:bg-foreground/90 [&_svg]:text-background"
+                    onClick={() => onTrack({
+                      id: job.id,
+                      title: job.title,
+                      company: job.company.display_name,
+                      location: job.location.display_name,
+                      description: job.description,
+                      url: job.redirect_url,
+                      salary: job.salary_min && job.salary_max ? `${job.salary_min} - ${job.salary_max}` : undefined,
+                      type: job.contract_type
+                    })}
+                    title={t`Start Tracking`}
+                  >
+                    <ClipboardText className="mr-2 h-4 w-4" />
+                    {t`Start Tracking`}
+                  </Button>
+
+                  {job.redirect_url && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={() => window.open(job.redirect_url, "_blank", "noopener,noreferrer")}
+                      title={t`Apply on Adzuna`}
+                    >
+                      <ArrowSquareOut className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      ))}
+    </AnimatePresence>
+  );
+};
+
 export const JobsPage = () => {
   const { user } = useUser();
   const { data: jobs, isLoading } = useJobs();
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: adzunaJobs, isLoading: isLoadingAdzuna } = useAdzunaJobs(searchQuery);
   const [isExtractDialogOpen, setIsExtractDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
@@ -160,8 +280,6 @@ export const JobsPage = () => {
   const [trackingJob, setTrackingJob] = useState<any>(null);
   const { isAdmin } = useAuth();
   const currentUserId = useAuthStore((state) => state.user?.id);
-  const authStoreUser = useAuthStore((state) => state.user);
-
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return { myJobs: [], allJobs: [] };
@@ -180,6 +298,25 @@ export const JobsPage = () => {
   const handleApplyClick = (job: any) => {
     setSelectedJob(job);
     setIsApplyDialogOpen(true);
+  };
+
+  const handleTrackJob = (job: any) => {
+    // For Adzuna jobs, format the job data to match our internal structure
+    if (job.company?.display_name) {
+      setTrackingJob({
+        id: job.id,
+        title: job.title,
+        company: job.company.display_name,
+        location: job.location?.display_name,
+        description: job.description,
+        url: job.redirect_url,
+        salary: job.salary_min && job.salary_max ? `${job.salary_min} - ${job.salary_max}` : undefined,
+        type: job.contract_type,
+        source: 'adzuna'
+      });
+    } else {
+      setTrackingJob(job);
+    }
   };
 
   return (
@@ -231,6 +368,10 @@ export const JobsPage = () => {
               <Globe className="mr-2 h-4 w-4" />
               {t`All Jobs`}
             </TabsTrigger>
+            <TabsTrigger value="adzuna-jobs" className="flex-1">
+              <Globe className="mr-2 h-4 w-4" />
+              {t`Adzuna Jobs`}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="my-jobs">
@@ -243,7 +384,7 @@ export const JobsPage = () => {
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}
-              onTrack={setTrackingJob}
+              onTrack={handleTrackJob}
             />
           </TabsContent>
 
@@ -257,7 +398,19 @@ export const JobsPage = () => {
               onApply={handleApplyClick}
               onEdit={setEditingJob}
               onView={setSelectedJob}
-              onTrack={setTrackingJob}
+              onTrack={handleTrackJob}
+            />
+          </TabsContent>
+
+          <TabsContent value="adzuna-jobs">
+            <div className="mb-4 text-sm text-muted-foreground">
+              {t`Search jobs on Adzuna`}
+            </div>
+            <AdzunaJobsList
+              jobs={adzunaJobs}
+              isLoading={isLoadingAdzuna}
+              searchQuery={searchQuery}
+              onTrack={handleTrackJob}
             />
           </TabsContent>
         </Tabs>
@@ -298,7 +451,7 @@ export const JobsPage = () => {
 
       <AddJobDialog
         isOpen={isAddJobOpen}
-        onClose={(newJob?: any) => {
+        onClose={() => {
           setIsAddJobOpen(false);
         }}
       />

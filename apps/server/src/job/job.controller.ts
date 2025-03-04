@@ -6,13 +6,19 @@ import { User as GetUser } from "../user/decorators/user.decorator";
 import { CreateJobDto, UpdateJobDto } from "@reactive-resume/dto";
 import { RoleGuard } from "../auth/guards/role.guard";
 import { Roles, Role } from "../auth/decorators/roles.decorator";
+import { ConfigService } from "@nestjs/config";
+import axios from 'axios';
+import type { Config } from "../config/schema";
 
 @Controller("jobs")
 @UseGuards(AuthGuard("jwt"))
 export class JobController { 
   private readonly logger = new Logger(JobController.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService<Config>
+  ) {}
 
   @Get()
   async getJobs(@GetUser() user: User) {
@@ -246,5 +252,49 @@ export class JobController {
         applications: true,
       },
     });
+  }
+
+  @Get("adzuna/search")
+  async searchAdzunaJobs(
+    @Query('what') what: string,
+    @Query('where') where: string = 'gb',
+    @Query('page') page: number = 1,
+    @Query('results_per_page') resultsPerPage: number = 10
+  ) {
+    try {
+      const appId = this.configService.get('ADZUNA_APP_ID');
+      const apiKey = this.configService.get('ADZUNA_API_KEY');
+      const baseUrl = this.configService.get('ADZUNA_API_BASE_URL');
+
+      // Debug log to check environment variables
+      this.logger.debug('Adzuna API Configuration:', {
+        appId: appId ? 'Set' : 'Not Set',
+        apiKey: apiKey ? 'Set' : 'Not Set',
+        baseUrl
+      });
+
+      if (!appId || !apiKey) {
+        throw new BadRequestException('Adzuna API credentials not configured');
+      }
+
+      const response = await axios.get(
+        `${baseUrl}/jobs/${where}/search/${page}`, {
+          params: {
+            app_id: appId,
+            app_key: apiKey,
+            what,
+            results_per_page: resultsPerPage
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      this.logger.error('Error searching Adzuna jobs:', error);
+      throw new BadRequestException('Failed to fetch jobs from Adzuna');
+    }
   }
 }

@@ -95,7 +95,8 @@ export const configSchema = z.object({
 
   // Adzuna API
   ADZUNA_APP_ID: z.string(),
-  ADZUNA_APP_KEY: z.string(),
+  ADZUNA_API_KEY: z.string(),
+  ADZUNA_API_BASE_URL: z.string().default("https://api.adzuna.com/v1/api"),
 });
 
 export type Config = z.infer<typeof configSchema>;

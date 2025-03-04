@@ -3395,3 +3395,35 @@ msgstr "Add New Job"
 
 msgid "My Jobs"
 msgstr "My Jobs"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "Adzuna Jobs"
+msgstr "Adzuna Jobs"
+
+#: apps/server/src/job/job.controller.ts
+msgid "Failed to fetch jobs from Adzuna"
+msgstr "Failed to fetch jobs from Adzuna"
+
+#: apps/server/src/job/job.controller.ts
+msgid "Adzuna API credentials not configured"
+msgstr "Adzuna API credentials not configured"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "Search jobs on Adzuna"
+msgstr "Search jobs on Adzuna"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "No jobs found on Adzuna"
+msgstr "No jobs found on Adzuna"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "Contract Type"
+msgstr "Contract Type"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "Salary Range"
+msgstr "Salary Range"
+
+#: apps/client/src/pages/dashboard/jobs/page.tsx
+msgid "Apply on Adzuna"
+msgstr "Apply on Adzuna"
