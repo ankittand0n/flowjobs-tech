@@ -150,7 +150,7 @@ const JobsList = ({ jobs, isLoading, searchQuery, currentUserId, isAdmin, onAppl
   );
 };
 
-const AdzunaJobsList = ({ jobs, isLoading, searchQuery, onTrack }: any) => {
+const AdzunaJobsList = ({ jobs, isLoading, searchQuery, onTrack, onView }: any) => {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -172,6 +172,19 @@ const AdzunaJobsList = ({ jobs, isLoading, searchQuery, onTrack }: any) => {
       </motion.div>
     );
   }
+
+  const handleViewDetails = (job: AdzunaJob) => {
+    onView({
+      id: job.id,
+      title: job.title,
+      company: job.company.display_name,
+      location: job.location?.display_name,
+      description: job.description,
+      url: job.redirect_url,
+      salary: job.salary_min && job.salary_max ? `${job.salary_min} - ${job.salary_max}` : undefined,
+      type: job.contract_type
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -244,6 +257,16 @@ const AdzunaJobsList = ({ jobs, isLoading, searchQuery, onTrack }: any) => {
                   >
                     <ClipboardText className="mr-2 h-4 w-4" />
                     {t`Start Tracking`}
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0"
+                    onClick={() => handleViewDetails(job)}
+                    title={t`View Details`}
+                  >
+                    <Eye className="h-4 w-4" />
                   </Button>
 
                   {job.redirect_url && (
@@ -411,6 +434,7 @@ export const JobsPage = () => {
               isLoading={isLoadingAdzuna}
               searchQuery={searchQuery}
               onTrack={handleTrackJob}
+              onView={setSelectedJob}
             />
           </TabsContent>
         </Tabs>
