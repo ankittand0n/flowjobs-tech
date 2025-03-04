@@ -6,6 +6,7 @@ import { Helmet } from "react-helmet-async";
 import { AccountSettings } from "./_sections/account";
 import { DangerZoneSettings } from "./_sections/danger";
 import { OpenAISettings } from "./_sections/openai";
+import { PaymentSettings } from "./_sections/payment";
 import { ProfileSettings } from "./_sections/profile";
 import { SecuritySettings } from "./_sections/security";
 
@@ -34,8 +35,8 @@ export const SettingsPage = () => (
           <Separator />
           <ProfileSettings />
           <Separator />
-          {/* <OpenAISettings /> */}
-          {/* <Separator /> */}
+          <PaymentSettings />
+          <Separator />
           <DangerZoneSettings />
         </div>
       </ScrollArea>

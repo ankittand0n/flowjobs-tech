@@ -3589,3 +3589,46 @@ msgstr "Success Stories"
 
 msgid "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
 msgstr "Join thousands of job seekers who have successfully managed their job search and landed their dream roles using our platform."
+
+# Payment Settings Section
+msgid "Subscription & Billing"
+msgstr "Subscription & Billing"
+
+msgid "Manage your subscription and payment settings"
+msgstr "Manage your subscription and payment settings"
+
+msgid "Basic Plan"
+msgstr "Basic Plan"
+
+msgid "Pro Plan"
+msgstr "Pro Plan"
+
+msgid "Access to basic features"
+msgstr "Access to basic features"
+
+msgid "Limited job applications"
+msgstr "Limited job applications"
+
+msgid "Standard resume templates"
+msgstr "Standard resume templates"
+
+msgid "Access to all premium features"
+msgstr "Access to all premium features"
+
+msgid "Unlimited job applications"
+msgstr "Unlimited job applications"
+
+msgid "All premium resume templates"
+msgstr "All premium resume templates"
+
+msgid "Priority support"
+msgstr "Priority support"
+
+msgid "Payment History"
+msgstr "Payment History"
+
+msgid "View your payment and billing history"
+msgstr "View your payment and billing history"
+
+msgid "No payment history available."
+msgstr "No payment history available."

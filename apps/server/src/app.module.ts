@@ -3,7 +3,6 @@ import path from "node:path";
 import { HttpException, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { RavenInterceptor, RavenModule } from "nest-raven";
 import { ZodValidationPipe } from "nestjs-zod";
 
 import { AdminModule } from "./admin/admin.module";
@@ -24,6 +23,7 @@ import { JobApplicationModule } from "./job-application/job-application.module";
 import { OpenAIModule } from './openai/openai.module';
 import { MockTestModule } from "./mock-test/mock-test.module";
 import { CommunityModule } from "./modules/community/community.module";
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -36,6 +36,7 @@ import { CommunityModule } from "./modules/community/community.module";
     JobModule,
     OpenAIModule,
     AdminModule,
+    PaymentModule,
 
     // Feature Modules
     AuthModule.register(),
@@ -51,12 +52,10 @@ import { CommunityModule } from "./modules/community/community.module";
     // Static Assets
     ServeStaticModule.forRoot({
       serveRoot: "/artboard",
-      // eslint-disable-next-line unicorn/prefer-module
       rootPath: path.join(__dirname, "..", "artboard"),
     }),
     ServeStaticModule.forRoot({
       renderPath: "/*",
-      // eslint-disable-next-line unicorn/prefer-module
       rootPath: path.join(__dirname, "..", "client"),
     }),
     MockTestModule,
@@ -65,19 +64,7 @@ import { CommunityModule } from "./modules/community/community.module";
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useValue: new RavenInterceptor({
-        filters: [
-          // Filter all HttpException with status code <= 500
-          {
-            type: HttpException,
-            filter: (exception: HttpException) => exception.getStatus() < 500,
-          },
-        ],
-      }),
-    },
+    }
   ],
 })
 export class AppModule {}

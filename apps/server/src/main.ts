@@ -38,7 +38,10 @@ async function bootstrap() {
   );
 
   // CORS
-  app.enableCors({ credentials: true, origin: isHTTPS });
+  app.enableCors({
+    credentials: true,
+    origin: true, // Allow all origins in development
+  });
 
   // Helmet - enabled only in production
   if (isHTTPS) app.use(helmet({ contentSecurityPolicy: false }));
