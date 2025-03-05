@@ -415,334 +415,352 @@ export const AiToolsSection = () => {
         </div>
       </header>
 
-      <Tabs defaultValue="ats" className="w-full h-full flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 flex-none">
-          <TabsTrigger value="ats">
-            <MagnifyingGlass className="mr-2 h-4 w-4" />
-            {t`ATS Analysis`}
-          </TabsTrigger>
-          <TabsTrigger value="chat">
-            <ChatCircleText className="mr-2 h-4 w-4" />
-            {t`AI Assistant`}
-          </TabsTrigger>
-        </TabsList>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Tab Header */}
+        <div className="flex-none flex items-center justify-between px-6 py-6">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setIsChatMode(false)}
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                !isChatMode
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <MagnifyingGlass className="h-4 w-4" />
+              {t`ATS Analysis`}
+            </button>
+            <button
+              onClick={() => setIsChatMode(true)}
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                isChatMode
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <ChatCircleText className="h-4 w-4" />
+              {t`AI Assistant`}
+            </button>
+          </div>
+        </div>
 
-        {/* ATS Analysis Tab */}
-        <TabsContent value="ats" className="mt-4 flex-1 overflow-hidden">
-          <div className="flex flex-col h-full">
-            {/* Scrollable Content */}
-            <ScrollArea className="flex-1">
-              <div className="space-y-4 pr-4">
-                {/* Job Selector */}
-                <div className="border rounded-lg p-4 bg-secondary/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label>{t`Select Job for Analysis`}</Label>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setIsAddJobOpen(true)}
-                      className="text-xs"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {t`Add Job`}
-                    </Button>
-                  </div>
-                  <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t`Choose a job to analyze`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {jobs?.map((job: CreateJobDto & { id: string }) => (
-                        <SelectItem key={job.id} value={job.id}>
-                          {job.title} - {job.company}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedJob && (
-                    <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="font-medium">{selectedJob.title}</span>
-                      <span>•</span>
-                      <span>{selectedJob.company}</span>
+        {/* Content Area */}
+        <div className="flex-1 min-h-0">
+          <ScrollArea className="h-full">
+            <div className="grid gap-y-6 p-6 @container/right">
+              {!isChatMode ? (
+                <div className="space-y-4">
+                  {/* Job Selector */}
+                  <div className="border rounded-lg p-4 bg-secondary/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label>{t`Select Job for Analysis`}</Label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setIsAddJobOpen(true)}
+                        className="text-xs"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        {t`Add Job`}
+                      </Button>
                     </div>
-                  )}
-                </div>
-
-                {selectedJob?.atsKeywords ? (
-                  <>
-                    {/* Resume Metrics */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2">
-                        <TextT className="h-4 w-4" />
-                        <h4 className="text-sm font-medium">{t`Resume Length Analysis`}</h4>
-                      </div>
-                      
-                      <div className="space-y-2 mt-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">{t`Word Count`}</span>
-                          <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">{t`Status`}</span>
-                          <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
-                            {wordCountAnalysis.rating.status}
-                          </span>
-                        </div>
-                        
-                        <div className="mt-2 text-sm text-muted-foreground">
-                          {wordCountAnalysis.rating.message}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Keyword Match Score */}
-                    <div className="border rounded-lg p-4">
-                      <h4 className="text-sm font-medium mb-4">{t`ATS Match Score`}</h4>
-                      <div className="relative h-4 bg-secondary rounded-full overflow-hidden">
-                        <div 
-                          className={cn(
-                            "h-full transition-all",
-                            getKeywordStats()?.percentage! >= 70 ? "bg-green-500" :
-                            getKeywordStats()?.percentage! >= 50 ? "bg-yellow-500" : "bg-red-500"
-                          )}
-                          style={{ width: `${getKeywordStats()?.percentage}%` }}
-                        />
-                      </div>
-                      <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-                        <span>{getKeywordStats()?.percentage}% {t`Match`}</span>
-                        <span>{getKeywordStats()?.matched}/{getKeywordStats()?.total} {t`Keywords Found`}</span>
-                      </div>
-                    </div>
-
-                    {/* Found Keywords */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <h4 className="text-sm font-medium">{t`Keywords Found`}</h4>
-                        <Tooltip content={t`Percentage shows how relevant each keyword is to the job`}>
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </Tooltip>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedJob.atsKeywords.skills
-                          .filter((skill: any) => matchedKeywords.has(skill.keyword))
-                          .map((skill: any) => (
-                            <div 
-                              key={skill.keyword} 
-                              className="bg-green-500/10 text-green-700 dark:text-green-400 rounded-full px-3 py-1 text-xs flex items-center gap-2"
-                            >
-                              <span>{skill.keyword}</span>
-                              <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-
-                    {/* Missing Keywords */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <h4 className="text-sm font-medium">{t`Missing Important Keywords`}</h4>
-                        <Tooltip content={t`Higher percentage indicates greater importance for the job`}>
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </Tooltip>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedJob.atsKeywords.skills
-                          .filter((skill: any) => !matchedKeywords.has(skill.keyword))
-                          .sort((a: any, b: any) => b.relevance - a.relevance)
-                          .map((skill: any) => (
-                            <div 
-                              key={skill.keyword} 
-                              className={cn(
-                                "rounded-full px-3 py-1 text-xs flex items-center gap-2",
-                                skill.relevance > 0.7 
-                                  ? "bg-red-500/10 text-red-700 dark:text-red-400"
-                                  : "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-                              )}
-                            >
-                              <span>{skill.keyword}</span>
-                              <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-
-                    {/* Section-wise Analysis */}
-                    <div className="border rounded-lg p-4">
-                      <h4 className="text-sm font-medium mb-4">{t`Section Analysis`}</h4>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between text-sm">
-                          <span>{t`Experience Section`}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {countKeywordsInSection('experience')} {t`keywords found`}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span>{t`Skills Section`}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {countKeywordsInSection('skills')} {t`keywords found`}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Format Compliance */}
-                    <div className="border rounded-lg p-4">
-                      <h4 className="text-sm font-medium mb-4">{t`ATS Format Check`}</h4>
-                      <div className="space-y-2">
-                        {formatChecks.map((check) => (
-                          <div key={check.id} className="flex items-center gap-2">
-                            {check.passed ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <WarningCircle className="h-4 w-4 text-yellow-500" />
-                            )}
-                            <span className="text-sm">{check.message}</span>
-                          </div>
+                    <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t`Choose a job to analyze`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jobs?.map((job: CreateJobDto & { id: string }) => (
+                          <SelectItem key={job.id} value={job.id}>
+                            {job.title} - {job.company}
+                          </SelectItem>
                         ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedJob && (
+                      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="font-medium">{selectedJob.title}</span>
+                        <span>•</span>
+                        <span>{selectedJob.company}</span>
                       </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="p-8 text-center text-muted-foreground">
-                    <MagnifyingGlass className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                    <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
-                    <p className="text-xs">{t`Please select a job above to analyze ATS keywords.`}</p>
+                    )}
                   </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </TabsContent>
 
-        {/* AI Assistant Tab */}
-        <TabsContent value="chat" className="mt-4 flex-1 overflow-hidden">
-          <div className="h-full flex flex-col border rounded-lg">
-            {/* Chat Interface - without job selector */}
-            {!selectedJob ? (
-              <div className="flex-1 flex items-center justify-center p-8 text-center text-muted-foreground">
-                <div>
-                  <Robot className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
-                  <p className="text-xs">{t`Please select a job above to get AI assistance.`}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col h-full">
-                <div className="flex-none border-b p-4 bg-secondary/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label>{t`Selected Job`}</Label>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setIsAddJobOpen(true)}
-                      className="text-xs"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {t`Add Job`}
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">{selectedJob.title}</span>
-                    <span>•</span>
-                    <span className="text-muted-foreground">{selectedJob.company}</span>
-                  </div>
-                </div>
-
-                <Alert className="flex-none">
-                  <AlertDescription className="text-xs text-muted-foreground">
-                    {t`Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually.`}
-                  </AlertDescription>
-                </Alert>
-
-                <div className="flex-1 flex flex-col min-h-0">
-                  <ScrollArea className="flex-1">
-                    <div className="space-y-4 p-4">
-                      {messages.map((message, index) => (
-                        <div
-                          key={index}
-                          className={cn(
-                            "rounded-lg p-3 max-w-[85%] break-words",
-                            message.role === 'user'
-                              ? "ml-auto bg-primary text-primary-foreground"
-                              : "mr-auto bg-muted"
-                          )}
-                        >
-                          {message.content}
+                  {selectedJob?.atsKeywords ? (
+                    <>
+                      {/* Resume Metrics */}
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2">
+                          <TextT className="h-4 w-4" />
+                          <h4 className="text-sm font-medium">{t`Resume Length Analysis`}</h4>
                         </div>
-                      ))}
-                      {isLoading && (
-                        <div className="mr-auto animate-pulse rounded-lg bg-muted p-3">
-                          {t`Thinking...`}
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-
-                  {proposedChanges && (
-                    <div className="border-t p-4 bg-secondary/20">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{t`Suggested Changes`}</span>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={rejectChanges}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              {t`Reject`}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={applyChanges}
-                              className="text-green-600 hover:text-green-700"
-                            >
-                              {t`Apply Changes`}
-                            </Button>
+                        
+                        <div className="space-y-2 mt-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">{t`Word Count`}</span>
+                            <span className="font-medium">{wordCountAnalysis.wordCount} {t`words`}</span>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">{t`Status`}</span>
+                            <span className={cn("font-medium", wordCountAnalysis.rating.color)}>
+                              {wordCountAnalysis.rating.status}
+                            </span>
+                          </div>
+                          
+                          <div className="mt-2 text-sm text-muted-foreground">
+                            {wordCountAnalysis.rating.message}
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {t`Review the suggested changes before applying them to your resume.`}
+                      </div>
+
+                      {/* Keyword Match Score */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="text-sm font-medium mb-4">{t`ATS Match Score`}</h4>
+                        <div className="relative h-4 bg-secondary rounded-full overflow-hidden">
+                          <div 
+                            className={cn(
+                              "h-full transition-all",
+                              getKeywordStats()?.percentage! >= 70 ? "bg-green-500" :
+                              getKeywordStats()?.percentage! >= 50 ? "bg-yellow-500" : "bg-red-500"
+                            )}
+                            style={{ width: `${getKeywordStats()?.percentage}%` }}
+                          />
                         </div>
+                        <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+                          <span>{getKeywordStats()?.percentage}% {t`Match`}</span>
+                          <span>{getKeywordStats()?.matched}/{getKeywordStats()?.total} {t`Keywords Found`}</span>
+                        </div>
+                      </div>
+
+                      {/* Found Keywords */}
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <h4 className="text-sm font-medium">{t`Keywords Found`}</h4>
+                          <Tooltip content={t`Percentage shows how relevant each keyword is to the job`}>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </Tooltip>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedJob.atsKeywords.skills
+                            .filter((skill: any) => matchedKeywords.has(skill.keyword))
+                            .map((skill: any) => (
+                              <div 
+                                key={skill.keyword} 
+                                className="bg-green-500/10 text-green-700 dark:text-green-400 rounded-full px-3 py-1 text-xs flex items-center gap-2"
+                              >
+                                <span>{skill.keyword}</span>
+                                <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* Missing Keywords */}
+                      <div className="border rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <h4 className="text-sm font-medium">{t`Missing Important Keywords`}</h4>
+                          <Tooltip content={t`Higher percentage indicates greater importance for the job`}>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </Tooltip>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedJob.atsKeywords.skills
+                            .filter((skill: any) => !matchedKeywords.has(skill.keyword))
+                            .sort((a: any, b: any) => b.relevance - a.relevance)
+                            .map((skill: any) => (
+                              <div 
+                                key={skill.keyword} 
+                                className={cn(
+                                  "rounded-full px-3 py-1 text-xs flex items-center gap-2",
+                                  skill.relevance > 0.7 
+                                    ? "bg-red-500/10 text-red-700 dark:text-red-400"
+                                    : "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
+                                )}
+                              >
+                                <span>{skill.keyword}</span>
+                                <span className="opacity-75">({Math.round(skill.relevance * 100)}%)</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* Section-wise Analysis */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="text-sm font-medium mb-4">{t`Section Analysis`}</h4>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>{t`Experience Section`}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {countKeywordsInSection('experience')} {t`keywords found`}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span>{t`Skills Section`}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {countKeywordsInSection('skills')} {t`keywords found`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Format Compliance */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="text-sm font-medium mb-4">{t`ATS Format Check`}</h4>
+                        <div className="space-y-2">
+                          {formatChecks.map((check) => (
+                            <div key={check.id} className="flex items-center gap-2">
+                              {check.passed ? (
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <WarningCircle className="h-4 w-4 text-yellow-500" />
+                              )}
+                              <span className="text-sm">{check.message}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-8 text-center text-muted-foreground">
+                      <MagnifyingGlass className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                      <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
+                      <p className="text-xs">{t`Please select a job above to analyze ATS keywords.`}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col border rounded-lg">
+                  {!selectedJob ? (
+                    <div className="flex-1 flex items-center justify-center p-8 text-center text-muted-foreground">
+                      <div>
+                        <Robot className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                        <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
+                        <p className="text-xs">{t`Please select a job above to get AI assistance.`}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col h-full">
+                      <div className="flex-none border-b p-4 bg-secondary/10">
+                        <div className="flex items-center justify-between mb-2">
+                          <Label>{t`Selected Job`}</Label>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setIsAddJobOpen(true)}
+                            className="text-xs"
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            {t`Add Job`}
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="font-medium">{selectedJob.title}</span>
+                          <span>•</span>
+                          <span className="text-muted-foreground">{selectedJob.company}</span>
+                        </div>
+                      </div>
+
+                      <Alert className="flex-none">
+                        <AlertDescription className="text-xs text-muted-foreground">
+                          {t`Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually.`}
+                        </AlertDescription>
+                      </Alert>
+
+                      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <ScrollArea className="flex-1">
+                          <div className="space-y-4 p-4">
+                            {messages.map((message, index) => (
+                              <div
+                                key={index}
+                                className={cn(
+                                  "rounded-lg p-3 max-w-[85%] break-words",
+                                  message.role === 'user'
+                                    ? "ml-auto bg-primary text-primary-foreground"
+                                    : "mr-auto bg-muted"
+                                )}
+                              >
+                                {message.role === 'assistant' ? (
+                                  <div className="whitespace-pre-wrap">{message.content}</div>
+                                ) : (
+                                  message.content
+                                )}
+                              </div>
+                            ))}
+                            {isLoading && (
+                              <div className="mr-auto animate-pulse rounded-lg bg-muted p-3">
+                                {t`Thinking...`}
+                              </div>
+                            )}
+                          </div>
+                        </ScrollArea>
+
+                        {proposedChanges && (
+                          <div className="flex-none border-t p-4 bg-secondary/20">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">{t`Suggested Changes`}</span>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={rejectChanges}
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    {t`Reject`}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={applyChanges}
+                                    className="text-green-600 hover:text-green-700"
+                                  >
+                                    {t`Apply Changes`}
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {t`Review the suggested changes before applying them to your resume.`}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="flex-none flex gap-2 p-4 border-t">
+                          <input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder={t`Ask anything about your resume...`}
+                            className="flex-1 bg-transparent p-2 border rounded outline-none text-sm"
+                            disabled={isLoading || !selectedJob}
+                          />
+                          <Button 
+                            type="submit" 
+                            variant="ghost" 
+                            disabled={isLoading || !selectedJob}
+                            className={cn(
+                              "min-w-[40px]",
+                              isLoading && "animate-pulse"
+                            )}
+                          >
+                            {isLoading ? (
+                              <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                                <span className="text-xs">{t`Processing...`}</span>
+                              </div>
+                            ) : (
+                              <ChatCircleText className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </form>
                       </div>
                     </div>
                   )}
-
-                  <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-                    <input
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder={t`Ask anything about your resume...`}
-                      className="flex-1 bg-transparent p-2 border rounded outline-none text-sm"
-                      disabled={isLoading || !selectedJob}
-                    />
-                    <Button 
-                      type="submit" 
-                      variant="ghost" 
-                      disabled={isLoading || !selectedJob}
-                      className={cn(
-                        "min-w-[40px]",
-                        isLoading && "animate-pulse"
-                      )}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                          <span className="text-xs">{t`Processing...`}</span>
-                        </div>
-                      ) : (
-                        <ChatCircleText className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </form>
                 </div>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
     </section>
   );
 };

@@ -7,10 +7,29 @@ import {
   CardDescription,
   CardFooter,
   CardTitle,
+  Separator,
 } from "@reactive-resume/ui";
 import { cn } from "@reactive-resume/utils";
 
 import { SectionIcon } from "../shared/section-icon";
+import type {
+  Award,
+  Certification,
+  Education,
+  Experience,
+  Interest,
+  Language,
+  Profile,
+  Project,
+  Publication,
+  Reference,
+  Skill,
+  Volunteer,
+} from "@reactive-resume/schema";
+
+import { BasicsSection } from "../../left/sections/basics";
+import { SummarySection } from "../../left/sections/summary";
+import { SectionBase } from "../../left/sections/shared/section-base";
 
 const DonateCard = () => (
   <Card className="space-y-4 bg-info text-info-foreground">
@@ -110,19 +129,87 @@ const DocumentationCard = () => (
 
 export const InformationSection = () => {
   return (
-    <section id="information" className="grid gap-y-6">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-x-4">
-          <SectionIcon id="information" size={18} name={t`Information`} />
-          <h2 className="line-clamp-1 text-2xl font-bold lg:text-3xl">{t`Information`}</h2>
-        </div>
-      </header>
-
-      <main className="grid gap-y-4">
-        <DonateCard />
-        <DocumentationCard />
-        <IssuesCard />
-      </main>
-    </section>
+    <div className="space-y-6">
+      <BasicsSection />
+      <Separator />
+      <SummarySection />
+      <Separator />
+      <SectionBase<Profile>
+        id="profiles"
+        title={(item) => item.network}
+        description={(item) => item.username}
+      />
+      <Separator />
+      <SectionBase<Experience>
+        id="experience"
+        title={(item) => item.company}
+        description={(item) => item.position}
+      />
+      <Separator />
+      <SectionBase<Education>
+        id="education"
+        title={(item) => item.institution}
+        description={(item) => item.area}
+      />
+      <Separator />
+      <SectionBase<Skill>
+        id="skills"
+        title={(item) => item.name}
+        description={(item) => {
+          if (item.description) return item.description;
+          if (item.keywords.length > 0) return `${item.keywords.length} keywords`;
+        }}
+      />
+      <Separator />
+      <SectionBase<Language>
+        id="languages"
+        title={(item) => item.name}
+        description={(item) => item.description}
+      />
+      <Separator />
+      <SectionBase<Award>
+        id="awards"
+        title={(item) => item.title}
+        description={(item) => item.awarder}
+      />
+      <Separator />
+      <SectionBase<Certification>
+        id="certifications"
+        title={(item) => item.name}
+        description={(item) => item.issuer}
+      />
+      <Separator />
+      <SectionBase<Interest>
+        id="interests"
+        title={(item) => item.name}
+        description={(item) => {
+          if (item.keywords.length > 0) return `${item.keywords.length} keywords`;
+        }}
+      />
+      <Separator />
+      <SectionBase<Project>
+        id="projects"
+        title={(item) => item.name}
+        description={(item) => item.description}
+      />
+      <Separator />
+      <SectionBase<Publication>
+        id="publications"
+        title={(item) => item.name}
+        description={(item) => item.publisher}
+      />
+      <Separator />
+      <SectionBase<Volunteer>
+        id="volunteer"
+        title={(item) => item.organization}
+        description={(item) => item.position}
+      />
+      <Separator />
+      <SectionBase<Reference>
+        id="references"
+        title={(item) => item.name}
+        description={(item) => item.description}
+      />
+    </div>
   );
 };

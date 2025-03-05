@@ -1,7 +1,7 @@
 import { t } from "@lingui/macro";
 import { ScrollArea, Separator, Button } from "@reactive-resume/ui";
 import { useRef, useState } from "react";
-import { Brain, Palette, FileText } from "@phosphor-icons/react";
+import { Palette, Info, MagnifyingGlass, ChatCircleText } from "@phosphor-icons/react";
 import type {
   Award,
   Certification,
@@ -25,7 +25,6 @@ import { UserOptions } from "@/client/components/user-options";
 import { Icon } from "@/client/components/icon";
 import { Link } from "react-router";
 
-import { AiToolsSection } from "./sections/ai-tools";
 import { CssSection } from "./sections/css";
 import { ExportSection } from "./sections/export";
 import { LayoutSection } from "./sections/layout";
@@ -37,13 +36,13 @@ import { TemplateSection } from "./sections/template";
 import { ThemeSection } from "./sections/theme";
 import { TypographySection } from "./sections/typography";
 import { SectionIcon } from "./shared/section-icon";
-import { BasicsSection } from "../left/sections/basics";
-import { SummarySection } from "../left/sections/summary";
-import { SectionBase } from "../left/sections/shared/section-base";
+import { AtsAnalysisSection } from "./sections/ats-analysis";
+import { AiAssistantSection } from "./sections/ai-assistant";
+import { InformationSection } from "./sections/information";
 
 export const RightSidebar = () => {
   const containterRef = useRef<HTMLDivElement | null>(null);
-  const [activeTab, setActiveTab] = useState<"ai" | "theme" | "info">("ai");
+  const [activeTab, setActiveTab] = useState<"ats-analysis" | "ai-assistant" | "theme" | "information">("ats-analysis");
 
   const scrollIntoView = (selector: string) => {
     const section = containterRef.current?.querySelector(selector);
@@ -58,26 +57,26 @@ export const RightSidebar = () => {
         <div className="flex-none flex items-center justify-between px-6 py-6">
           <div className="flex gap-4">
             <button
-              onClick={() => setActiveTab("ai")}
+              onClick={() => setActiveTab("ats-analysis")}
               className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                activeTab === "ai"
+                activeTab === "ats-analysis"
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
               }`}
             >
-              <Brain className="h-4 w-4" />
-              {t`AI Tools`}
+              <MagnifyingGlass className="h-4 w-4" />
+              {t`Analysis`}
             </button>
             <button
-              onClick={() => setActiveTab("info")}
+              onClick={() => setActiveTab("ai-assistant")}
               className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                activeTab === "info"
+                activeTab === "ai-assistant"
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
               }`}
             >
-              <FileText className="h-4 w-4" />
-              {t`Information`}
+              <ChatCircleText className="h-4 w-4" />
+              {t`Assistant`}
             </button>
             <button
               onClick={() => setActiveTab("theme")}
@@ -90,6 +89,17 @@ export const RightSidebar = () => {
               <Palette className="h-4 w-4" />
               {t`Theme`}
             </button>
+            <button
+              onClick={() => setActiveTab("information")}
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                activeTab === "information"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <Info className="h-4 w-4" />
+              {t`Information`}
+            </button>
           </div>
         </div>
 
@@ -97,9 +107,9 @@ export const RightSidebar = () => {
         <div className="flex-1 min-h-0">
           <ScrollArea className="h-full">
             <div ref={containterRef} className="grid gap-y-6 p-6 @container/right">
-              {activeTab === "ai" ? (
-                <AiToolsSection />
-              ) : activeTab === "theme" ? (
+              {activeTab === "ats-analysis" && <AtsAnalysisSection />}
+              {activeTab === "ai-assistant" && <AiAssistantSection />}
+              {activeTab === "theme" && (
                 <div className="space-y-6">
                   <TemplateSection />
                   <Separator />
@@ -123,90 +133,8 @@ export const RightSidebar = () => {
                   <Separator />
                   <Copyright className="text-center" />
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <BasicsSection />
-                  <Separator />
-                  <SummarySection />
-                  <Separator />
-                  <SectionBase<Profile>
-                    id="profiles"
-                    title={(item) => item.network}
-                    description={(item) => item.username}
-                  />
-                  <Separator />
-                  <SectionBase<Experience>
-                    id="experience"
-                    title={(item) => item.company}
-                    description={(item) => item.position}
-                  />
-                  <Separator />
-                  <SectionBase<Education>
-                    id="education"
-                    title={(item) => item.institution}
-                    description={(item) => item.area}
-                  />
-                  <Separator />
-                  <SectionBase<Skill>
-                    id="skills"
-                    title={(item) => item.name}
-                    description={(item) => {
-                      if (item.description) return item.description;
-                      if (item.keywords.length > 0) return `${item.keywords.length} keywords`;
-                    }}
-                  />
-                  <Separator />
-                  <SectionBase<Language>
-                    id="languages"
-                    title={(item) => item.name}
-                    description={(item) => item.description}
-                  />
-                  <Separator />
-                  <SectionBase<Award>
-                    id="awards"
-                    title={(item) => item.title}
-                    description={(item) => item.awarder}
-                  />
-                  <Separator />
-                  <SectionBase<Certification>
-                    id="certifications"
-                    title={(item) => item.name}
-                    description={(item) => item.issuer}
-                  />
-                  <Separator />
-                  <SectionBase<Interest>
-                    id="interests"
-                    title={(item) => item.name}
-                    description={(item) => {
-                      if (item.keywords.length > 0) return `${item.keywords.length} keywords`;
-                    }}
-                  />
-                  <Separator />
-                  <SectionBase<Project>
-                    id="projects"
-                    title={(item) => item.name}
-                    description={(item) => item.description}
-                  />
-                  <Separator />
-                  <SectionBase<Publication>
-                    id="publications"
-                    title={(item) => item.name}
-                    description={(item) => item.publisher}
-                  />
-                  <Separator />
-                  <SectionBase<Volunteer>
-                    id="volunteer"
-                    title={(item) => item.organization}
-                    description={(item) => item.position}
-                  />
-                  <Separator />
-                  <SectionBase<Reference>
-                    id="references"
-                    title={(item) => item.name}
-                    description={(item) => item.description}
-                  />
-                </div>
               )}
+              {activeTab === "information" && <InformationSection />}
             </div>
           </ScrollArea>
         </div>
@@ -219,11 +147,18 @@ export const RightSidebar = () => {
         </div>
 
         <div className="flex flex-col items-center justify-center gap-y-2">
-          {activeTab === "ai" && (
+          {activeTab === "ats-analysis" && (
             <SectionIcon
               id="ai-tools"
-              name={t`AI Tools`}
-              onClick={() => scrollIntoView("#ai-tools")}
+              name={t`Analysis`}
+              onClick={() => scrollIntoView("#ats-analysis")}
+            />
+          )}
+          {activeTab === "ai-assistant" && (
+            <SectionIcon
+              id="ai-tools"
+              name={t`Assistant`}
+              onClick={() => scrollIntoView("#ai-assistant")}
             />
           )}
           {activeTab === "theme" && (
@@ -280,7 +215,7 @@ export const RightSidebar = () => {
               />
             </>
           )}
-          {activeTab === "info" && (
+          {activeTab === "information" && (
             <>
               <SectionIcon
                 id="basics"

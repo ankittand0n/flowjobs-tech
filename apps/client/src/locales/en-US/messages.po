@@ -3682,3 +3682,18 @@ msgstr "Reject"
 #: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
 msgid "Apply Changes"
 msgstr "Apply Changes"
+
+msgid "Analysis"
+msgstr "Analysis"
+
+msgid "Assistant"
+msgstr "Assistant"
+
+msgid "Select Job for Assistant"
+msgstr "Select Job for Assistant"
+
+msgid "Choose a job to get assistance"
+msgstr "Choose a job to get assistance"
+
+msgid "Please select a job above to get assistance."
+msgstr "Please select a job above to get assistance."
