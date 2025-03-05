@@ -30,7 +30,7 @@ FROM base AS release
 ARG NX_CLOUD_ACCESS_TOKEN
 
 RUN apt update && \
-    apt install -y dumb-init wget curl --no-install-recommends && \
+    apt install -y dumb-init wget curl chromium chromium-sandbox --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     wget --no-check-certificate https://dl.min.io/server/minio/release/linux-amd64/minio && \
@@ -38,6 +38,10 @@ RUN apt update && \
     mv minio /usr/local/bin/ && \
     mkdir -p /data
 
+# Set Chrome environment variables
+ENV CHROME_URL=ws://localhost:9222
+ENV CHROME_TOKEN=0a10d4c4a8db4842616bc41470b3a21470dd5ed5090b47b6e3676a7524117231
+ENV CHROME_IGNORE_HTTPS_ERRORS=true
 
 COPY --chown=node:node --from=build /app/.npmrc /app/package.json /app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
@@ -55,10 +59,12 @@ ENV MINIO_ROOT_PASSWORD=minioadmin
 
 EXPOSE 3000
 EXPOSE 9000
+EXPOSE 9222
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
 minio server /data &\n\
+chromium --remote-debugging-port=9222 --no-sandbox --disable-setuid-sandbox &\n\
 dumb-init pnpm run start' > /usr/local/bin/start.sh
 
 RUN chmod +x /usr/local/bin/start.sh
