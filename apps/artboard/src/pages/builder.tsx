@@ -50,14 +50,14 @@ export const BuilderLayout = () => {
       centerOnInit
       maxScale={2}
       minScale={0.4}
-      initialScale={0.8}
+      initialScale={1}
       limitToBounds={false}
       wheel={{ wheelDisabled: wheelPanning }}
       panning={{ wheelPanning: wheelPanning }}
     >
       <TransformComponent
         wrapperClass="!w-screen !h-screen"
-        contentClass="grid items-start justify-center space-x-12 pointer-events-none"
+        contentClass="grid items-start justify-start space-x-12 pointer-events-none pl-[0.7rem]"
         contentStyle={{
           width: `${layout.length * (pageSizeMap[format].width * MM_TO_PX + 42)}px`,
           gridTemplateColumns: `repeat(${layout.length}, 1fr)`,
