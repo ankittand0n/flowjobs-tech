@@ -38,7 +38,7 @@ export const BuilderPage = () => {
   useEffect(updateResumeInFrame, [resume.data]);
 
   return (
-    <>
+    <div className="overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
       <Helmet>
         <title>
           {title} - {t`Reactive Resume`}
@@ -49,10 +49,10 @@ export const BuilderPage = () => {
         ref={setFrameRef}
         title={resume.id}
         src="/artboard/builder"
-        className="mt-16 w-screen"
-        style={{ height: `calc(100vh - 64px)` }}
+        className="w-full h-full"
+        style={{ height: '100%' }}
       />
-    </>
+    </div>
   );
 };
 

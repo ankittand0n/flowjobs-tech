@@ -20,7 +20,6 @@ import { useBuilderStore } from "@/client/stores/builder";
 
 import { BuilderHeader } from "./_components/header";
 import { BuilderToolbar } from "./_components/toolbar";
-import { LeftSidebar } from "./sidebars/left";
 import { RightSidebar } from "./sidebars/right";
 
 const onOpenAutoFocus = (event: Event) => {
@@ -41,47 +40,16 @@ const OutletSlot = () => (
 
 export const BuilderLayout = () => {
   const { isDesktop } = useBreakpoint();
-  const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
 
   const sheet = useBuilderStore((state) => state.sheet);
-
-  const leftSetSize = useBuilderStore((state) => state.panel.left.setSize);
   const rightSetSize = useBuilderStore((state) => state.panel.right.setSize);
-
-  const leftHandle = useBuilderStore((state) => state.panel.left.handle);
   const rightHandle = useBuilderStore((state) => state.panel.right.handle);
 
   if (isDesktop) {
     return (
-      <div className="relative size-full overflow-hidden">
-        <PanelGroup direction="horizontal">
-          <Panel
-            minSize={leftCollapsed ? 0 : 25}
-            maxSize={leftCollapsed ? 0 : 45}
-            defaultSize={leftCollapsed ? 0 : 30}
-            className={cn(
-              "z-10 bg-background relative",
-              !leftHandle.isDragging && "transition-[flex]"
-            )}
-            onResize={leftSetSize}
-          >
-            <LeftSidebar />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -right-8 top-2 z-50 bg-background shadow-md rounded-full"
-              onClick={() => setLeftCollapsed(!leftCollapsed)}
-            >
-              <CaretLeft className={cn("h-4 w-4 transition-transform", leftCollapsed && "rotate-180")} />
-            </Button>
-          </Panel>
-
-          <PanelResizeHandle
-            isDragging={leftHandle.isDragging}
-            onDragging={leftHandle.setDragging}
-          />
-
+      <div className="relative h-screen w-screen overflow-hidden">
+        <PanelGroup direction="horizontal" className="h-full">
           <Panel>
             <OutletSlot />
           </Panel>
@@ -96,7 +64,7 @@ export const BuilderLayout = () => {
             maxSize={rightCollapsed ? 0 : 45}
             defaultSize={rightCollapsed ? 0 : 30}
             className={cn(
-              "z-10 bg-background relative",
+              "z-10 bg-background relative overflow-hidden",
               !rightHandle.isDragging && "transition-[flex]"
             )}
             onResize={rightSetSize}
@@ -109,7 +77,9 @@ export const BuilderLayout = () => {
             >
               <CaretRight className={cn("h-4 w-4 transition-transform", rightCollapsed && "rotate-180")} />
             </Button>
-            <RightSidebar />
+            <div className="h-full overflow-hidden">
+              <RightSidebar />
+            </div>
           </Panel>
         </PanelGroup>
       </div>
@@ -117,25 +87,7 @@ export const BuilderLayout = () => {
   }
 
   return (
-    <div className="relative">
-      <Sheet open={sheet.left.open} onOpenChange={sheet.left.setOpen}>
-        <VisuallyHidden>
-          <SheetHeader>
-            <SheetTitle />
-            <SheetDescription />
-          </SheetHeader>
-        </VisuallyHidden>
-
-        <SheetContent
-          side="left"
-          showClose={false}
-          className="top-16 p-0 sm:max-w-xl"
-          onOpenAutoFocus={onOpenAutoFocus}
-        >
-          <LeftSidebar />
-        </SheetContent>
-      </Sheet>
-
+    <div className="relative h-screen w-screen overflow-hidden">
       <OutletSlot />
 
       <Sheet open={sheet.right.open} onOpenChange={sheet.right.setOpen}>
@@ -152,7 +104,9 @@ export const BuilderLayout = () => {
             </SheetHeader>
           </VisuallyHidden>
 
-          <RightSidebar />
+          <div className="h-full overflow-hidden">
+            <RightSidebar />
+          </div>
         </SheetContent>
       </Sheet>
     </div>

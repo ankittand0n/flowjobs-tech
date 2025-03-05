@@ -3638,3 +3638,47 @@ msgstr "Note: Personal details (name, contact info, etc.) are not sent to AI. Pl
 
 msgid "Processing..."
 msgstr "Processing..."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Selected Job"
+msgstr "Selected Job"
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "No Job Selected"
+msgstr "No Job Selected"
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Please select a job above to get AI assistance."
+msgstr "Please select a job above to get AI assistance."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+msgstr "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Processing..."
+msgstr "Processing..."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Thinking..."
+msgstr "Thinking..."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Suggested Changes"
+msgstr "Suggested Changes"
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Review the suggested changes before applying them to your resume."
+msgstr "Review the suggested changes before applying them to your resume."
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Reject"
+msgstr "Reject"
+
+#: apps/client/src/pages/builder/sidebars/right/sections/ai-tools.tsx
+msgid "Apply Changes"
+msgstr "Apply Changes"
