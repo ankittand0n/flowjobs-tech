@@ -3632,3 +3632,9 @@ msgstr "View your payment and billing history"
 
 msgid "No payment history available."
 msgstr "No payment history available."
+
+msgid "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+msgstr "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+
+msgid "Processing..."
+msgstr "Processing..."

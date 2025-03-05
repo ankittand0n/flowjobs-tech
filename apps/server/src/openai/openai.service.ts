@@ -236,7 +236,7 @@ export class OpenAIService {
 
   async handleResumeChat(messages: any[], resumeData: any, jobData: any) {
     const lastMessage = messages[messages.length - 1].content;
-    const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
+    const model = 'gpt-3.5-turbo';
     const maxTokens = 4096;
     
     const prompt = RESUME_CHAT_PROMPT

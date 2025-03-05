@@ -16,7 +16,9 @@ import {
   TabsTrigger,
   Tooltip,
   TooltipContent,
-  TooltipTrigger
+  TooltipTrigger,
+  Alert,
+  AlertDescription
 } from "@reactive-resume/ui";
 import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
@@ -24,6 +26,7 @@ import { CreateJobDto, ResumeChatDto, ResumeChatResponseDto } from "@reactive-re
 import { cn } from "@reactive-resume/utils";
 import { useResumeStore } from "@/client/stores/resume"
 import { AddJobDialog } from "@/client/pages/dashboard/jobs/_dialogs/add-job";
+import { updateResume } from "@/client/services/resume/update";
 
 // Add type for resume data structure
 type ResumeData = {
@@ -202,19 +205,31 @@ export const AiToolsSection = () => {
       metadata: Object.keys(resumeData.metadata)
     });
 
-    // Create a minimal version of the resume data
+    // Create a minimal version of the resume data with only relevant sections
     const minimalResumeData = {
       sections: {
-        experience: resumeData.sections.experience,
-        education: resumeData.sections.education,
-        skills: resumeData.sections.skills,
-        projects: resumeData.sections.projects,
-        awards: resumeData.sections.awards,
-        volunteer: resumeData.sections.volunteer,
-        publications: resumeData.sections.publications,
-        certifications: resumeData.sections.certifications,
-        references: resumeData.sections.references,
-        custom: resumeData.sections.custom
+        experience: resumeData.sections.experience?.items?.map((item: any) => ({
+          company: item.company,
+          position: item.position,
+          date: item.date,
+          summary: item.summary,
+          description: item.description
+        })),
+        education: resumeData.sections.education?.items?.map((item: any) => ({
+          institution: item.institution,
+          area: item.area,
+          date: item.date,
+          summary: item.summary
+        })),
+        skills: resumeData.sections.skills?.items?.map((item: any) => ({
+          name: item.name,
+          keywords: item.keywords
+        })),
+        projects: resumeData.sections.projects?.items?.map((item: any) => ({
+          name: item.name,
+          summary: item.summary,
+          description: item.description
+        }))
       }
     };
 
@@ -222,8 +237,8 @@ export const AiToolsSection = () => {
     Object.keys(minimalResumeData.sections).forEach((key) => {
       const sectionKey = key as keyof typeof minimalResumeData.sections;
       if (!minimalResumeData.sections[sectionKey] || 
-          (Array.isArray(minimalResumeData.sections[sectionKey]?.items) && 
-           minimalResumeData.sections[sectionKey].items.length === 0)) {
+          (Array.isArray(minimalResumeData.sections[sectionKey]) && 
+           minimalResumeData.sections[sectionKey].length === 0)) {
         delete minimalResumeData.sections[sectionKey];
       }
     });
@@ -236,15 +251,36 @@ export const AiToolsSection = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          resume: minimalResumeData, // Send minimal data
-          job: selectedJob
+          resume: minimalResumeData,
+          job: {
+            id: selectedJob.id,
+            title: selectedJob.title,
+            company: selectedJob.company,
+            atsKeywords: selectedJob.atsKeywords
+          }
         } as ResumeChatDto),
       });
 
-      const data = await response.json() as ResumeChatResponseDto;
-      console.log('API Response:', data);
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.message }]);
+      const data = await response.json() as ResumeChatResponseDto;
+      
+      // Clean up the message content by removing any JSON blocks and function calls
+      let cleanMessage = data.message;
+      if (cleanMessage) {
+        // Remove JSON blocks
+        cleanMessage = cleanMessage.replace(/```json\n[\s\S]*?\n```/g, '');
+        // Remove any other code blocks
+        cleanMessage = cleanMessage.replace(/```\n[\s\S]*?\n```/g, '');
+        // Remove function call JSON
+        cleanMessage = cleanMessage.replace(/{\s*"resumeData":\s*[\s\S]*?}/g, '');
+        // Clean up any remaining whitespace
+        cleanMessage = cleanMessage.trim();
+      }
+      
+      setMessages((prev) => [...prev, { role: 'assistant', content: cleanMessage || t`I couldn't process that request.` }]);
       
       if (data.resumeUpdates) {
         // Merge updates with full resume data
@@ -262,13 +298,12 @@ export const AiToolsSection = () => {
         };
         
         setProposedChanges(mergedUpdates);
-        console.log('Merged Updates:', mergedUpdates);
       }
     } catch (error) {
       console.error('Chat error:', error);
       setMessages((prev) => [...prev, { 
         role: 'assistant', 
-        content: t`Sorry, I encountered an error while processing your request.` 
+        content: t`Sorry, I encountered an error while processing your request. Please try again.` 
       }]);
     } finally {
       setIsLoading(false);
@@ -278,7 +313,37 @@ export const AiToolsSection = () => {
   const applyChanges = async () => {
     if (proposedChanges) {
       try {
-        setValue('', proposedChanges); // Update entire resume data
+        // Update each section individually using the left sidebar's setValue function
+        Object.entries(proposedChanges.sections).forEach(([sectionKey, sectionData]) => {
+          if (sectionData?.items) {
+            // Preserve the existing section structure
+            const existingSection = resume.data.sections[sectionKey as keyof typeof resume.data.sections];
+            
+            // Create a complete section object with all required fields
+            const updatedSection = {
+              id: sectionKey,
+              name: existingSection?.name || sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1),
+              columns: existingSection?.columns || 1,
+              separateLinks: existingSection?.separateLinks ?? true,
+              visible: existingSection?.visible ?? true,
+              items: sectionData.items.map((item: any) => ({
+                ...item,
+                id: item.id || crypto.randomUUID(),
+                visible: item.visible ?? true,
+                date: item.date || "",
+                location: item.location || "",
+                url: item.url || { label: "", href: "" },
+                summary: item.summary || "",
+                description: item.description || "",
+                keywords: Array.isArray(item.keywords) ? item.keywords : [],
+                level: typeof item.level === 'number' ? item.level : 1
+              }))
+            };
+
+            setValue(`sections.${sectionKey}`, updatedSection);
+          }
+        });
+        
         setProposedChanges(null);
       } catch (error) {
         console.error('Failed to save resume changes:', error);
@@ -561,6 +626,12 @@ export const AiToolsSection = () => {
               </div>
             ) : (
               <>
+                <Alert>
+                  <AlertDescription className="text-xs text-muted-foreground">
+                    {t`Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually.`}
+                  </AlertDescription>
+                </Alert>
+
                 <ScrollArea className="h-[400px] border rounded-lg">
                   <div className="space-y-4 p-4">
                     {messages.map((message, index) => (
@@ -592,8 +663,23 @@ export const AiToolsSection = () => {
                     className="flex-1 bg-transparent p-2 border rounded outline-none"
                     disabled={isLoading || !selectedJob}
                   />
-                  <Button type="submit" variant="ghost" disabled={isLoading || !selectedJob}>
-                    <ChatCircleText className="h-4 w-4" />
+                  <Button 
+                    type="submit" 
+                    variant="ghost" 
+                    disabled={isLoading || !selectedJob}
+                    className={cn(
+                      "min-w-[40px]",
+                      isLoading && "animate-pulse"
+                    )}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                        <span className="text-xs">{t`Processing...`}</span>
+                      </div>
+                    ) : (
+                      <ChatCircleText className="h-4 w-4" />
+                    )}
                   </Button>
                 </form>
 
