@@ -3723,3 +3723,69 @@ msgstr "Explore our powerful features"
 
 msgid "Learn about our features"
 msgstr "Learn about our features"
+
+# SEO Meta Tags
+msgid "Flow Jobs - Professional Resume Builder"
+msgstr "Flow Jobs - Professional Resume Builder"
+
+msgid "Create professional resumes with Flow Jobs. Build, customize, and download your resume in minutes."
+msgstr "Create professional resumes with Flow Jobs. Build, customize, and download your resume in minutes."
+
+msgid "Resume Builder"
+msgstr "Resume Builder"
+
+msgid "CV Maker"
+msgstr "CV Maker"
+
+msgid "Professional Resume"
+msgstr "Professional Resume"
+
+msgid "Job Application"
+msgstr "Job Application"
+
+msgid "Career Tools"
+msgstr "Career Tools"
+
+# 404 Page
+msgid "Page Not Found"
+msgstr "Page Not Found"
+
+msgid "The page you're looking for doesn't exist or has been moved."
+msgstr "The page you're looking for doesn't exist or has been moved."
+
+msgid "Go to Homepage"
+msgstr "Go to Homepage"
+
+msgid "Browse Templates"
+msgstr "Browse Templates"
+
+msgid "Popular Pages"
+msgstr "Popular Pages"
+
+msgid "Resume Templates"
+msgstr "Resume Templates"
+
+msgid "Pricing"
+msgstr "Pricing"
+
+msgid "Blog"
+msgstr "Blog"
+
+msgid "Contact"
+msgstr "Contact"
+
+# Structured Data
+msgid "Professional Resume Templates"
+msgstr "Professional Resume Templates"
+
+msgid "Customizable Design"
+msgstr "Customizable Design"
+
+msgid "PDF Export"
+msgstr "PDF Export"
+
+msgid "Multiple Languages"
+msgstr "Multiple Languages"
+
+msgid "Cloud Storage"
+msgstr "Cloud Storage"
