@@ -3697,3 +3697,29 @@ msgstr "Choose a job to get assistance"
 
 msgid "Please select a job above to get assistance."
 msgstr "Please select a job above to get assistance."
+
+# SEO Meta Tags
+msgid "Flow Jobs - Job Tracking, Resume Builder & Mock Interview Platform"
+msgstr "Flow Jobs - Job Tracking, Resume Builder & Mock Interview Platform"
+
+msgid "Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation. Track applications, create professional resumes, and practice interviews with AI."
+msgstr "Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation. Track applications, create professional resumes, and practice interviews with AI."
+
+msgid "job tracking, resume builder, mock interviews, career platform, job applications, professional resume, interview preparation, AI interviews"
+msgstr "job tracking, resume builder, mock interviews, career platform, job applications, professional resume, interview preparation, AI interviews"
+
+# Hero Section
+msgid "Your Career Journey Starts Here"
+msgstr "Your Career Journey Starts Here"
+
+msgid "All-in-One Career Platform"
+msgstr "All-in-One Career Platform"
+
+msgid "Track job applications, build professional resumes, and prepare for interviews with AI-powered mock interviews. Your complete career toolkit in one place."
+msgstr "Track job applications, build professional resumes, and prepare for interviews with AI-powered mock interviews. Your complete career toolkit in one place."
+
+msgid "Explore our powerful features"
+msgstr "Explore our powerful features"
+
+msgid "Learn about our features"
+msgstr "Learn about our features"

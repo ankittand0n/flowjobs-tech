@@ -20,13 +20,59 @@ export const HomePage = () => {
         <html lang={i18n.locale} />
 
         <title>
-          {t`Reactive Resume`} - {t`A free and open-source resume builder`}
+          {t`Flow Jobs`} - {t`Job Tracking, Resume Builder & Mock Interview Platform`}
         </title>
 
         <meta
           name="description"
-          content="A free and open-source resume builder that simplifies the process of creating, updating, and sharing your resume."
+          content="Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation. Track applications, create professional resumes, and practice interviews with AI."
         />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://flowjobs.tech/" />
+        <meta property="og:title" content="Flow Jobs - Job Tracking, Resume Builder & Mock Interview Platform" />
+        <meta property="og:description" content="Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation. Track applications, create professional resumes, and practice interviews with AI." />
+        <meta property="og:image" content="/screenshots/builder.jpg" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://flowjobs.tech/" />
+        <meta property="twitter:title" content="Flow Jobs - Job Tracking, Resume Builder & Mock Interview Platform" />
+        <meta property="twitter:description" content="Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation. Track applications, create professional resumes, and practice interviews with AI." />
+        <meta property="twitter:image" content="/screenshots/builder.jpg" />
+
+        {/* Additional SEO Meta Tags */}
+        <meta name="keywords" content="job tracking, resume builder, mock interviews, career platform, job applications, professional resume, interview preparation, AI interviews" />
+        <meta name="author" content="Flow Jobs" />
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="English" />
+        <meta name="revisit-after" content="7 days" />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Flow Jobs",
+            "url": "https://flowjobs.tech",
+            "description": "Flow Jobs is your all-in-one career platform for job tracking, resume building, and mock interview preparation.",
+            "applicationCategory": "Career Platform",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "Job Application Tracking",
+              "Professional Resume Builder",
+              "AI-Powered Mock Interviews",
+              "Resume Templates",
+              "Application Analytics"
+            ]
+          })}
+        </script>
       </Helmet>
 
       <HeroSection />
