@@ -93,31 +93,39 @@ export class PrinterService {
 
   async generateResume(resume: ResumeDto) {
     try {
+      this.logger.log(`Starting PDF generation for resume #${resume.id}`);
+      this.logger.debug(`Resume title: ${resume.title}`);
+      this.logger.debug(`Number of pages: ${resume.data.metadata.layout.length}`);
+
       const browser = await this.getBrowser();
+      this.logger.debug('Browser connection established');
+
       const page = await browser.newPage();
+      this.logger.debug('New page created');
 
       const publicUrl = this.configService.getOrThrow<string>("PUBLIC_URL");
       const storageUrl = this.configService.getOrThrow<string>("STORAGE_URL");
 
       let url = publicUrl;
+      this.logger.debug(`Using public URL: ${url}`);
 
       if ([publicUrl, storageUrl].some((url) => /https?:\/\/localhost(:\d+)?/.test(url))) {
-        // Switch client URL from `http[s]://localhost[:port]` to `http[s]://host.docker.internal[:port]` in development
-        // This is required because the browser is running in a container and the client is running on the host machine.
+        this.logger.debug('Detected localhost URLs, switching to host.docker.internal');
         url = url.replace(
           /localhost(:\d+)?/,
           (_match, port) => `host.docker.internal${port ?? ""}`,
         );
 
         await page.setRequestInterception(true);
+        this.logger.debug('Request interception enabled');
 
-        // Intercept requests of `localhost` to `host.docker.internal` in development
         page.on("request", (request) => {
           if (request.url().startsWith(storageUrl)) {
             const modifiedUrl = request
               .url()
               .replace(/localhost(:\d+)?/, (_match, port) => `host.docker.internal${port ?? ""}`);
 
+            this.logger.debug(`Intercepted storage URL: ${request.url()} -> ${modifiedUrl}`);
             void request.continue({ url: modifiedUrl });
           } else {
             void request.continue();
@@ -125,23 +133,28 @@ export class PrinterService {
         });
       }
 
-      // Set the data of the resume to be printed in the browser's session storage
-      const numberPages = resume.data.metadata.layout.length;
-
+      this.logger.debug('Setting resume data in localStorage');
       await page.evaluateOnNewDocument((data) => {
         window.localStorage.setItem("resume", JSON.stringify(data));
       }, resume.data);
 
+      this.logger.debug(`Navigating to ${url}/artboard/preview`);
       await page.goto(`${url}/artboard/preview`, { waitUntil: "networkidle0" });
+      this.logger.debug('Page loaded successfully');
 
       const pagesBuffer: Buffer[] = [];
 
       const processPage = async (index: number) => {
+        this.logger.debug(`Processing page ${index}`);
         const pageElement = await page.$(`[data-page="${index}"]`);
-        // eslint-disable-next-line unicorn/no-await-expression-member
+        if (!pageElement) {
+          this.logger.error(`Page element not found for index ${index}`);
+          throw new Error(`Page element not found for index ${index}`);
+        }
+
         const width = (await (await pageElement?.getProperty("scrollWidth"))?.jsonValue()) ?? 0;
-        // eslint-disable-next-line unicorn/no-await-expression-member
         const height = (await (await pageElement?.getProperty("scrollHeight"))?.jsonValue()) ?? 0;
+        this.logger.debug(`Page ${index} dimensions: ${width}x${height}`);
 
         const temporaryHtml = await page.evaluate((element: HTMLDivElement) => {
           const clonedElement = element.cloneNode(true) as HTMLDivElement;
@@ -150,40 +163,38 @@ export class PrinterService {
           return temporaryHtml_;
         }, pageElement);
 
-        // Apply custom CSS if enabled
-        const css = resume.data.metadata.css;
-
-        if (css.visible) {
+        if (resume.data.metadata.css.visible) {
+          this.logger.debug('Applying custom CSS');
           await page.evaluate((cssValue: string) => {
             const styleTag = document.createElement("style");
             styleTag.textContent = cssValue;
             document.head.append(styleTag);
-          }, css.value);
+          }, resume.data.metadata.css.value);
         }
 
+        this.logger.debug(`Generating PDF for page ${index}`);
         const uint8array = await page.pdf({ width, height, printBackground: true });
         const buffer = Buffer.from(uint8array);
         pagesBuffer.push(buffer);
+        this.logger.debug(`PDF generated for page ${index}, size: ${buffer.length} bytes`);
 
         await page.evaluate((temporaryHtml_: string) => {
           document.body.innerHTML = temporaryHtml_;
         }, temporaryHtml);
       };
 
-      // Loop through all the pages and print them, by first displaying them, printing the PDF and then hiding them back
-      for (let index = 1; index <= numberPages; index++) {
+      for (let index = 1; index <= resume.data.metadata.layout.length; index++) {
         await processPage(index);
       }
 
-      // Using 'pdf-lib', merge all the pages from their buffers into a single PDF
+      this.logger.debug('Merging PDF pages');
       const pdf = await PDFDocument.create();
       pdf.registerFontkit(fontkit);
 
-      // Get information about fonts used in the resume from the metadata
       const fontData = resume.data.metadata.typography.font;
       const fontUrls = getFontUrls(fontData.family, fontData.variants);
+      this.logger.debug(`Loading fonts: ${fontUrls.join(', ')}`);
 
-      // Load all the fonts from the URLs using HttpService
       const responses = await Promise.all(
         fontUrls.map((url) =>
           this.httpService.axiosRef.get(url, {
@@ -192,35 +203,38 @@ export class PrinterService {
         ),
       );
       const fontsBuffer = responses.map((response) => response.data as ArrayBuffer);
+      this.logger.debug(`Loaded ${fontsBuffer.length} fonts`);
 
-      // Embed all the fonts in the PDF
       await Promise.all(fontsBuffer.map((buffer) => pdf.embedFont(buffer)));
+      this.logger.debug('Fonts embedded in PDF');
 
       for (const element of pagesBuffer) {
         const page = await PDFDocument.load(element);
         const [copiedPage] = await pdf.copyPages(page, [0]);
         pdf.addPage(copiedPage);
       }
+      this.logger.debug(`Merged ${pagesBuffer.length} pages into final PDF`);
 
-      // Save the PDF to storage and return the URL to download the resume
-      // Store the URL in cache for future requests, under the previously generated hash digest
       const buffer = Buffer.from(await pdf.save());
+      this.logger.debug(`Final PDF size: ${buffer.length} bytes`);
 
-      // This step will also save the resume URL in cache
+      this.logger.debug('Uploading PDF to storage');
       const resumeUrl = await this.storageService.uploadObject(
         resume.userId,
         "resumes",
         buffer,
         resume.title,
       );
+      this.logger.debug(`PDF uploaded successfully, URL: ${resumeUrl}`);
 
-      // Close all the pages and disconnect from the browser
       await page.close();
       await browser.disconnect();
+      this.logger.debug('Browser connection closed');
 
       return resumeUrl;
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(`Error generating PDF for resume #${resume.id}:`, error);
+      this.logger.error('Stack trace:', (error as Error).stack);
 
       throw new InternalServerErrorException(
         ErrorMessage.ResumePrinterError,
