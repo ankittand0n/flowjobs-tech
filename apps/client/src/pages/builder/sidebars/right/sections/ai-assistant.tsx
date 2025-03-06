@@ -12,7 +12,7 @@ import {
   Alert,
   AlertDescription,
 } from "@reactive-resume/ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useJobs } from "@/client/services/jobs/job";
 import { CreateJobDto, ResumeChatDto, ResumeChatResponseDto } from "@reactive-resume/dto";
 import { cn } from "@reactive-resume/utils";
@@ -34,6 +34,10 @@ interface SectionData {
   visible?: boolean;
 }
 
+interface ChatHistory {
+  [jobId: string]: Array<{ role: 'user' | 'assistant'; content: string }>;
+}
+
 export const AiAssistantSection = () => {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [input, setInput] = useState('');
@@ -45,6 +49,29 @@ export const AiAssistantSection = () => {
   const setValue = useResumeStore((state) => state.setValue);
   const [proposedChanges, setProposedChanges] = useState<any>(null);
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
+
+  // Load chat history when component mounts or job changes
+  useEffect(() => {
+    if (selectedJobId) {
+      const savedHistory = localStorage.getItem('resume_chat_history');
+      if (savedHistory) {
+        const chatHistory: ChatHistory = JSON.parse(savedHistory);
+        setMessages(chatHistory[selectedJobId] || []);
+      }
+    } else {
+      setMessages([]);
+    }
+  }, [selectedJobId]);
+
+  // Save chat history whenever messages change
+  useEffect(() => {
+    if (selectedJobId && messages.length > 0) {
+      const savedHistory = localStorage.getItem('resume_chat_history');
+      const chatHistory: ChatHistory = savedHistory ? JSON.parse(savedHistory) : {};
+      chatHistory[selectedJobId] = messages;
+      localStorage.setItem('resume_chat_history', JSON.stringify(chatHistory));
+    }
+  }, [messages, selectedJobId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +89,13 @@ export const AiAssistantSection = () => {
       education: resume?.data?.sections?.education?.items || [],
       skills: resume?.data?.sections?.skills?.items || [],
       projects: resume?.data?.sections?.projects?.items || [],
+      // Add custom sections
+      ...Object.entries(resume?.data?.sections || {})
+        .filter(([key]) => key.startsWith('custom_'))
+        .reduce((acc, [key, section]) => ({
+          ...acc,
+          [key]: 'items' in section ? section.items : []
+        }), {})
     };
 
     // Remove empty sections to reduce payload size
@@ -84,7 +118,7 @@ export const AiAssistantSection = () => {
             id: selectedJob.id,
             title: selectedJob.title,
             company: selectedJob.company,
-            atsKeywords: selectedJob.atsKeywords
+            atsKeywords: selectedJob.atsKeywords || []
           }
         } as ResumeChatDto),
       });
@@ -95,37 +129,110 @@ export const AiAssistantSection = () => {
 
       const data = await response.json() as ResumeChatResponseDto;
       
-      // Clean up the message content by removing any JSON blocks and function calls
-      let cleanMessage = data.message;
-      if (cleanMessage) {
-        // Remove JSON blocks
-        cleanMessage = cleanMessage.replace(/```json\n[\s\S]*?\n```/g, '');
-        // Remove any other code blocks
-        cleanMessage = cleanMessage.replace(/```\n[\s\S]*?\n```/g, '');
-        // Remove function call JSON
-        cleanMessage = cleanMessage.replace(/{\s*"resumeData":\s*[\s\S]*?}/g, '');
-        // Clean up any remaining whitespace
-        cleanMessage = cleanMessage.trim();
+      // Log the response for debugging
+      console.log('AI Response:', data);
+      
+      // Extract the message and resumeData from the response
+      let message = data.message;
+      let resumeUpdates = data.resumeData || data.resumeUpdates;
+      
+      // If the response is a string that looks like JSON, try to parse it
+      if (typeof message === 'string') {
+        try {
+          // First try to parse the entire message as JSON
+          if (message.trim().startsWith('{')) {
+            const parsedResponse = JSON.parse(message);
+            message = parsedResponse.message;
+            resumeUpdates = parsedResponse.resumeData || parsedResponse.resumeUpdates;
+          } else {
+            // If not JSON, clean up any JSON blocks in the message
+            message = message.replace(/```json\n[\s\S]*?\n```/g, '');
+            message = message.replace(/```\n[\s\S]*?\n```/g, '');
+            message = message.replace(/{\s*"resumeData":\s*[\s\S]*?}/g, '');
+            message = message.trim();
+          }
+        } catch (e) {
+          console.error('Failed to parse JSON response:', e);
+          // If parsing fails, clean up the message
+          message = message.replace(/```json\n[\s\S]*?\n```/g, '');
+          message = message.replace(/```\n[\s\S]*?\n```/g, '');
+          message = message.replace(/{\s*"resumeData":\s*[\s\S]*?}/g, '');
+          message = message.trim();
+        }
       }
       
-      setMessages((prev) => [...prev, { role: 'assistant', content: cleanMessage || t`I couldn't process that request.` }]);
+      // Set the message in chat
+      setMessages((prev) => [...prev, { 
+        role: 'assistant', 
+        content: message || t`I couldn't process that request.` 
+      }]);
       
-      if (data.resumeUpdates) {
-        // Merge updates with full resume data
-        const mergedUpdates = {
-          ...resume.data,
-          ...data.resumeUpdates,
-          basics: {
-            ...resume.data.basics,
-            ...data.resumeUpdates.basics
-          },
-          sections: {
-            ...resume.data.sections,
-            ...data.resumeUpdates.sections
-          }
-        };
+      // Handle resume updates if available
+      if (resumeUpdates) {
+        // Create a complete section object with all required fields
+        const updatedSections: Record<string, any> = {};
         
-        setProposedChanges(mergedUpdates);
+        Object.entries(resumeUpdates).forEach(([sectionKey, sectionData]) => {
+          if (sectionData && typeof sectionData === 'object') {
+            const existingSection = resume.data.sections[sectionKey as keyof typeof resume.data.sections];
+            
+            // Skip sections that don't exist
+            if (!existingSection) {
+              return;
+            }
+            
+            // Handle sections with items
+            if ('items' in sectionData && 'items' in existingSection) {
+              const typedSectionData = sectionData as { items: any[] };
+              const existingItems = Array.isArray(existingSection.items) ? existingSection.items : [];
+              
+              // Merge existing items with new items
+              const newItems = typedSectionData.items.map((item: any) => {
+                const existingItem = existingItems.find((ei: any) => ei.id === item.id) || {};
+                return {
+                  ...existingItem,
+                  ...item,
+                  id: item.id || crypto.randomUUID(),
+                  visible: item.visible ?? true,
+                  date: item.date || (existingItem as any).date || "",
+                  location: item.location || (existingItem as any).location || "",
+                  url: item.url || (existingItem as any).url || { label: "", href: "" },
+                  summary: item.summary || (existingItem as any).summary || "",
+                  description: item.description || (existingItem as any).description || "",
+                  keywords: Array.isArray(item.keywords) 
+                    ? [...new Set([...((existingItem as any).keywords || []), ...item.keywords])]
+                    : (existingItem as any).keywords || [],
+                  level: typeof item.level === 'number' ? item.level : (existingItem as any).level || 1
+                };
+              });
+              
+              updatedSections[sectionKey] = {
+                ...existingSection,
+                items: newItems
+              };
+            }
+            // Handle sections without items (like summary)
+            else if ('content' in sectionData) {
+              updatedSections[sectionKey] = {
+                ...existingSection,
+                content: sectionData.content
+              };
+            }
+          }
+        });
+        
+        // Only set proposed changes if we have updates
+        if (Object.keys(updatedSections).length > 0) {
+          const changes = {
+            ...resume.data,
+            sections: {
+              ...resume.data.sections,
+              ...updatedSections
+            }
+          };
+          console.log('Proposed Changes:', changes);
+          setProposedChanges(changes);
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -141,38 +248,10 @@ export const AiAssistantSection = () => {
   const applyChanges = async () => {
     if (proposedChanges) {
       try {
-        // Update each section individually using the left sidebar's setValue function
-        Object.entries(proposedChanges.sections).forEach(([sectionKey, sectionData]) => {
-          const typedSectionData = sectionData as SectionData;
-          if (typedSectionData?.items) {
-            // Preserve the existing section structure
-            const existingSection = resume.data.sections[sectionKey as keyof typeof resume.data.sections];
-            
-            // Create a complete section object with all required fields
-            const updatedSection = {
-              id: sectionKey,
-              name: existingSection?.name || sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1),
-              columns: existingSection?.columns || 1,
-              separateLinks: existingSection?.separateLinks ?? true,
-              visible: existingSection?.visible ?? true,
-              items: typedSectionData.items.map((item: any) => ({
-                ...item,
-                id: item.id || crypto.randomUUID(),
-                visible: item.visible ?? true,
-                date: item.date || "",
-                location: item.location || "",
-                url: item.url || { label: "", href: "" },
-                summary: item.summary || "",
-                description: item.description || "",
-                keywords: Array.isArray(item.keywords) ? item.keywords : [],
-                level: typeof item.level === 'number' ? item.level : 1
-              }))
-            };
-
-            setValue(`sections.${sectionKey}`, updatedSection);
-          }
-        });
+        // Update the entire resume data at once
+        setValue('', proposedChanges);
         
+        // Clear proposed changes after successful update
         setProposedChanges(null);
       } catch (error) {
         console.error('Failed to save resume changes:', error);
@@ -190,8 +269,8 @@ export const AiAssistantSection = () => {
   };
 
   return (
-    <div className="h-full flex flex-col border rounded-lg">
-      <div className="flex-none border-b p-4 bg-secondary/10">
+    <div className="h-full flex flex-col gap-4">
+      <div className="flex-none border rounded-lg p-4 bg-secondary/10">
         <div className="flex items-center justify-between mb-2">
           <Label>{t`Select Job for Assistant`}</Label>
           <Button 
@@ -218,111 +297,117 @@ export const AiAssistantSection = () => {
         </Select>
       </div>
 
-      {!selectedJob ? (
-        <div className="flex-1 flex items-center justify-center p-8 text-center text-muted-foreground">
-          <div>
-            <Robot className="mx-auto h-12 w-12 mb-4 opacity-50" />
-            <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
-            <p className="text-xs">{t`Please select a job above to get assistance.`}</p>
+      <div className="flex-1 border rounded-lg overflow-hidden flex flex-col">
+        {!selectedJob ? (
+          <div className="flex-1 flex items-center justify-center p-8 text-center text-muted-foreground">
+            <div>
+              <Robot className="mx-auto h-12 w-12 mb-4 opacity-50" />
+              <p className="text-sm font-medium mb-2">{t`No Job Selected`}</p>
+              <p className="text-xs">{t`Please select a job above to get assistance.`}</p>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col h-full">
-          <Alert className="flex-none">
-            <AlertDescription className="text-xs text-muted-foreground">
-              {t`Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually.`}
-            </AlertDescription>
-          </Alert>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0">
+            <Alert className="flex-none">
+              <AlertDescription className="text-xs text-muted-foreground">
+                {t`Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually.`}
+              </AlertDescription>
+            </Alert>
 
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            <ScrollArea className="flex-1">
-              <div className="space-y-4 p-4">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "rounded-lg p-3 max-w-[85%] break-words",
-                      message.role === 'user'
-                        ? "ml-auto bg-primary text-primary-foreground"
-                        : "mr-auto bg-muted"
-                    )}
-                  >
-                    {message.role === 'assistant' ? (
-                      <div className="whitespace-pre-wrap">{message.content}</div>
-                    ) : (
-                      message.content
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full">
+                  <div className="space-y-4 p-4">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "rounded-lg p-3 max-w-[85%] break-words",
+                          message.role === 'user'
+                            ? "ml-auto bg-primary text-primary-foreground"
+                            : "mr-auto bg-muted"
+                        )}
+                      >
+                        {message.role === 'assistant' ? (
+                          <div className="whitespace-pre-wrap">{message.content}</div>
+                        ) : (
+                          message.content
+                        )}
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="mr-auto animate-pulse rounded-lg bg-muted p-3">
+                        {t`Thinking...`}
+                      </div>
                     )}
                   </div>
-                ))}
-                {isLoading && (
-                  <div className="mr-auto animate-pulse rounded-lg bg-muted p-3">
-                    {t`Thinking...`}
-                  </div>
-                )}
+                </ScrollArea>
               </div>
-            </ScrollArea>
 
-            {proposedChanges && (
-              <div className="flex-none border-t p-4 bg-secondary/20">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{t`Suggested Changes`}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={rejectChanges}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        {t`Reject`}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={applyChanges}
-                        className="text-green-600 hover:text-green-700"
-                      >
-                        {t`Apply Changes`}
-                      </Button>
+              {proposedChanges && (
+                <div className="flex-none border-t p-4 bg-secondary/20">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{t`Suggested Changes`}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={rejectChanges}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          {t`Reject`}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={applyChanges}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          {t`Apply Changes`}
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {t`Review the suggested changes before applying them to your resume.`}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {t`Review the suggested changes before applying them to your resume.`}
-                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <form onSubmit={handleSubmit} className="flex-none flex gap-2 p-4 border-t">
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={t`Ask anything about your resume...`}
-                className="flex-1 bg-transparent p-2 border rounded outline-none text-sm"
-                disabled={isLoading || !selectedJob}
-              />
-              <Button 
-                type="submit" 
-                variant="ghost" 
-                disabled={isLoading || !selectedJob}
-                className={cn(
-                  "min-w-[40px]",
-                  isLoading && "animate-pulse"
-                )}
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                    <span className="text-xs">{t`Processing...`}</span>
-                  </div>
-                ) : (
-                  <ChatCircleText className="h-4 w-4" />
-                )}
-              </Button>
-            </form>
+              <div className="flex-none border-t bg-background">
+                <form onSubmit={handleSubmit} className="flex gap-2 p-4">
+                  <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={t`Ask anything about your resume...`}
+                    className="flex-1 bg-transparent p-2 border rounded outline-none text-sm"
+                    disabled={isLoading || !selectedJob}
+                  />
+                  <Button 
+                    type="submit" 
+                    variant="ghost" 
+                    disabled={isLoading || !selectedJob}
+                    className={cn(
+                      "min-w-[40px]",
+                      isLoading && "animate-pulse"
+                    )}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                        <span className="text-xs">{t`Processing...`}</span>
+                      </div>
+                    ) : (
+                      <ChatCircleText className="h-4 w-4" />
+                    )}
+                  </Button>
+                </form>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <AddJobDialog 
         isOpen={isAddJobOpen} 

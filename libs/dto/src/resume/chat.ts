@@ -15,5 +15,6 @@ export interface ResumeChatDto {
 
 export interface ResumeChatResponseDto {
   message: string;
+  resumeData?: Record<string, any>;
   resumeUpdates?: Record<string, any>;
 } 
