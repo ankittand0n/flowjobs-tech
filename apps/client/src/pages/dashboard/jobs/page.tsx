@@ -346,7 +346,7 @@ export const JobsPage = () => {
     <>
       <Helmet>
         <title>
-          {t`Jobs`} - {t`Reactive Resume`}
+          {t`Jobs`} - {t`Flow Jobs`}
         </title>
       </Helmet>
 

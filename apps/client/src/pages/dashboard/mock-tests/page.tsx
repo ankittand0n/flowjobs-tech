@@ -106,7 +106,7 @@ export const MockTestsPage = () => {
     <>
       <Helmet>
         <title>
-          {t`Mock Tests`} - {t`Reactive Resume`}
+          {t`Mock Tests`} - {t`Flow Jobs`}
         </title>
       </Helmet>
 

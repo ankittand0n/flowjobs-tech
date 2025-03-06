@@ -6,7 +6,7 @@ export const InterviewPrepPage = () => {
     <>
       <Helmet>
         <title>
-          {t`Interview Prep`} - {t`Reactive Resume`}
+          {t`Interview Prep`} - {t`Flow Jobs`}
         </title>
       </Helmet>
 

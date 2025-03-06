@@ -67,7 +67,7 @@ export const JobTrackerPage = () => {
     <>
       <Helmet>
         <title>
-          {t`Job Tracker`} - {t`Reactive Resume`}
+          {t`Job Tracker`} - {t`Flow Jobs`}
         </title>
       </Helmet>
 

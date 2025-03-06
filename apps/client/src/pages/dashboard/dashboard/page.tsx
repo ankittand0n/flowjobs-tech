@@ -132,7 +132,7 @@ export const DashboardPage = () => {
     <>
       <Helmet>
         <title>
-          {t`Dashboard`} - {t`Reactive Resume`}
+          {t`Dashboard`} - {t`Flow Jobs`}
         </title>
       </Helmet>
 
