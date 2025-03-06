@@ -35,8 +35,6 @@ export const SettingsPage = () => (
           <Separator />
           <ProfileSettings />
           <Separator />
-          <PaymentSettings />
-          <Separator />
           <DangerZoneSettings />
         </div>
       </ScrollArea>
