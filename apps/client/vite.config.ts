@@ -64,29 +64,36 @@ Sitemap: http://localhost:5173/sitemap.xml`;
 
         const sitemap = generateSitemap(baseUrl);
         
-        // Ensure the public directory exists
-        const publicDir = path.resolve(__dirname, 'public');
-        if (!fs.existsSync(publicDir)) {
-          fs.mkdirSync(publicDir, { recursive: true });
+        // Write directly to the build output directory
+        const outDir = path.resolve(__dirname, '../../dist/apps/client');
+        if (!fs.existsSync(outDir)) {
+          fs.mkdirSync(outDir, { recursive: true });
         }
 
-        // Write sitemap.xml to the public directory
+        // Write sitemap.xml
         fs.writeFileSync(
-          path.resolve(publicDir, 'sitemap.xml'),
-          sitemap
+          path.resolve(outDir, 'sitemap.xml'),
+          sitemap,
+          'utf8'
         );
 
-        // Write robots.txt to the public directory
-        const robotsTxt = `User-agent: *
-Allow: /
-
-# Sitemaps
-Sitemap: ${baseUrl}/sitemap.xml`;
+        // Write robots.txt
+        const robotsTxt = [
+          'User-agent: *',
+          'Allow: /',
+          '',
+          '# Sitemaps',
+          `Sitemap: ${baseUrl}/sitemap.xml`,
+          '' // Add empty line at end of file
+        ].join('\n');
 
         fs.writeFileSync(
-          path.resolve(publicDir, 'robots.txt'),
-          robotsTxt
+          path.resolve(outDir, 'robots.txt'),
+          robotsTxt,
+          'utf8'
         );
+
+        console.log('✓ Generated sitemap.xml and robots.txt');
       },
     },
   ],
