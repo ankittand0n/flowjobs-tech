@@ -20,7 +20,7 @@ export const HomePage = () => {
         <html lang={i18n.locale} />
 
         <title>
-          {t`Flow Jobs`} - {t`Job Tracking, Resume Builder & Mock Interview Platform`}
+          {t`Flow Jobs`} - {t`Career Platform for Job Seekers`}
         </title>
 
         <meta
@@ -43,7 +43,7 @@ export const HomePage = () => {
         <meta property="twitter:image" content="/screenshots/builder.jpg" />
 
         {/* Additional SEO Meta Tags */}
-        <meta name="keywords" content="job tracking, resume builder, mock interviews, career platform, job applications, professional resume, interview preparation, AI interviews" />
+        <meta name="keywords" content="job search platform, career management, resume builder, job application tracker, interview preparation, AI mock interviews, professional resume templates, career development, job hunting tools, application management, career advancement, job search optimization, resume writing, interview skills, job seeker platform" />
         <meta name="author" content="Flow Jobs" />
         <meta name="robots" content="index, follow" />
         <meta name="language" content="English" />

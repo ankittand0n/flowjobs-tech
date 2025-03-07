@@ -93,7 +93,7 @@ export const FeaturesSection = () => (
                 >
                   {feature.icon}
                 </div>
-                {feature.title}
+                <h3 className="font-semibold">{feature.title}</h3>
               </dt>
               <dd className="mt-2 text-base leading-7 text-muted-foreground">
                 {feature.description}

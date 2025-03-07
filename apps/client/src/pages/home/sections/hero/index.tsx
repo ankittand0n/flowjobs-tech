@@ -23,7 +23,7 @@ export const HeroSection = () => (
         whileInView={{ opacity: 1, x: 0 }}
       >
         <div className="hidden items-center gap-x-4 sm:flex">
-          <Badge>{t`Flow Jobs v1.0`}</Badge>
+          <Badge>{t`Reactive Resume v4`}</Badge>
 
           <a
             href="https://docs.flowjobs.tech/features"
@@ -36,7 +36,7 @@ export const HeroSection = () => (
         </div>
 
         <div className="mt-10 space-y-2">
-          <h6 className="text-base font-bold tracking-wide">{t`Your Career Journey Starts Here`}</h6>
+          <h2 className="text-base font-bold tracking-wide">{t`Your Career Journey Starts Here`}</h2>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
             {t`All-in-One Career Platform`}
           </h1>

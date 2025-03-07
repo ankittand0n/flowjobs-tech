@@ -3789,3 +3789,9 @@ msgstr "Multiple Languages"
 
 msgid "Cloud Storage"
 msgstr "Cloud Storage"
+
+msgid "Career Platform for Job Seekers"
+msgstr "Career Platform for Job Seekers"
+
+msgid "Reactive Resume v4"
+msgstr "Reactive Resume v4"
