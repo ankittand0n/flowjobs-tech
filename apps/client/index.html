@@ -88,8 +88,41 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="/src/styles/main.css" />
+
+    <!-- SEO Styles -->
+    <style>
+      .seo-content {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
   </head>
   <body class="bg-background text-sm text-foreground antialiased print:m-0 print:bg-white">
+    <!-- SEO Content - Accessible to screen readers and search engines -->
+    <main class="seo-content" aria-hidden="false">
+      <h1>Flow Jobs - Your All-in-One Career Platform</h1>
+      <div>
+        <p>Welcome to Flow Jobs, the comprehensive career platform designed to streamline your job search journey.</p>
+        <h2>Key Features</h2>
+        <ul>
+          <li>Job Application Tracking: Efficiently manage and monitor all your job applications</li>
+          <li>Professional Resume Builder: Create stunning, ATS-friendly resumes</li>
+          <li>AI-Powered Mock Interviews: Practice and perfect your interview skills</li>
+          <li>Resume Templates: Choose from a variety of professional templates</li>
+          <li>Application Analytics: Gain insights into your job search progress</li>
+        </ul>
+        <h2>Why Choose Flow Jobs</h2>
+        <p>Flow Jobs combines cutting-edge technology with user-friendly design to provide a seamless job search experience.</p>
+      </div>
+    </main>
+
     <div id="root"></div>
 
     <!-- Scripts -->
