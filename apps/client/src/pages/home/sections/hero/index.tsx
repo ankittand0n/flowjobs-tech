@@ -36,10 +36,10 @@ export const HeroSection = () => (
         </div>
 
         <div className="mt-10 space-y-2">
-          <h2 className="text-base font-bold tracking-wide">{t`Your Career Journey Starts Here`}</h2>
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
             {t`All-in-One Career Platform`}
           </h1>
+          <h2 className="text-base font-bold tracking-wide">{t`Your Career Journey Starts Here`}</h2>
         </div>
 
         <p className="prose prose-base prose-zinc mt-6 text-lg leading-8 dark:prose-invert">
@@ -51,7 +51,7 @@ export const HeroSection = () => (
         </div>
       </motion.div>
 
-      <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-20">
+      <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none xl:ml-20">
         <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
           <motion.div
             viewport={{ once: true }}

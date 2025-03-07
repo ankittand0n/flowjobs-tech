@@ -65,7 +65,7 @@ const testimonials: Testimonial[][] = [
 export const TestimonialsSection = () => (
   <section id="testimonials" className="container relative space-y-12 py-24 sm:py-32">
     <div className="space-y-6 text-center">
-      <h1 className="text-4xl font-bold">{t`Testimonials`}</h1>
+      <h2 className="text-4xl font-bold">{t`Testimonials`}</h2>
       <p className="mx-auto max-w-2xl leading-relaxed">
         <Trans>
           I always love to hear from the users of Reactive Resume with feedback or support. Here are

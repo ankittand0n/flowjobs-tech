@@ -68,7 +68,7 @@ export const FeaturesSection = () => (
   <section id="features" className="relative py-24 sm:py-32">
     <div className="container">
       <div className="mx-auto max-w-2xl lg:text-center">
-        <h2 className="text-4xl font-bold">Tools of the Trade</h2>
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Tools of the Trade</h2>
         <p className="mt-6 text-lg leading-8">
           Arm yourself with our comprehensive suite of tools. From tracking your hunts to forging your path, we stand ready to aid your journey.
         </p>
@@ -93,7 +93,7 @@ export const FeaturesSection = () => (
                 >
                   {feature.icon}
                 </div>
-                <h3 className="font-semibold">{feature.title}</h3>
+                <h3 className="text-lg font-semibold">{feature.title}</h3>
               </dt>
               <dd className="mt-2 text-base leading-7 text-muted-foreground">
                 {feature.description}

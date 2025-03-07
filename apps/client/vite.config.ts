@@ -15,6 +15,7 @@ export default defineConfig({
 
   define: {
     appVersion: JSON.stringify(process.env.npm_package_version),
+    appDescription: JSON.stringify("Your all-in-one career platform. Track job applications, build professional resumes, and ace interviews with AI-powered mock practice. Land your dream job faster."),
   },
 
   server: {
@@ -108,7 +109,9 @@ Sitemap: http://localhost:5173/sitemap.xml`;
 
   build: {
     outDir: "../../dist/apps/client",
+    emptyOutDir: true,
     reportCompressedSize: true,
+    chunkSizeWarningLimit: 1000,
     commonjsOptions: {
       transformMixedEsModules: true,
     },
