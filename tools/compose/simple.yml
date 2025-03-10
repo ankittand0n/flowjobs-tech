@@ -33,24 +33,25 @@ services:
     environment:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
+      TZ: ${TZ:-UTC}
 
   # Chrome Browser (for printing and previews)
   chrome:
-    image: ghcr.io/browserless/chromium:v2.18.0 # Upgrading to newer versions causes issues
+    image: ghcr.io/browserless/chromium:latest
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      TIMEOUT: 10000
-      CONCURRENT: 10
-      TOKEN: ${CHROME_TOKEN:-chrome_token}
-      EXIT_ON_HEALTH_FAILURE: "true"
-      PRE_REQUEST_HEALTH_CHECK: "true"
+      HEALTH: "true"
+      TOKEN: ${CHROME_TOKEN}
+      PROXY_HOST: "chrome"
+      PROXY_PORT: 3000
+      PROXY_SSL: "false"
 
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.rx
       args:
         - NX_CLOUD_ACCESS_TOKEN=${NX_CLOUD_ACCESS_TOKEN}
     restart: unless-stopped
@@ -60,27 +61,71 @@ services:
       - minio
       - chrome
     environment:
+      # Core settings
       PORT: ${PORT:-3000}
       NODE_ENV: ${NODE_ENV:-production}
+      TZ: ${TZ:-UTC}
+
+      # URLs
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      VITE_APP_URL: ${VITE_APP_URL:-http://localhost:3000}
       STORAGE_URL: ${STORAGE_URL:-http://localhost:9000/default}
-      CHROME_TOKEN: ${CHROME_TOKEN:-chrome_token}
-      CHROME_URL: ws://chrome:3000
+      API_URL: ${API_URL}
+
+      # Database
       DATABASE_URL: ${DATABASE_URL}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-access_token_secret}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-refresh_token_secret}
-      MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
+      DIRECT_URL: ${DIRECT_URL}
+
+      # Authentication
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+
+      # Chrome/Puppeteer
+      CHROME_TOKEN: ${CHROME_TOKEN}
+      CHROME_URL: "ws://chrome:3000"
+      CHROME_IGNORE_HTTPS_ERRORS: ${CHROME_IGNORE_HTTPS_ERRORS:-true}
+      CHROME_MAX_RETRIES: ${CHROME_MAX_RETRIES:-10}
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: ${PUPPETEER_SKIP_CHROMIUM_DOWNLOAD:-true}
+      PUPPETEER_EXECUTABLE_PATH: ${PUPPETEER_EXECUTABLE_PATH:-/usr/bin/chromium}
+
+      # Storage
       STORAGE_ENDPOINT: minio
       STORAGE_PORT: 9000
-      STORAGE_BUCKET: default
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-default}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-minioadmin}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-minioadmin}
-      STORAGE_USE_SSL: "false"
-      STORAGE_SKIP_BUCKET_CHECK: "false"
+      STORAGE_USE_SSL: ${STORAGE_USE_SSL:-false}
+      STORAGE_SKIP_BUCKET_CHECK: ${STORAGE_SKIP_BUCKET_CHECK:-false}
+
+      # Mail
+      MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
+      SMTP_URL: ${SMTP_URL}
+
+      # OpenAI
       OPENAI_BASE_URL: ${OPENAI_BASE_URL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_MODEL: ${OPENAI_MODEL}
       OPENAI_MAX_TOKENS: ${OPENAI_MAX_TOKENS}
+
+      # Adzuna
+      ADZUNA_APP_ID: ${ADZUNA_APP_ID}
+      ADZUNA_API_KEY: ${ADZUNA_API_KEY}
+      ADZUNA_API_BASE_URL: ${ADZUNA_API_BASE_URL}
+
+      # Payment Gateways
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      PAYU_MERCHANT_KEY: ${PAYU_MERCHANT_KEY}
+      PAYU_MERCHANT_SALT: ${PAYU_MERCHANT_SALT}
+
+      # OAuth
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_CALLBACK_URL: ${GITHUB_CALLBACK_URL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
 
 volumes:
   minio_data:
