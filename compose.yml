@@ -22,15 +22,15 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/minio server /data --console-address ':9001' &
+    entrypoint: |
+      /bin/sh -c '
+      /usr/bin/minio server /data --console-address ":9001" &
       sleep 10
       /usr/bin/mc alias set myminio http://localhost:9000 ${STORAGE_ACCESS_KEY:-minioadmin} ${STORAGE_SECRET_KEY:-minioadmin}
       /usr/bin/mc mb myminio/default || true
       /usr/bin/mc policy set public myminio/default
       wait
-      "
+      '
 
   # Chrome Browser (for printing and previews)
   chrome:
