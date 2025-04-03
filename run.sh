@@ -24,7 +24,7 @@ wait_for_service() {
     
     echo -e "${YELLOW}Waiting for $service to be ready...${NC}"
     while [ $attempt -le $max_attempts ]; do
-        if docker compose ps $service | grep -q "running"; then
+        if docker-compose ps $service | grep -q "running"; then
             echo -e "${GREEN}✓ $service is running${NC}"
             return 0
         fi
@@ -45,21 +45,21 @@ if [ ! -f .env ]; then
 fi
 print_status "Environment file found"
 
-# Check if docker compose is installed
-if ! command -v docker compose &> /dev/null; then
-    echo -e "${RED}✗ docker compose is not installed${NC}"
+# Check if docker-compose is installed
+if ! command -v docker-compose &> /dev/null; then
+    echo -e "${RED}✗ docker-compose is not installed${NC}"
     exit 1
 fi
 print_status "Docker Compose is installed"
 
 # Stop any running containers
 echo -e "${YELLOW}Stopping existing containers...${NC}"
-docker compose down
+docker-compose down
 print_status "Existing containers stopped"
 
 # Start the services
 echo -e "${YELLOW}Starting services...${NC}"
-docker compose up -d
+docker-compose up -d
 print_status "Services started"
 
 # Wait for MinIO to be healthy
@@ -73,7 +73,7 @@ print_status "MinIO initialization completed"
 
 # Test MinIO connectivity
 echo -e "${YELLOW}Testing MinIO connectivity...${NC}"
-if docker compose exec minio mc ls myminio/default &> /dev/null; then
+if docker-compose exec minio mc ls myminio/default &> /dev/null; then
     print_status "MinIO bucket is accessible"
 else
     echo -e "${RED}✗ MinIO bucket is not accessible${NC}"
@@ -82,7 +82,7 @@ fi
 
 # Test MinIO public access
 echo -e "${YELLOW}Testing MinIO public access...${NC}"
-if docker compose exec minio mc policy get myminio/default | grep -q "public"; then
+if docker-compose exec minio mc policy get myminio/default | grep -q "public"; then
     print_status "MinIO bucket has public access"
 else
     echo -e "${RED}✗ MinIO bucket does not have public access${NC}"
@@ -91,7 +91,7 @@ fi
 
 # Test MinIO bucket policy
 echo -e "${YELLOW}Testing MinIO bucket policy...${NC}"
-if docker compose exec minio mc admin policy list myminio | grep -q "public-read-policy"; then
+if docker-compose exec minio mc admin policy list myminio | grep -q "public-read-policy"; then
     print_status "MinIO public-read policy is set"
 else
     echo -e "${RED}✗ MinIO public-read policy is not set${NC}"
@@ -100,7 +100,7 @@ fi
 
 # Test MinIO file operations with public access
 echo -e "${YELLOW}Testing MinIO file operations with public access...${NC}"
-echo "test" | docker compose exec -T minio mc pipe myminio/default/test.txt
+echo "test" | docker-compose exec -T minio mc pipe myminio/default/test.txt
 if curl -s "http://localhost:9000/default/test.txt" | grep -q "test"; then
     print_status "MinIO public file access is working"
 else
@@ -109,7 +109,7 @@ else
 fi
 
 # Clean up test file
-docker compose exec minio mc rm myminio/default/test.txt
+docker-compose exec minio mc rm myminio/default/test.txt
 print_status "Test file cleaned up"
 
 # Wait for Chrome service
@@ -137,4 +137,4 @@ echo -e "  MinIO API: ${GREEN}https://flowjobs.tech:9000${NC}"
 
 # Print container status
 echo -e "\nContainer Status:"
-docker compose ps 
+docker-compose ps 
