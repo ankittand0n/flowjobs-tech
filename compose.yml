@@ -2,25 +2,7 @@
 # The only two exposed ports here are from minio (:9000) and the app itself (:3000).
 # If these ports are changed, ensure that the env vars passed to the app are also changed accordingly.
 
-version: "3.8"
-
 services:
-  # Database (Postgres)
-  # postgres:
-  #   image: postgres:16-alpine
-  #   restart: unless-stopped
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRES_DB:-postgres}
-  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-
   # Storage (for image uploads)
   minio:
     image: minio/minio:latest
@@ -58,8 +40,10 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      - minio
-      - chrome
+      minio:
+        condition: service_started
+      chrome:
+        condition: service_started
     environment:
       # Core settings
       PORT: ${PORT:-3000}
@@ -72,7 +56,7 @@ services:
       STORAGE_URL: ${STORAGE_URL:-http://localhost:9000/default}
       API_URL: ${API_URL}
 
-      # Database
+      # Database (Supabase)
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
 

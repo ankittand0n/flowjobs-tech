@@ -141,7 +141,10 @@ export class StorageService implements OnModuleInit {
           .toBuffer();
       }
 
-      await this.client.putObject(this.bucketName, filepath, buffer, metadata);
+      await this.client.putObject(this.bucketName, filepath, buffer, {
+        ...metadata,
+        'x-amz-acl': 'public-read'  // Set ACL to public-read
+      });
 
       return url;
     } catch {
