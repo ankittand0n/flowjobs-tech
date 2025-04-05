@@ -45,15 +45,14 @@ services:
       echo "Setting bucket policies..." &&
       mc policy set public myminio/default &&
       mc policy set download myminio/default &&
-      echo "Creating public-read policy..." &&
+      echo "Creating and applying public-read policy..." &&
       mc admin policy add myminio public-read-policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::default/*\",\"arn:aws:s3:::default\"]}]}" &&
-      echo "Applying public-read policy..." &&
       mc admin policy set myminio public-read-policy user=${STORAGE_ACCESS_KEY:-minioadmin} &&
       echo "Setting bucket policy..." &&
-      mc admin policy add myminio bucket-policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::default/*\",\"arn:aws:s3:::default\"]}]}" &&
-      mc admin policy set myminio bucket-policy user=${STORAGE_ACCESS_KEY:-minioadmin} &&
-      echo "Verifying bucket creation..." &&
+      mc policy set public myminio/default &&
+      echo "Verifying bucket creation and policy..." &&
       mc ls myminio/default &&
+      mc policy get myminio/default &&
       echo "MinIO initialization completed."
       '
     environment:
