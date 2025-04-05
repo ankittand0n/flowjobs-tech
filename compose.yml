@@ -17,47 +17,8 @@ services:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
       TZ: ${TZ:-UTC}
-      MINIO_BROWSER_REDIRECT_URL: "https://flowjobs.tech:9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-
-  # MinIO initialization
-  minio-init:
-    image: alpine:latest
-    depends_on:
-      minio:
-        condition: service_healthy
-    command: >
-      /bin/sh -c '
-      echo "Starting MinIO initialization..." &&
-      apk add --no-cache curl &&
-      sleep 10 &&
-      echo "Downloading MinIO client..." &&
-      curl -sSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc &&
-      chmod +x /usr/local/bin/mc &&
-      echo "Setting up MinIO alias..." &&
-      mc alias set myminio http://minio:9000 ${STORAGE_ACCESS_KEY:-minioadmin} ${STORAGE_SECRET_KEY:-minioadmin} &&
-      echo "Creating default bucket..." &&
-      mc mb myminio/default || true &&
-      echo "Setting bucket policies..." &&
-      mc policy set public myminio/default &&
-      mc policy set download myminio/default &&
-      echo "Creating and applying public-read policy..." &&
-      mc admin policy add myminio public-read-policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::default/*\",\"arn:aws:s3:::default\"]}]}" &&
-      mc admin policy set myminio public-read-policy user=${STORAGE_ACCESS_KEY:-minioadmin} &&
-      echo "Setting bucket policy..." &&
-      mc policy set public myminio/default &&
-      echo "Verifying bucket creation and policy..." &&
-      mc ls myminio/default &&
-      mc policy get myminio/default &&
-      echo "MinIO initialization completed."
-      '
-    environment:
-      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
+      MINIO_BROWSER_REDIRECT_URL: "https://minio.flowjobs.tech"
+      MINIO_SERVER_URL: "https://minio.flowjobs.tech"
 
   # Chrome Browser (for printing and previews)
   chrome:
@@ -82,10 +43,8 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     depends_on:
-      minio:
-        condition: service_healthy
-      chrome:
-        condition: service_started
+      - minio
+      - chrome
     environment:
       # Core settings
       PORT: ${PORT:-3000}
