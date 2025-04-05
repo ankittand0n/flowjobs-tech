@@ -7,7 +7,7 @@ services:
   minio:
     image: minio/minio:latest
     restart: unless-stopped
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9001" --address ":9000"
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -20,6 +20,7 @@ services:
       MINIO_BROWSER_REDIRECT_URL: "${STORAGE_URL:-http://localhost:9000}/console"
       MINIO_SERVER_URL: "${STORAGE_URL:-http://localhost:9000}"
       MINIO_BROWSER: "on"
+      MINIO_POLICY: "public"
 
   # Chrome Browser (for printing and previews)
   chrome:
@@ -75,13 +76,13 @@ services:
       PUPPETEER_EXECUTABLE_PATH: ${PUPPETEER_EXECUTABLE_PATH:-/usr/bin/chromium}
 
       # Storage
-      STORAGE_ENDPOINT: minio
-      STORAGE_PORT: 9000
+      STORAGE_ENDPOINT: minio.flowjobs.tech
+      STORAGE_PORT: 443
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
       STORAGE_BUCKET: ${STORAGE_BUCKET:-default}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-minioadmin}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-minioadmin}
-      STORAGE_USE_SSL: "false"
+      STORAGE_USE_SSL: "true"
       STORAGE_SKIP_BUCKET_CHECK: ${STORAGE_SKIP_BUCKET_CHECK:-false}
 
       # Mail
