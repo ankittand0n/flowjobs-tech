@@ -19,6 +19,7 @@ services:
       TZ: ${TZ:-UTC}
       MINIO_BROWSER_REDIRECT_URL: "https://minio.flowjobs.tech"
       MINIO_SERVER_URL: "https://minio.flowjobs.tech"
+      MINIO_BROWSER: "on"
 
   # Chrome Browser (for printing and previews)
   chrome:
@@ -74,8 +75,8 @@ services:
       PUPPETEER_EXECUTABLE_PATH: ${PUPPETEER_EXECUTABLE_PATH:-/usr/bin/chromium}
 
       # Storage
-      STORAGE_ENDPOINT: minio
-      STORAGE_PORT: 9000
+      STORAGE_ENDPOINT: minio.flowjobs.tech
+      STORAGE_PORT: 443
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
       STORAGE_BUCKET: ${STORAGE_BUCKET:-default}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-minioadmin}
