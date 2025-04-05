@@ -17,8 +17,8 @@ services:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
       TZ: ${TZ:-UTC}
-      MINIO_BROWSER_REDIRECT_URL: "http://localhost:9001"
-      MINIO_SERVER_URL: "http://localhost:9000"
+      MINIO_BROWSER_REDIRECT_URL: "${STORAGE_URL:-http://localhost:9000}/console"
+      MINIO_SERVER_URL: "${STORAGE_URL:-http://localhost:9000}"
       MINIO_BROWSER: "on"
 
   # Chrome Browser (for printing and previews)
@@ -75,13 +75,13 @@ services:
       PUPPETEER_EXECUTABLE_PATH: ${PUPPETEER_EXECUTABLE_PATH:-/usr/bin/chromium}
 
       # Storage
-      STORAGE_ENDPOINT: localhost
+      STORAGE_ENDPOINT: minio
       STORAGE_PORT: 9000
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
       STORAGE_BUCKET: ${STORAGE_BUCKET:-default}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-minioadmin}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-minioadmin}
-      STORAGE_USE_SSL: false
+      STORAGE_USE_SSL: "false"
       STORAGE_SKIP_BUCKET_CHECK: ${STORAGE_SKIP_BUCKET_CHECK:-false}
 
       # Mail
