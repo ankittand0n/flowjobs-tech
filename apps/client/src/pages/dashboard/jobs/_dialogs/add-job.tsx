@@ -101,8 +101,8 @@ export const AddJobDialog = ({ isOpen, onClose, onSuccess, initialStep = 1, init
         } : undefined
       });
 
-      // First create the job
-      const job = await createJob({
+      // Create the job
+      await createJob({
         title: jobData.title || "",
         company: jobData.company || "",
         description: description || "",
@@ -118,19 +118,27 @@ export const AddJobDialog = ({ isOpen, onClose, onSuccess, initialStep = 1, init
         } : undefined
       });
 
-      // Then create a job application in draft status
-      await createJobApplication({
-        jobId: job.id,
-        status: "draft",
-        notes: ""
-      });
-
       toast({
         title: "Success",
         description: "Job added successfully"
       });
+      
+      // Reset all form state
+      setJobData({
+        title: "",
+        company: "",
+        description: "",
+        location: "",
+        type: "",
+        salary: "",
+        url: ""
+      });
+      setDescription("");
+      setExtractedKeywords(null);
+      setStep(1);
+      
       onSuccess?.();
-      setStep(3);
+      onClose(); // Close the dialog after successful job creation
     } catch (error: any) {
       // Detailed error logging
       console.error("Job creation error:", {

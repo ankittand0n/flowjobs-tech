@@ -13,7 +13,7 @@ services:
       sleep 5 &&
       mc alias set myminio http://localhost:9000 minioadmin minioadmin &&
       mc mb --ignore-existing myminio/default &&
-      mc anonymous set download myminio/default &&
+      mc anonymous set public myminio/default &&
       wait'
     ports:
       - "9000:9000"
@@ -27,10 +27,10 @@ services:
       MINIO_BROWSER_REDIRECT_URL: "https://minio.flowjobs.tech"
       MINIO_SERVER_URL: "https://minio.flowjobs.tech"
       MINIO_BROWSER: "on"
-      MINIO_ANONYMOUS_POLICY: "download"
+      MINIO_ANONYMOUS_POLICY: "public"
       MINIO_POLICY_OBJ_LOCK: "off"
-      MINIO_DEFAULT_BUCKET_POLICY: "download"
-      MINIO_BUCKET_POLICY: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject","s3:GetBucketLocation"],"Resource":["arn:aws:s3:::default/*","arn:aws:s3:::default"]}]}'
+      MINIO_DEFAULT_BUCKET_POLICY: "public"
+      MINIO_BUCKET_POLICY: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject","s3:GetBucketLocation"],"Resource":["arn:aws:s3:::default/*","arn:aws:s3:::default"]}]}'
 
   # Chrome Browser (for printing and previews)
   chrome:
