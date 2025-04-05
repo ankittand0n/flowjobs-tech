@@ -17,6 +17,7 @@ services:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
       TZ: ${TZ:-UTC}
+      MINIO_BROWSER_REDIRECT_URL: "https://flowjobs.tech:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -155,3 +156,8 @@ services:
 
 volumes:
   minio_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /data/minio
+      o: bind
