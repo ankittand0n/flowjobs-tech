@@ -7,7 +7,14 @@ services:
   minio:
     image: minio/minio:latest
     restart: unless-stopped
-    command: server /data --console-address ":9001" --address ":9000"
+    entrypoint: >
+      /bin/sh -c '
+      minio server /data --console-address ":9001" --address ":9000" &
+      sleep 5 &&
+      mc alias set myminio http://localhost:9000 minioadmin minioadmin &&
+      mc mb --ignore-existing myminio/default &&
+      mc anonymous set download myminio/default &&
+      wait'
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -17,10 +24,13 @@ services:
       MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
       TZ: ${TZ:-UTC}
-      MINIO_BROWSER_REDIRECT_URL: "${STORAGE_URL:-http://localhost:9000}/console"
-      MINIO_SERVER_URL: "${STORAGE_URL:-http://localhost:9000}"
+      MINIO_BROWSER_REDIRECT_URL: "https://minio.flowjobs.tech"
+      MINIO_SERVER_URL: "https://minio.flowjobs.tech"
       MINIO_BROWSER: "on"
-      MINIO_POLICY: "public"
+      MINIO_ANONYMOUS_POLICY: "download"
+      MINIO_POLICY_OBJ_LOCK: "off"
+      MINIO_DEFAULT_BUCKET_POLICY: "download"
+      MINIO_BUCKET_POLICY: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject","s3:GetBucketLocation"],"Resource":["arn:aws:s3:::default/*","arn:aws:s3:::default"]}]}'
 
   # Chrome Browser (for printing and previews)
   chrome:
@@ -56,7 +66,7 @@ services:
       # URLs
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
       VITE_APP_URL: ${VITE_APP_URL:-http://localhost:3000}
-      STORAGE_URL: ${STORAGE_URL:-http://localhost:9000/default}
+      STORAGE_URL: ${STORAGE_URL:-http://minio:9000/default}
       API_URL: ${API_URL}
 
       # Database (Supabase)
@@ -76,14 +86,14 @@ services:
       PUPPETEER_EXECUTABLE_PATH: ${PUPPETEER_EXECUTABLE_PATH:-/usr/bin/chromium}
 
       # Storage
-      STORAGE_ENDPOINT: minio.flowjobs.tech
-      STORAGE_PORT: 443
+      STORAGE_ENDPOINT: minio
+      STORAGE_PORT: 9000
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
       STORAGE_BUCKET: ${STORAGE_BUCKET:-default}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-minioadmin}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-minioadmin}
-      STORAGE_USE_SSL: "true"
-      STORAGE_SKIP_BUCKET_CHECK: ${STORAGE_SKIP_BUCKET_CHECK:-false}
+      STORAGE_USE_SSL: "false"
+      STORAGE_SKIP_BUCKET_CHECK: "true"
 
       # Mail
       MAIL_FROM: ${MAIL_FROM:-noreply@localhost}
