@@ -1,0 +1,36 @@
+{
+  "name": "flowjobs-chrome-extension",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "rm -rf dist",
+    "build": "tsc && vite build && node scripts/copy-manifest.js && node scripts/copy-icons.js && node scripts/copy-html.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.6",
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
+    "lucide-react": "^0.487.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@radix-ui/react-tabs": "^1.1.3",
+    "@tailwindcss/forms": "^0.5.10",
+    "@types/chrome": "^0.0.260",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.21",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "postcss": "^8.5.3",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}
