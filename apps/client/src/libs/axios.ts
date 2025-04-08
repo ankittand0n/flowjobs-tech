@@ -40,8 +40,14 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response) => {
+    // Parse dates in response data if any
+    if (response.data) {
+      response.data = deepSearchAndParseDates(response.data, ['createdAt', 'updatedAt', 'date', 'startDate', 'endDate']);
+    }
+    return response;
+  },
+  async (error) => {
     if (error.response) {
       console.error('Response error:', {
         data: error.response.data,
@@ -50,14 +56,40 @@ axiosInstance.interceptors.response.use(
         requestData: error.config?.data
       });
 
-      toast({
-        variant: "error",
-        title: error.response.data.message || 'An error occurred'
-      });
+      // Only handle 401/403 if it's not a refresh token request
+      // This prevents redirect loops
+      if ((error.response.status === 401 || error.response.status === 403) && 
+          !error.config.url?.includes('/auth/refresh')) {
+        // Clear user data from query client
+        queryClient.setQueryData(USER_KEY, null);
+        
+        // Only redirect if it's not an API call from the auth pages
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/auth/')) {
+          window.location.href = `/auth/login?redirect=${currentPath}`;
+        }
+        return Promise.reject(error);
+      }
+
+      // Show error toast unless it's an auth-related error
+      if (![401, 403].includes(error.response.status)) {
+        const errorMessage = error.response.data?.message || t`An error occurred`;
+        toast({
+          variant: "error",
+          title: translateError(errorMessage) as string
+        });
+      }
     } else if (error.request) {
       console.error('No response received:', {
         request: error.request,
         config: error.config
+      });
+      
+      // Show network error toast
+      toast({
+        variant: "error",
+        title: t`Network error`,
+        description: t`Please check your internet connection.`
       });
     } else {
       console.error('Request setup error:', error.message);
@@ -68,19 +100,36 @@ axiosInstance.interceptors.response.use(
 
 // Create another instance to handle failed refresh tokens
 // Reference: https://github.com/Flyrell/axios-auth-refresh/issues/191
-const axiosForRefresh = axios.create({ baseURL: "/api", withCredentials: true });
+const axiosForRefresh = axios.create({ 
+  baseURL: "/api", 
+  withCredentials: true,
+  timeout: 10000 // 10 second timeout for refresh requests
+});
 
 // Interceptor to handle expired access token errors
-const handleAuthError = () => refreshToken(axiosForRefresh);
+const handleAuthError = async (failedRequest: any) => {
+  try {
+    await refreshToken(axiosForRefresh);
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 // Interceptor to handle expired refresh token errors
 const handleRefreshError = async () => {
   await queryClient.invalidateQueries({ queryKey: USER_KEY });
-  redirect("/auth/login");
+  const currentPath = window.location.pathname;
+  if (!currentPath.startsWith('/auth/')) {
+    window.location.href = '/auth/login';
+  }
 };
 
 // Intercept responses to check for 401 and 403 errors, refresh token and retry the request
-createAuthRefreshInterceptor(axiosInstance, handleAuthError, { statusCodes: [401, 403] });
+createAuthRefreshInterceptor(axiosInstance, handleAuthError, { 
+  statusCodes: [401, 403],
+  pauseInstanceWhileRefreshing: true // Prevent multiple refresh requests
+});
 createAuthRefreshInterceptor(axiosForRefresh, handleRefreshError);
 
 export { axiosInstance as axios };
