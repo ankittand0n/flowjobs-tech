@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
-    emptyOutDir: false,
+    emptyOutDir: true,
     cssCodeSplit: false,
-    cssMinify: false,
+    cssMinify: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/main.tsx'),
@@ -36,6 +36,10 @@ export default defineConfig({
         },
         chunkFileNames: '[name].js',
       },
+      onwarn(warning, warn) {
+        if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+        warn(warning);
+      }
     }
   },
   resolve: {
@@ -43,5 +47,7 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  base: ''
+  base: '',
+  logLevel: 'error',
+  clearScreen: false
 }); 

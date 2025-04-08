@@ -17,7 +17,7 @@
     "dev": "nx run-many -t serve --parallel=3 --projects=client,server,artboard",
     "test": "pnpm vitest run",
     "prebuild": "pnpm prisma:generate",
-    "build": "nx run-many -t build",
+    "build": "nx run-many -t build --exclude=flowjobs-chrome-extension",
     "prestart": "pnpm prisma:migrate",
     "start": "node dist/apps/server/main",
     "lint": "nx run-many -t lint",
