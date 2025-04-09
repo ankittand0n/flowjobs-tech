@@ -81,7 +81,9 @@ type MetadataKey =
   | "publications"
   | "volunteer"
   | "references"
-  | "custom";
+  | "custom"
+  | "ats-analysis"
+  | "ai-assistant";
 
 const getSectionIcon = (id: MetadataKey, props: IconProps = {}) => {
   switch (id) {
@@ -169,6 +171,12 @@ const getSectionIcon = (id: MetadataKey, props: IconProps = {}) => {
     }
     case "custom": {
       return <PlusIcon size={18} {...props} />;
+    }
+    case "ats-analysis": {
+      return <ChartLineUp size={18} {...props} />;
+    }
+    case "ai-assistant": {
+      return <Brain size={18} {...props} />;
     }
     default: {
       return null;

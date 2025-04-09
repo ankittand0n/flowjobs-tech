@@ -195,6 +195,7 @@ Important guidelines:
 3. Keep the same data structure
 4. Preserve formatting and styling
 5. Focus on making the resume more relevant to the selected job
+6. When adding keywords, add them to the skills section with same structure
 
 Resume Data: {resumeData}
 Job Details: {jobDetails}

@@ -247,7 +247,6 @@ export const LeftSidebar = () => {
           {Object.values(customSections).map((section) => (
             <Fragment key={section.id}>
               <Separator />
-
               <SectionBase<CustomSection>
                 id={`custom.${section.id}`}
                 title={(item) => item.name}
@@ -255,13 +254,6 @@ export const LeftSidebar = () => {
               />
             </Fragment>
           ))}
-
-          <Separator />
-
-          <Button size="lg" variant="outline" onClick={addSection}>
-            <PlusCircle />
-            <span className="ml-2">{t`Add a new section`}</span>
-          </Button>
         </div>
       </ScrollArea>
     </div>

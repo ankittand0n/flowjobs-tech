@@ -118,7 +118,9 @@ export const AiAssistantSection = () => {
             id: selectedJob.id,
             title: selectedJob.title,
             company: selectedJob.company,
-            atsKeywords: selectedJob.atsKeywords || []
+            atsKeywords: selectedJob.atsKeywords || [],
+            description: selectedJob.description || '',
+            requirements: selectedJob.requirements || []
           }
         } as ResumeChatDto),
       });
@@ -232,6 +234,17 @@ export const AiAssistantSection = () => {
           };
           console.log('Proposed Changes:', changes);
           setProposedChanges(changes);
+          
+          // Add a message about the proposed changes
+          setMessages((prev) => [...prev, { 
+            role: 'assistant', 
+            content: t`I've analyzed the job requirements and prepared some updates to your resume. Please review the changes below and click "Apply Changes" if you'd like to keep them.` 
+          }]);
+        } else {
+          setMessages((prev) => [...prev, { 
+            role: 'assistant', 
+            content: t`I've analyzed your resume against the job requirements, but I don't have any specific updates to suggest at this time.` 
+          }]);
         }
       }
     } catch (error) {

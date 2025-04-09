@@ -253,6 +253,7 @@ export class OpenAIService {
       model,
       max_tokens: maxTokens,
       temperature: 0.7,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -264,48 +265,16 @@ export class OpenAIService {
 
     const message = response.choices[0].message;
     let resumeUpdates = null;
-    let cleanMessage = message.content || "I couldn't process that request.";
+    let cleanMessage = "I couldn't process that request.";
 
-    // Try to extract JSON from the message content
     if (message.content) {
       try {
-        // First try to parse the entire message as JSON
-        if (message.content.trim().startsWith('{')) {
-          const parsedJson = JSON.parse(message.content);
-          cleanMessage = parsedJson.message;
-          resumeUpdates = parsedJson.resumeData;
-        } else {
-          // If not JSON, try to find JSON blocks
-          const jsonMatch = message.content.match(/```json\n([\s\S]*?)\n```/);
-          if (jsonMatch && jsonMatch[1]) {
-            const parsedJson = JSON.parse(jsonMatch[1]);
-            resumeUpdates = parsedJson.resumeData;
-            // Remove the JSON block from the message
-            cleanMessage = message.content.replace(/```json\n[\s\S]*?\n```/, '').trim();
-          } else {
-            // Check for HTML blocks that might contain summary updates
-            const htmlMatch = message.content.match(/```html\n([\s\S]*?)\n```/);
-            if (htmlMatch && htmlMatch[1]) {
-              // Create a resume update with the summary section
-              resumeUpdates = {
-                summary: {
-                  content: htmlMatch[1].trim()
-                }
-              };
-              // Remove the HTML block from the message
-              cleanMessage = message.content.replace(/```html\n[\s\S]*?\n```/, '').trim();
-            }
-          }
-        }
+        const parsedResponse = JSON.parse(message.content);
+        cleanMessage = parsedResponse.message || cleanMessage;
+        resumeUpdates = parsedResponse.resumeData;
       } catch (e) {
-        console.error('Failed to parse JSON from message:', e);
-        // If parsing fails, clean up the message
-        cleanMessage = message.content
-          .replace(/```json\n[\s\S]*?\n```/g, '')
-          .replace(/```html\n[\s\S]*?\n```/g, '')
-          .replace(/```\n[\s\S]*?\n```/g, '')
-          .replace(/{\s*"resumeData":\s*[\s\S]*?}/g, '')
-          .trim();
+        console.error('Failed to parse JSON response:', e);
+        cleanMessage = message.content;
       }
     }
 

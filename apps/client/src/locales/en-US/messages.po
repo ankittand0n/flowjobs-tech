@@ -3795,3 +3795,99 @@ msgstr "Career Platform for Job Seekers"
 
 msgid "Reactive Resume v4"
 msgstr "Reactive Resume v4"
+
+msgid "I've analyzed the job requirements and prepared some updates to your resume. Please review the changes below and click \"Apply Changes\" if you'd like to keep them."
+msgstr "I've analyzed the job requirements and prepared some updates to your resume. Please review the changes below and click \"Apply Changes\" if you'd like to keep them."
+
+msgid "I've analyzed your resume against the job requirements, but I don't have any specific updates to suggest at this time."
+msgstr "I've analyzed your resume against the job requirements, but I don't have any specific updates to suggest at this time."
+
+msgid "ATS Tools"
+msgstr "ATS Tools"
+
+msgid "ATS Analysis"
+msgstr "ATS Analysis"
+
+msgid "AI Assistant"
+msgstr "AI Assistant" 
+
+msgid "Type your message..."
+msgstr "Type your message..."
+
+msgid "Ask AI"
+msgstr "Ask AI"
+
+msgid "AI Assistant"
+msgstr "AI Assistant" 
+
+msgid "Select a job to analyze"
+msgstr "Select a job to analyze"
+
+msgid "Job Description"
+msgstr "Job Description"
+
+msgid "Analysis Results"
+msgstr "Analysis Results"
+
+msgid "Analyzing resume against job requirements..."
+msgstr "Analyzing resume against job requirements..."
+
+msgid "Select a job to see the ATS analysis"
+msgstr "Select a job to see the ATS analysis"
+
+msgid "I couldn't process that request."
+msgstr "I couldn't process that request."
+
+msgid "Failed to parse JSON response"
+msgstr "Failed to parse JSON response"
+
+msgid "I've analyzed the job requirements and prepared some updates to your resume. Please review the changes below and click \"Apply Changes\" if you'd like to keep them."
+msgstr "I've analyzed the job requirements and prepared some updates to your resume. Please review the changes below and click \"Apply Changes\" if you'd like to keep them."
+
+msgid "I've analyzed your resume against the job requirements, but I don't have any specific updates to suggest at this time."
+msgstr "I've analyzed your resume against the job requirements, but I don't have any specific updates to suggest at this time."
+
+msgid "Sorry, I encountered an error while processing your request. Please try again."
+msgstr "Sorry, I encountered an error while processing your request. Please try again."
+
+msgid "Failed to save resume changes"
+msgstr "Failed to save resume changes"
+
+msgid "Processing..."
+msgstr "Processing..."
+
+msgid "Ask anything about your resume..."
+msgstr "Ask anything about your resume..."
+
+msgid "Suggested Changes"
+msgstr "Suggested Changes"
+
+msgid "Review the suggested changes before applying them to your resume."
+msgstr "Review the suggested changes before applying them to your resume."
+
+msgid "Reject"
+msgstr "Reject"
+
+msgid "Apply Changes"
+msgstr "Apply Changes"
+
+msgid "No Job Selected"
+msgstr "No Job Selected"
+
+msgid "Please select a job above to get assistance."
+msgstr "Please select a job above to get assistance."
+
+msgid "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+msgstr "Note: Personal details (name, contact info, etc.) are not sent to AI. Please fill these in manually."
+
+msgid "Select Job for Assistant"
+msgstr "Select Job for Assistant"
+
+msgid "Add Job"
+msgstr "Add Job"
+
+msgid "Choose a job to get assistance"
+msgstr "Choose a job to get assistance"
+
+msgid "Thinking..."
+msgstr "Thinking..."

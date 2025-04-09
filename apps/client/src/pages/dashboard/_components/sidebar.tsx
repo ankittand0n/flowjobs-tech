@@ -11,10 +11,11 @@ import {
   ChartBar,
 } from "@phosphor-icons/react";
 
-import { Button, Separator } from "@reactive-resume/ui";
+import { Button, KeyboardShortcut, Separator } from "@reactive-resume/ui";
 import { cn } from "@reactive-resume/utils";
 import { motion } from "framer-motion";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import useKeyboardShortcut from "use-keyboard-shortcut";
 
 import { Copyright } from "@/client/components/copyright";
 import { Icon } from "@/client/components/icon";
@@ -42,6 +43,7 @@ const ActiveIndicator = ({ className }: Props) => (
 type SidebarItem = {
   path: string;
   name: string;
+  shortcut?: string;
   icon: React.ReactNode;
 };
 
@@ -49,7 +51,7 @@ type SidebarItemProps = SidebarItem & {
   onClick?: () => void;
 };
 
-const SidebarItem = ({ path, name, icon, onClick }: SidebarItemProps) => {
+const SidebarItem = ({ path, name, shortcut, icon, onClick }: SidebarItemProps) => {
   const isActive = useLocation().pathname === path;
 
   return (
@@ -66,6 +68,7 @@ const SidebarItem = ({ path, name, icon, onClick }: SidebarItemProps) => {
       <Link to={path}>
         <div className="mr-3">{icon}</div>
         <span>{name}</span>
+        {!isActive && shortcut && <KeyboardShortcut className="ml-auto">{shortcut}</KeyboardShortcut>}
         {isActive && <ActiveIndicator className="ml-auto" />}
       </Link>
     </Button>
@@ -75,36 +78,79 @@ const SidebarItem = ({ path, name, icon, onClick }: SidebarItemProps) => {
 export const Sidebar = ({ setOpen }: Props) => {
   const { user } = useUser();
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  // Add keyboard shortcuts
+  useKeyboardShortcut(["shift", "d"], () => {
+    void navigate("/dashboard");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "r"], () => {
+    void navigate("/dashboard/resumes");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "t"], () => {
+    void navigate("/dashboard/job-tracker");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "j"], () => {
+    void navigate("/dashboard/jobs");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "m"], () => {
+    void navigate("/dashboard/mock-tests");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "c"], () => {
+    void navigate("/dashboard/community");
+    setOpen?.(false);
+  });
+
+  useKeyboardShortcut(["shift", "s"], () => {
+    void navigate("/dashboard/settings");
+    setOpen?.(false);
+  });
 
   const sidebarItems: SidebarItem[] = [
     {
       path: "/dashboard",
       name: t`Dashboard`,
+      shortcut: "⇧D",
       icon: <ReadCvLogo />,
     },
     {
       path: "/dashboard/resumes",
       name: t`Resumes`,
+      shortcut: "⇧R",
       icon: <FileText />,
     },
     {
       path: "/dashboard/job-tracker",
       name: t`Tracking`,
+      shortcut: "⇧T",
       icon: <ChartLineUp />,
     },
     {
       path: "/dashboard/jobs",
       name: t`Jobs`,
+      shortcut: "⇧J",
       icon: <Briefcase />,
     },
     {
       path: "/dashboard/mock-tests",
       name: t`Mock Tests`,
+      shortcut: "⇧M",
       icon: <Brain />,
     },
     {
       path: "/dashboard/community",
       name: t`Community`,
+      shortcut: "⇧C",
       icon: <ChatCircle />,
     },
     ...(isAdmin
@@ -119,6 +165,7 @@ export const Sidebar = ({ setOpen }: Props) => {
     {
       path: "/dashboard/settings",
       name: t`Settings`,
+      shortcut: "⇧S",
       icon: <GearSix />,
     }
   ];
