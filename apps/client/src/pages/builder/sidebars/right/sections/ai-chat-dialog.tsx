@@ -296,9 +296,9 @@ export const AiChatDialog = () => {
                 // Process each item in the section
                 const newItems = sectionData.map((item: any) => {
                   // Find existing item by name if no id is provided
-                  const existingItem = existingSection.items?.find(
-                    (ei: any) => ei.id === item.id || ei.name === item.name
-                  ) || {};
+                  const existingItem = ('items' in existingSection && Array.isArray(existingSection.items)) 
+                    ? existingSection.items.find((ei: any) => ei.id === item.id || ei.name === item.name)
+                    : {};
 
                   // Create a complete item with all required fields
                   return {
