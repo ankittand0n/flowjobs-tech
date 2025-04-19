@@ -9,8 +9,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@reactive-resume/utils": "*",
-    "@reactive-resume/schema": "*",
+    "@reactive-resume/utils": "workspace:*",
+    "@reactive-resume/schema": "workspace:*",
     "@sindresorhus/slugify": "^2.2.1",
     "nestjs-zod": "^3.0.0",
     "@swc/helpers": "~0.5.11",
