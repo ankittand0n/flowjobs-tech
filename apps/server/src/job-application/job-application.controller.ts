@@ -56,13 +56,26 @@ export class JobApplicationController {
 
   @Get()
   async getJobApplications(@GetUser() user: User) {
+    // First get all valid job IDs
+    const validJobs = await this.prisma.job.findMany({
+      select: { id: true }
+    });
+    const validJobIds = validJobs.map(job => job.id);
+
+    // Then get applications only for valid jobs
     return this.prisma.jobApplication.findMany({
       where: {
-        userId: user.id, // Only get applications created by the current user
+        userId: user.id,
+        jobId: {
+          in: validJobIds
+        }
       },
       include: {
         job: true,
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }
 
