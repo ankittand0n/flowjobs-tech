@@ -3891,3 +3891,6 @@ msgstr "Choose a job to get assistance"
 
 msgid "Thinking..."
 msgstr "Thinking..."
+
+msgid "No applications found. Start by applying to jobs!"
+msgstr "No applications found. Start by applying to jobs!"
