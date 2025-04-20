@@ -3894,3 +3894,7 @@ msgstr "Thinking..."
 
 msgid "No applications found. Start by applying to jobs!"
 msgstr "No applications found. Start by applying to jobs!"
+
+#: apps/client/src/services/errors/translate-error.ts:67
+msgid "User not found"
+msgstr "User not found"

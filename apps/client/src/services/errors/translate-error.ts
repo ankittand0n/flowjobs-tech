@@ -57,7 +57,9 @@ export const translateError = (error: ErrorMessage) => {
     case ErrorMessage.SomethingWentWrong: {
       return t`Something went wrong while processing your request. Please try again later or raise an issue on GitHub.`;
     }
-
+    case ErrorMessage.UserNotFound: {
+      return t`User not found`;
+    }
     default: {
       return null;
     }
