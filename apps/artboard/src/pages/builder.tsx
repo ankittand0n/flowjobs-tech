@@ -49,8 +49,8 @@ export const BuilderLayout = () => {
       ref={transformRef}
       centerOnInit
       maxScale={2}
-      minScale={0.4}
-      initialScale={1}
+      minScale={0.2}
+      initialScale={0.5}
       limitToBounds={false}
       wheel={{ wheelDisabled: wheelPanning }}
       panning={{ wheelPanning: wheelPanning }}
