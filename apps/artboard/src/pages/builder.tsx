@@ -50,7 +50,7 @@ export const BuilderLayout = () => {
       centerOnInit
       maxScale={2}
       minScale={0.2}
-      initialScale={0.5}
+      initialScale={0.8}
       limitToBounds={false}
       wheel={{ wheelDisabled: wheelPanning }}
       panning={{ wheelPanning: wheelPanning }}
