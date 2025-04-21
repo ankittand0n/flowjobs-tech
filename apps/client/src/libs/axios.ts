@@ -24,16 +24,9 @@ export const axiosInstance = axios.create({
 // Add request interceptor for better error handling
 axiosInstance.interceptors.request.use(
   (config) => {
-    // console.log('Making request:', {
-    //   method: config.method,
-    //   url: config.url,
-    //   data: config.data,
-    //   headers: config.headers
-    // });
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -49,13 +42,6 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     if (error.response) {
-      console.error('Response error:', {
-        data: error.response.data,
-        status: error.response.status,
-        headers: error.response.headers,
-        requestData: error.config?.data
-      });
-
       // Only handle 401/403 if it's not a refresh token request
       // This prevents redirect loops
       if ((error.response.status === 401 || error.response.status === 403) && 
@@ -73,26 +59,47 @@ axiosInstance.interceptors.response.use(
 
       // Show error toast unless it's an auth-related error
       if (![401, 403].includes(error.response.status)) {
-        const errorMessage = error.response.data?.message || t`An error occurred`;
+        // Extract error message from various possible locations in the response
+        const errorMessage = error.response.data?.message || 
+                           error.response.data?.error || 
+                           error.response.data?.details ||
+                           error.response.statusText ||
+                           t`An error occurred`;
+
+        // Try to translate the error message if it's a known error type
+        let translatedMessage = translateError(errorMessage as ErrorMessage);
+        if (!translatedMessage) {
+          // If it's not a known error type, use the raw message
+          translatedMessage = errorMessage;
+        }
+
+        // Extract error details from various possible locations
+        const errorDetails = error.response.data?.details || 
+                           error.response.data?.error || 
+                           error.response.data?.message ||
+                           error.response.data?.stack ||
+                           '';
+
         toast({
           variant: "error",
-          title: translateError(errorMessage) as string
+          title: translatedMessage as string,
+          description: errorDetails ? String(errorDetails) : t`Please try again later`
         });
       }
     } else if (error.request) {
-      console.error('No response received:', {
-        request: error.request,
-        config: error.config
-      });
-      
       // Show network error toast
       toast({
         variant: "error",
         title: t`Network error`,
-        description: t`Please check your internet connection.`
+        description: t`Please check your internet connection and try again`
       });
     } else {
-      console.error('Request setup error:', error.message);
+      // Handle other types of errors
+      toast({
+        variant: "error",
+        title: t`An error occurred`,
+        description: error.message || t`Please try again later`
+      });
     }
     return Promise.reject(error);
   }
