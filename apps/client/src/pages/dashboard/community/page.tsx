@@ -86,12 +86,20 @@ export const CommunityPage = () => {
   };
 
   const onSubmit = async (data: any) => {
+    if (!data.content?.trim()) {
+      toast.error(t`Message cannot be empty`);
+      return;
+    }
+
     try {
-      await axios.post("/community", { content: data.content, type: selectedType });
+      await axios.post("/community", {
+        content: data.content.trim(),
+        type: selectedType
+      });
       toast.success(t`Message sent!`);
       reset();
-      await refetch(); // Wait for refetch to complete
-      scrollToBottom(); // Scroll after sending a new message
+      await refetch();
+      scrollToBottom();
     } catch (error) {
       toast.error(t`Failed to send message`);
     }

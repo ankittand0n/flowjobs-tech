@@ -9,13 +9,12 @@ export enum PostType {
 }
 
 const CreatePostSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
+  content: z.string().min(1).max(1000),
   type: z.nativeEnum(PostType),
 });
 
 const CreateCommentSchema = z.object({
-  content: z.string().min(1),
+  content: z.string().min(1).max(1000),
 });
 
 export class CreatePostDto extends createZodDto(CreatePostSchema) {}
