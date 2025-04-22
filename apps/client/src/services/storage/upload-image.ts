@@ -7,8 +7,10 @@ export const uploadImage = (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  return axios.put<string, AxiosResponse<string>, FormData>("/storage/image", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+  return axios.post<string, AxiosResponse<string>, FormData>("/storage/image", formData, {
+    headers: { 
+      "Content-Type": "multipart/form-data"
+    }
   });
 };
 

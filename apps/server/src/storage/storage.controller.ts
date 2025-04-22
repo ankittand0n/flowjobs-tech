@@ -1,10 +1,11 @@
 import {
   BadRequestException,
   Controller,
-  Put,
+  Post,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  InternalServerErrorException
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiTags } from "@nestjs/swagger";
@@ -19,16 +20,25 @@ import { StorageService } from "./storage.service";
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
-  @Put("image")
+  @Post("image")
   @UseGuards(TwoFactorGuard)
   @UseInterceptors(FileInterceptor("file"))
-  async uploadFile(@User("id") userId: string, @UploadedFile("file") file: Express.Multer.File) {
+  async uploadFile(@User("id") userId: string, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException("No file was uploaded.");
+    }
+
     if (!file.mimetype.startsWith("image")) {
       throw new BadRequestException(
         "The file you uploaded doesn't seem to be an image, please upload a file that ends in .jp(e)g or .png.",
       );
     }
 
-    return this.storageService.uploadObject(userId, "pictures", file.buffer, file.filename);
+    try {
+      const url = await this.storageService.uploadObject(userId, "pictures", file.buffer, file.originalname);
+      return { url };
+    } catch (error) {
+      throw new InternalServerErrorException("Failed to upload image. Please try again.");
+    }
   }
 }

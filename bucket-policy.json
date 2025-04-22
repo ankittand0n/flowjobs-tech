@@ -1,1 +1,27 @@
-{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Resource":["arn:aws:s3:::default/*"]}]}
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicAccess",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject"],
+      "Principal": { "AWS": ["*"] },
+      "Resource": [
+        "arn:aws:s3:::default/*/pictures/*",
+        "arn:aws:s3:::default/*/previews/*",
+        "arn:aws:s3:::default/*/resumes/*"
+      ]
+    },
+    {
+      "Sid": "AllowUpload",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:DeleteObject"],
+      "Principal": { "AWS": ["*"] },
+      "Resource": [
+        "arn:aws:s3:::default/*/pictures/*",
+        "arn:aws:s3:::default/*/previews/*",
+        "arn:aws:s3:::default/*/resumes/*"
+      ]
+    }
+  ]
+}

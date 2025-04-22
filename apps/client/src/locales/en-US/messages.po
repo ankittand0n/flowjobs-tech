@@ -3898,3 +3898,35 @@ msgstr "No applications found. Start by applying to jobs!"
 #: apps/client/src/services/errors/translate-error.ts:67
 msgid "User not found"
 msgstr "User not found"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Community Chat"
+msgstr "Community Chat"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Type your message..."
+msgstr "Type your message..."
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Send"
+msgstr "Send"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Message sent!"
+msgstr "Message sent!"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Failed to send message"
+msgstr "Failed to send message"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Message deleted"
+msgstr "Message deleted"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Failed to delete message"
+msgstr "Failed to delete message"
+
+#: apps/client/src/pages/dashboard/community/page.tsx:XX
+msgid "Failed to vote"
+msgstr "Failed to vote"
