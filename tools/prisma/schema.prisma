@@ -73,6 +73,7 @@ model User {
   payments           Payment[]
   posts     CommunityPost[]
   comments  Comment[]
+  postVotes PostVote[]
 }
 
 model Secrets {
@@ -223,16 +224,16 @@ model Payment {
 // Community Post Model
 model CommunityPost {
   id        String   @id @default(cuid())
-  title     String
+  title     String?
   content   String   @db.Text
   type      PostType
-  status    String   @default("open") // open, closed, in-progress
   votes     Int      @default(0)
 
   // Relations
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   comments  Comment[]
+  postVotes PostVote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -254,6 +255,25 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([postId])
+  @@index([userId])
+}
+
+// Track post votes
+model PostVote {
+  id        String   @id @default(cuid())
+  value     Int      @default(1)  // 1 for upvote, -1 for downvote
+  
+  // Relations
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([postId, userId])
   @@index([postId])
   @@index([userId])
 }

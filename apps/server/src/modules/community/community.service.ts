@@ -11,13 +11,19 @@ export class CommunityService {
   }
 
   async createPost(userId: string, createPostDto: CreatePostDto) {
+    const data: any = {
+      content: createPostDto.content,
+      type: createPostDto.type,
+      userId,
+      votes: 0,
+    };
+    
+    if (createPostDto.title) {
+      data.title = createPostDto.title;
+    }
+
     return this.prisma.communityPost.create({
-      data: {
-        title: createPostDto.title,
-        content: createPostDto.content,
-        type: createPostDto.type as PostType,
-        userId: userId,
-      },
+      data,
       include: {
         user: {
           select: {

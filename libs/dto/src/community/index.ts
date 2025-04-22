@@ -9,6 +9,7 @@ export enum PostType {
 }
 
 const CreatePostSchema = z.object({
+  title: z.string().min(1).max(100).optional(),
   content: z.string().min(1).max(1000),
   type: z.nativeEnum(PostType),
 });
