@@ -7,12 +7,13 @@ import { StorageModule } from "../storage/storage.module";
 import { ResumeController } from "./resume.controller";
 import { ResumeChatController } from "./resume-chat.controller";
 import { ResumeService } from "./resume.service";
-import { OpenAIService } from "../services/openai.service";
+import { OpenAIService } from "../openai/openai.service";
+import { OpenAIModule } from "../openai/openai.module";
 
 @Module({
-  imports: [AuthModule, PrinterModule, StorageModule],
+  imports: [AuthModule, PrinterModule, StorageModule, OpenAIModule],
   controllers: [ResumeController, ResumeChatController],
-  providers: [ResumeService, OpenAIService],
+  providers: [ResumeService],
   exports: [ResumeService],
 })
 export class ResumeModule {}

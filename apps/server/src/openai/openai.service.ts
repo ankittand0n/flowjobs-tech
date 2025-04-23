@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { ATS_PROMPT, QUESTIONS_PROMPT, ANSWER_EVALUATION_PROMPT, MOCK_QUESTIONS_PROMPT, CHANGE_TONE_PROMPT, FIX_GRAMMAR_PROMPT, IMPROVE_WRITING_PROMPT, RESUME_CHAT_PROMPT } from './prompts';
 
 @Injectable()
 export class OpenAIService {
-  private openai: OpenAI;
+  private readonly logger = new Logger(OpenAIService.name);
+  private readonly client: OpenAI;
 
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
@@ -15,7 +16,7 @@ export class OpenAIService {
       throw new Error('OpenAI API key not configured');
     }
     
-    this.openai = new OpenAI({
+    this.client = new OpenAI({
       apiKey,
       baseURL,
     });
@@ -25,7 +26,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.3,
@@ -62,7 +63,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.7, // Slightly higher for more creative questions
@@ -98,7 +99,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.3,
@@ -147,7 +148,7 @@ export class OpenAIService {
       .replace("{keywords}", params.keywords.join(", "))
       .replace("{count}", params.count.toString());
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.7,
@@ -179,7 +180,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.5,
@@ -200,7 +201,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0,
@@ -219,7 +220,7 @@ export class OpenAIService {
     const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0,
@@ -240,7 +241,7 @@ export class OpenAIService {
 
   async handleResumeChat(messages: any[], resumeData: any, jobData: any) {
     const lastMessage = messages[messages.length - 1].content;
-    const model = 'gpt-3.5-turbo';
+    const model = this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
     const maxTokens = 4096;
     
     const prompt = RESUME_CHAT_PROMPT
@@ -253,7 +254,7 @@ export class OpenAIService {
       }))
       .replace('{query}', lastMessage);
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.client.chat.completions.create({
       model,
       max_tokens: maxTokens,
       temperature: 0.7,
@@ -286,5 +287,35 @@ export class OpenAIService {
       message: cleanMessage,
       resumeData: resumeUpdates
     };
+  }
+
+  async chatWithResume(resumeId: string, message: string): Promise<string> {
+    try {
+      const response = await this.client.chat.completions.create({
+        model: this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that can help users improve their resumes. Provide specific, actionable feedback and suggestions.',
+          },
+          {
+            role: 'user',
+            content: message,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new InternalServerErrorException('No response content received from OpenAI');
+      }
+
+      return content;
+    } catch (error) {
+      this.logger.error('Error in resume chat:', error);
+      throw new InternalServerErrorException('Failed to process resume chat request');
+    }
   }
 } 

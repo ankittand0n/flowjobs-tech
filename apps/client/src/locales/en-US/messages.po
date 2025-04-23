@@ -3930,3 +3930,42 @@ msgstr "Failed to delete message"
 #: apps/client/src/pages/dashboard/community/page.tsx:XX
 msgid "Failed to vote"
 msgstr "Failed to vote"
+
+msgid "post.vote.upvote"
+msgstr "Upvote"
+
+msgid "post.vote.downvote"
+msgstr "Downvote"
+
+msgid "post.vote.alreadyVoted"
+msgstr "You have already voted on this post"
+
+msgid "post.vote.error"
+msgstr "Error voting on post"
+
+msgid "post.vote.success"
+msgstr "Vote recorded successfully"
+
+msgid "post.title.required"
+msgstr "Post title is required"
+
+msgid "post.title.tooLong"
+msgstr "Post title cannot be longer than 100 characters" 
+
+msgid "Missing Keywords"
+msgid "Missing Keywords"
+
+msgid "Discard Changes"
+msgid "Discard Changes"
+
+msgid "resume.chat.error"
+msgstr "Error processing resume chat request"
+
+msgid "resume.chat.noResponse"
+msgstr "No response received from the server"
+
+msgid "resume.chat.invalidResponse"
+msgstr "Invalid response format received"
+
+msgid "resume.chat.networkError"
+msgstr "Network error occurred while processing request"
