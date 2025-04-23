@@ -225,6 +225,10 @@ export class OpenAIService {
       temperature: 0,
       messages: [
         {
+          role: "system",
+          content: "You are an AI writing assistant. Your task is to improve the writing while maintaining the exact same language as the input text. Do not translate or change the language under any circumstances."
+        },
+        {
           role: "user",
           content: IMPROVE_WRITING_PROMPT.replace("{input}", text)
         }
