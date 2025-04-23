@@ -153,12 +153,12 @@ export const CommunityPage = () => {
                   )}
                 </div>
                 <p className="text-foreground/90">{post.content}</p>
-              </div>
+          </div>
               
               <div className="flex items-center gap-2">
-                <Button
+              <Button 
                   variant={post.hasVoted ? "primary" : "outline"}
-                  size="sm"
+                size="sm" 
                   onClick={() => handleVote(post)}
                 >
                   <ThumbsUp 
@@ -169,28 +169,28 @@ export const CommunityPage = () => {
                 </Button>
                 
                 {canDeleteMessage(post) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={async () => {
-                      try {
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            try {
                         await axios.delete(`/community/${post.id}`);
                         toast.success(t`Message deleted`);
-                        refetch();
-                      } catch (error) {
+                              refetch();
+                            } catch (error) {
                         toast.error(t`Failed to delete message`);
-                      }
-                    }}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
+                            }
+                          }}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
           <div ref={messagesEndRef} />
-        </div>
-      </div>
+            </div>
+          </div>
 
       <div className="border-t p-4 bg-background">
         <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4">
@@ -212,17 +212,17 @@ export const CommunityPage = () => {
             </SelectContent>
           </Select>
 
-          <TextArea
+            <TextArea
             {...register("content")}
             placeholder={t`Type your message...`}
             className="flex-1 min-h-[2.5rem] max-h-32"
             rows={1}
-          />
+            />
           
           <Button type="submit">
             {t`Send`}
-          </Button>
-        </form>
+            </Button>
+          </form>
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ import { MockTestsPage } from "../pages/dashboard/mock-tests/page";
 import { MockTestPage } from "../pages/dashboard/mock-tests/test";
 import { AdminStatisticsPage } from "../pages/dashboard/admin/statistics/page";
 import { AdminGuard } from "./guards/admin";
+import { ChangelogPage } from "../pages/dashboard/changelog";
 
 export const routes = createRoutesFromElements(
   // eslint-disable-next-line lingui/no-unlocalized-strings
@@ -82,6 +83,7 @@ export const routes = createRoutesFromElements(
           </Route>
           <Route path="interview-prep" element={<InterviewPrepPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="changelog" element={<ChangelogPage />} />
           
           {/* Admin Routes */}
           <Route element={<AdminGuard />}>

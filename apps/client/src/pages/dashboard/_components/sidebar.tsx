@@ -10,6 +10,7 @@ import {
   ChatCircle,
   ChartBar,
 } from "@phosphor-icons/react";
+import { Sparkles } from "lucide-react";
 
 import { Button, KeyboardShortcut, Separator } from "@reactive-resume/ui";
 import { cn } from "@reactive-resume/utils";
@@ -162,12 +163,6 @@ export const Sidebar = ({ setOpen }: Props) => {
           },
         ]
       : []),
-    {
-      path: "/dashboard/settings",
-      name: t`Settings`,
-      shortcut: "⇧S",
-      icon: <GearSix />,
-    }
   ];
 
   return (

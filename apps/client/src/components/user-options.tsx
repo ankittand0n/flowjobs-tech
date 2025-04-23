@@ -8,6 +8,7 @@ import {
   KeyboardShortcut,
 } from "@reactive-resume/ui";
 import { useNavigate } from "react-router";
+import { LogOut, Settings, Sparkles } from "lucide-react";
 
 import { useLogout } from "../services/auth";
 
@@ -29,12 +30,22 @@ export const UserOptions = ({ children }: Props) => {
             void navigate("/dashboard/settings");
           }}
         >
+          <Settings className="mr-2 h-4 w-4" />
           {t`Settings`}
           {/* eslint-disable-next-line lingui/no-unlocalized-strings */}
           <KeyboardShortcut>⇧S</KeyboardShortcut>
         </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            void navigate("/dashboard/changelog");
+          }}
+        >
+          <Sparkles className="mr-2 h-4 w-4" />
+          {t`changelog.title`}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout()}>
+          <LogOut className="mr-2 h-4 w-4" />
           {t`Logout`}
           {/* eslint-disable-next-line lingui/no-unlocalized-strings */}
           <KeyboardShortcut>⇧Q</KeyboardShortcut>

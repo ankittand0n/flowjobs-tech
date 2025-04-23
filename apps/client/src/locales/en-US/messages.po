@@ -3969,3 +3969,42 @@ msgstr "Invalid response format received"
 
 msgid "resume.chat.networkError"
 msgstr "Network error occurred while processing request"
+
+msgid "changelog.title"
+msgstr "Changelog"
+
+msgid "changelog.version"
+msgstr "Version"
+
+msgid "changelog.released"
+msgstr "Released"
+
+msgid "changelog.upcoming"
+msgstr "Upcoming"
+
+msgid "changelog.features"
+msgstr "Features"
+
+msgid "changelog.initialRelease"
+msgstr "Initial release of FlowJobs"
+
+msgid "changelog.resumeBuilder"
+msgstr "Resume builder with AI assistance"
+
+msgid "changelog.jobTracking"
+msgstr "Job application tracking"
+
+msgid "changelog.atsOptimization"
+msgstr "ATS keyword optimization"
+
+msgid "changelog.enhancedAnalysis"
+msgstr "Enhanced AI resume analysis"
+
+msgid "changelog.customTemplates"
+msgstr "Custom resume templates"
+
+msgid "changelog.multipleFormats"
+msgstr "Export to multiple formats"
+
+msgid "changelog.collaborativeEditing"
+msgstr "Collaborative resume editing"

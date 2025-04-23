@@ -1,0 +1,35 @@
+msgid "changelog.fixedOpenPopup"
+msgstr "Fixed popup opening issues in the editor"
+
+msgid "changelog.improvedWritingPrompt"
+msgstr "Enhanced writing prompts for better content generation"
+
+msgid "changelog.updatedAiActions"
+msgstr "Updated AI actions with improved functionality"
+
+msgid "changelog.fixedValidationErrors"
+msgstr "Fixed form validation errors in the builder"
+
+msgid "changelog.updatedImageUpload"
+msgstr "Improved image upload functionality"
+
+msgid "changelog.addedUploadPolicy"
+msgstr "Added new upload policy for better security"
+
+msgid "changelog.fixedZoomIssues"
+msgstr "Fixed zoom and scaling issues in the editor"
+
+msgid "changelog.updatedTranslations"
+msgstr "Updated translations for better localization"
+
+msgid "changelog.addedBucketPolicy"
+msgstr "Added bucket policy for storage management"
+
+msgid "changelog.updatedPackages"
+msgstr "Updated dependencies and packages"
+
+msgid "changelog.fixedClsxDependency"
+msgstr "Fixed clsx dependency issues"
+
+msgid "changelog.improvedChatbot"
+msgstr "Enhanced chatbot functionality" 
